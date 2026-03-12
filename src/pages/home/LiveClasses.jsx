@@ -27,6 +27,7 @@ import VideoCallIcon from "@mui/icons-material/VideoCall";
 import SchoolIcon from "@mui/icons-material/School";
 import StarIcon from "@mui/icons-material/Star";
 import { useNavigate } from "react-router-dom";
+import Gallery from "./Gallery";
 
 // Animations
 const floatAnimation = keyframes`
@@ -549,6 +550,9 @@ export default function LiveClass() {
             </Box>
           )}
         </Box>
+        {/* GALLERY SECTION */}
+        <Gallery />
+
         {/* STATS STRIP */}
         <Box
           className="stats-strip"

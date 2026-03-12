@@ -1,4 +1,4 @@
-import { Box, Typography, Button, Avatar, Chip, Rating } from "@mui/material";
+import { Box, Typography, Button, Avatar, Chip, Rating ,Stack} from "@mui/material";
 import SchoolIcon from "@mui/icons-material/School";
 import DownloadIcon from "@mui/icons-material/Download";
 import StarIcon from "@mui/icons-material/Star";
@@ -338,9 +338,6 @@ const Product = () => {
         `}
       </style>
     </Box>
-  );
-};
-
   );
 };
 
