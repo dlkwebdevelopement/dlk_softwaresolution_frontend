@@ -4,7 +4,6 @@ import {
   Typography,
   Button,
   Paper,
-  Divider,
   IconButton,
   Dialog,
   DialogTitle,
@@ -15,9 +14,14 @@ import {
   Chip,
   Avatar,
   Fade,
-  Badge,
   alpha,
+  Container,
+  Rating,
+  Grow,
+  Zoom,
+  Slide,
 } from "@mui/material";
+import { styled, keyframes } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import {
   FavoriteBorder,
@@ -37,27 +41,165 @@ import {
   FavoriteTwoTone,
   ArrowBackIosNew,
   ArrowForwardIos,
+  PlayCircleOutline,
+  Verified,
+  EmojiEvents,
+  WorkspacePremium,
+  Group,
+  Timeline,
 } from "@mui/icons-material";
 import { GetRequest, PostRequest } from "../../api/config";
 import {
   ADMIN_GET_CATEGORIES,
   ADMIN_POST_REGISTRATIONS,
 } from "../../api/endpoints";
-import { BASE_URL } from "../../api/api";
+import { BASE_URL, getImgUrl } from "../../api/api";
 
+// Animations
+const floatAnimation = keyframes`
+  0% { transform: translateY(0px) rotate(0deg); }
+  33% { transform: translateY(-10px) rotate(1deg); }
+  66% { transform: translateY(5px) rotate(-1deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+`;
 
+const pulseGlow = keyframes`
+  0% { box-shadow: 0 0 0 0 rgba(61, 184, 67, 0.4); }
+  70% { box-shadow: 0 0 0 20px rgba(61, 184, 67, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(61, 184, 67, 0); }
+`;
+
+const shimmer = keyframes`
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+`;
+
+const rotateGradient = keyframes`
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+`;
+
+const scaleIn = keyframes`
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+`;
+
+const slideInLeft = keyframes`
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+`;
 
 // Color scheme
 const colors = {
-  primary: "#48723e", // Middle green
-  secondary: "#bfdb81", // Lime green
-  dark: "#1a4718", // Dark green
+  primary: "#3DB843",
+  secondary: "#D3F36B",
+  dark: "#1a4718",
   light: "#ffffff",
   grey: "#f5f5f5",
-  textPrimary: "#333333",
-  textSecondary: "#666666",
-  accent: "#bfdb81", // Changed to lime green to match new palette
+  textPrimary: "#fbfdf3",
+  textSecondary: "#c2eac4",
+  accent: "#D3F36B",
+  background: {
+    dark: "#fbfdf3",
+    medium: "#f0f5eb",
+    light: "#ffffff",
+  }
 };
+
+// Styled Components
+const GlassCard = styled(({ $hovered, ...other }) => <Paper {...other} />)(({ theme, $hovered }) => ({
+  background: 'rgba(255, 255, 255, 0.05)',
+  backdropFilter: 'blur(10px)',
+  WebkitBackdropFilter: 'blur(10px)',
+  border: '1px solid var(--green-dark, #1a4718)', // Changed to dark green outline
+  borderRadius: '24px',
+  overflow: 'hidden',
+  position: 'relative',
+  transition: 'all 0.3s ease-in-out',
+  transform: $hovered ? 'scale(1.02)' : 'scale(1)',
+  boxShadow: $hovered
+    ? '0 10px 30px rgba(72, 114, 62, 0.15)'
+    : '0 4px 15px rgba(0, 0, 0, 0.05)',
+  '&::after': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: 'linear-gradient(135deg, rgba(61,184,67,0.1) 0%, rgba(61,184,67,0.05) 100%)',
+    borderRadius: 'inherit',
+    pointerEvents: 'none',
+  },
+}));
+
+const GradientText = styled('span')({
+  background: 'linear-gradient(135deg, var(--green), var(--green-dark))',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  backgroundClip: 'text',
+  display: 'inline-block',
+});
+
+const AnimatedButton = styled(Button)(({ theme }) => ({
+  background: 'linear-gradient(135deg, #3DB843, #D3F36B)',
+  color: '#0a1a05',
+  borderRadius: '50px',
+  padding: '8px 10px',
+  fontWeight: 700,
+  textTransform: 'none',
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    transform: 'scale(1.05)',
+    boxShadow: '0 10px 20px rgba(191, 219, 129, 0.2)',
+  },
+}));
+
+const StatsCard = styled(Paper)(({ theme }) => ({
+  background: 'rgba(255, 255, 255, 0.8)',
+  backdropFilter: 'blur(10px)',
+  WebkitBackdropFilter: 'blur(10px)',
+  borderRadius: '16px',
+  padding: theme.spacing(1.2, 2.5),
+  border: '1px solid var(--green-light)',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '12px',
+  transition: 'all 0.3s ease',
+  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)',
+  '&:hover': {
+    transform: 'translateY(-3px)',
+    background: 'rgba(191, 219, 129, 0.1)',
+    borderColor: 'rgba(191, 219, 129, 0.3)',
+  },
+}));
+
+const BackgroundOrb = styled(Box)(({ size, top, right, color }) => ({
+  position: 'absolute',
+  width: size,
+  height: size,
+  borderRadius: '50%',
+  background: `radial-gradient(circle, ${color} 0%, transparent 70%)`,
+  top,
+  right,
+  filter: 'blur(60px)',
+  animation: `${floatAnimation} ${15 + Math.random() * 10}s ease-in-out infinite`,
+  pointerEvents: 'none',
+  zIndex: 0,
+}));
 
 const Ads = () => {
   const navigate = useNavigate();
@@ -68,6 +210,7 @@ const Ads = () => {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [favorites, setFavorites] = useState([]);
   const [hoveredCard, setHoveredCard] = useState(null);
+  const [isHoveringSlider, setIsHoveringSlider] = useState(false);
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -77,15 +220,15 @@ const Ads = () => {
   });
 
   // Calculate gaps for different breakpoints
-  const GAP_MOBILE = 16; // xs
-  const GAP_TABLET = 24; // sm
-  const GAP_DESKTOP = 28; // md and up
+  const GAP_MOBILE = 8;
+  const GAP_TABLET = 12;
+  const GAP_DESKTOP = 16;
 
   // Card dimensions
   const CARD_WIDTH = {
-    xs: 280,
-    sm: 300,
-    md: 320,
+    xs: 260,
+    sm: 280,
+    md: 300,
   };
 
   useEffect(() => {
@@ -149,7 +292,6 @@ const Ads = () => {
   const handleCardClick = async (categoryId) => {
     try {
       const res = await GetRequest(`/admin/course/category/${categoryId}`);
-
       const courses = res?.data || [];
 
       if (courses.length > 0) {
@@ -181,450 +323,367 @@ const Ads = () => {
       component="section"
       sx={{
         width: "100%",
-        maxWidth: "1455px",
-        mx: "auto",
-        p: { xs: 2, sm: 3, md: 4 },
-        position: "relative"
+        background: `linear-gradient(135deg, ${colors.background.dark} 0%, ${colors.background.medium} 100%)`,
+        position: 'relative',
+        overflow: 'hidden',
+        py: { xs: 3, sm: 4, md: 5 },
       }}
     >
-      {/* HEADER SECTION */}
-      <Box
-        sx={{
-          mb: { xs: 2, sm: 1 },
-          textAlign: "center"
-        }}
-      >
-        <Box
-          sx={{
-            textAlign: "center"
-          }}
-        >
-          <Typography sx={{ fontSize: "36px", fontWeight: 700, color: "#1a4718" }}>
-            Popular <span style={{ color: "#83a561" }}> Courses</span>
+      <Container maxWidth="xl">
+        {/* HEADER SECTION */}
+        <Box sx={{ textAlign: "center", mb: { xs: 2.5, sm: 3 } }}>
+          {/* Premium Badge */}
+          <Chip
+            label="TOP RATED COURSES"
+            icon={<WorkspacePremium sx={{ color: 'var(--green-dark) !important' }} />}
+            sx={{
+              bgcolor: 'var(--green-light)',
+              color: 'var(--green-dark)',
+              border: '1px solid var(--green-mid)',
+              fontWeight: 800,
+              letterSpacing: 1,
+              '& .MuiChip-label': { px: 2 }
+            }}
+          />
+
+          {/* Title */}
+          <Typography
+            variant="h2"
+            sx={{
+              fontWeight: 900,
+              fontSize: { xs: '2.5rem', sm: '3rem', md: '3.5rem' },
+              color: 'black',
+            }}
+          >
+            Popular <Box component="span" sx={{ color: 'var(--green-dark)' }}>Courses</Box>
           </Typography>
+
+          <Typography
+            variant="h6"
+            sx={{
+              color: '#6b8f76',
+              fontWeight: 400,
+              maxWidth: 700,
+              mx: "auto",
+              mb: 4,
+              fontSize: { xs: '1rem', sm: '1.1rem' },
+            }}
+          >
+            Unlock your potential with our expert-led courses and transform your career
+          </Typography>     
         </Box>
 
-        <Typography
-          variant="h6"
+        {/* SLIDER CONTROLS */}
+        <Box
           sx={{
-            color: colors.textSecondary,
-            fontWeight: 400,
-            maxWidth: 600,
-            mx: "auto"
+            display: { xs: "none", md: "flex" },
+            justifyContent: "flex-end",
+            gap: 1.5,
+            mb: 2,
           }}
         >
-          Unlock your potential with our expert-led courses
-        </Typography>
 
-        {/* STATS */}
+        </Box>
+
+        {/* COURSE CARDS - Horizontal Scroll */}
         <Box
+          ref={sliderRef}
+          onMouseEnter={() => setIsHoveringSlider(true)}
+          onMouseLeave={() => setIsHoveringSlider(false)}
           sx={{
             display: "flex",
-            gap: { xs: 2, sm: 4 },
-            justifyContent: "center",
-            mt: 2
+            gap: {
+              xs: `${GAP_MOBILE}px`,
+              sm: `${GAP_TABLET}px`,
+              md: `${GAP_DESKTOP}px`,
+            },
+            overflowX: "auto",
+            scrollSnapType: "x mandatory",
+            scrollBehavior: "smooth",
+            pb: 4,
+            px: 2,
+            py: 4,
+            "&::-webkit-scrollbar": {
+              height: 8,
+            },
+            "&::-webkit-scrollbar-track": {
+              background: 'rgba(61, 184, 67, 0.05)',
+              borderRadius: 10,
+            },
+            "&::-webkit-scrollbar-thumb": {
+              background: 'rgba(61, 184, 67, 0.5)',
+              borderRadius: 10,
+              "&:hover": {
+                background: '#3DB843',
+              },
+            }
           }}
         >
-          <Box sx={{ textAlign: "center" }}>
-            <Typography
-              variant="h4"
-              sx={{ color: colors.primary, fontWeight: 700 }}
+          {cats.map((item, index) => (
+            <Grow
+              in={true}
+              timeout={500 + index * 100}
+              key={item.id}
+              style={{ transformOrigin: '0 0 0' }}
             >
-              {cats.length}+
-            </Typography>
-            <Typography variant="body2" sx={{ color: colors.textSecondary }}>
-              Courses
-            </Typography>
-          </Box>
-          <Box sx={{ textAlign: "center" }}>
-            <Typography
-              variant="h4"
-              sx={{ color: colors.primary, fontWeight: 700 }}
-            >
-              2.5k+
-            </Typography>
-            <Typography variant="body2" sx={{ color: colors.textSecondary }}>
-              Students
-            </Typography>
-          </Box>
-          <Box sx={{ textAlign: "center" }}>
-            <Typography
-              variant="h4"
-              sx={{ color: colors.primary, fontWeight: 700 }}
-            >
-              15+
-            </Typography>
-            <Typography variant="body2" sx={{ color: colors.textSecondary }}>
-              Experts
-            </Typography>
-          </Box>
-        </Box>
-      </Box>
-
-      {/* SLIDER CONTROLS - Only visible on desktop */}
-      <Box
-        sx={{
-          display: { xs: "none", md: "flex" },
-          justifyContent: "flex-end",
-          gap: 2,
-          mb: 2
-        }}
-      >
-        <IconButton
-          onClick={() => scroll("left")}
-          sx={{
-            bgcolor: colors.light,
-            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-            "&:hover": {
-              bgcolor: colors.primary,
-              color: colors.light,
-              transform: "scale(1.1)",
-            },
-            transition: "all 0.3s ease"
-          }}
-        >
-          <ArrowBackIosNew fontSize="small" />
-        </IconButton>
-        <IconButton
-          onClick={() => scroll("right")}
-          sx={{
-            bgcolor: colors.light,
-            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-            "&:hover": {
-              bgcolor: colors.primary,
-              color: colors.light,
-              transform: "scale(1.1)",
-            },
-            transition: "all 0.3s ease"
-          }}
-        >
-          <ArrowForwardIos fontSize="small" />
-        </IconButton>
-      </Box>
-
-      {/* COURSE CARDS - Horizontal Scroll */}
-      <Box
-        ref={sliderRef}
-        sx={{
-          display: "flex",
-          gap: {
-            xs: `${GAP_MOBILE}px`,
-            sm: `${GAP_TABLET}px`,
-            md: `${GAP_DESKTOP}px`,
-          },
-          overflowX: "auto",
-          scrollSnapType: "x mandatory",
-          scrollBehavior: "smooth",
-          pb: 3,
-          px: 1,
-          py: 2,
-          "&::-webkit-scrollbar": {
-            height: 6,
-          },
-          "&::-webkit-scrollbar-track": {
-            background: alpha(colors.dark, 0.05),
-            borderRadius: 10,
-          },
-          "&::-webkit-scrollbar-thumb": {
-            background: colors.primary,
-            borderRadius: 10,
-            "&:hover": {
-              background: alpha(colors.primary, 0.8),
-            },
-          }
-        }}
-      >
-        {cats.map((item, index) => (
-          <Fade in={true} timeout={500 + index * 100} key={item.id}>
-            <Paper
-              elevation={hoveredCard === index ? 8 : 0}
-              onMouseEnter={() => setHoveredCard(index)}
-              onMouseLeave={() => setHoveredCard(null)}
-              sx={{
-                minWidth: {
-                  xs: `calc((100vw - ${GAP_MOBILE * 2}px - 32px) / 2)`, // 2 cards visible
-                  sm: `calc((100vw - ${GAP_TABLET * 2}px - 48px) / 3)`, // 3 cards visible
-                  md: `calc((100vw - ${GAP_DESKTOP * 3}px - 128px) / 4)`,
-                },
-                maxWidth: {
-                  xs: CARD_WIDTH.xs,
-                  sm: CARD_WIDTH.sm,
-                  md: CARD_WIDTH.md,
-                },
-                height: 420,
-                borderRadius: 3,
-                overflow: "hidden",
-                position: "relative",
-                cursor: "pointer",
-                border: `1px solid ${alpha(colors.dark, 0.05)}`,
-                display: "flex",
-                flexDirection: "column",
-                flexShrink: 0,
-                scrollSnapAlign: "start",
-
-                /* Hover Effects */
-                transform: hoveredCard === index ? "translateY(-8px)" : "translateY(0px)",
-                willChange: "transform",
-                transition: "transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease",
-
-                "&:hover": {
-                  boxShadow: "0px 15px 40px rgba(0,0,0,0.12)",
-                  borderColor: colors.primary,
-                  "& .card-image": {
-                    transform: "scale(1.08)",
+              <Box
+                sx={{
+                  minWidth: {
+                    xs: `calc((100vw - ${GAP_MOBILE * 2}px - 48px) / 2)`,
+                    sm: `calc((100vw - ${GAP_TABLET * 2}px - 64px) / 3)`,
+                    md: `calc((100vw - ${GAP_DESKTOP * 3}px - 144px) / 4)`,
                   },
-                },
-
-                "&:hover .card-overlay": {
-                  opacity: 1,
-                }
-              }}
-            >
-              {/* IMAGE SECTION */}
-              <Box
-                sx={{
-                  position: "relative",
-                  height: 140,
-                  overflow: "hidden",
-                  bgcolor: colors.grey
-                }}
-                onClick={() => handleCardClick(item.id)}
-              >
-                <Box
-                  component="img"
-                  src={`${BASE_URL}/${item.image}`}
-                  alt={item.category}
-                  className="card-image"
-                  sx={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    transition: "transform 0.5s ease"
-                  }}
-                />
-
-                {/* GRADIENT OVERLAY */}
-                <Box
-                  className="card-overlay"
-                  sx={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    background: `linear-gradient(180deg, transparent 0%, ${alpha(colors.dark, 0.6)} 100%)`,
-                    opacity: 0,
-                    transition: "opacity 0.3s ease"
-                  }}
-                />
-
-                {/* BADGES */}
-                <Box
-                  sx={{
-                    position: "absolute",
-                    top: 12,
-                    left: 12,
-                    display: "flex",
-                    gap: 1
-                  }}
-                >
-                  <Chip
-                    label="Bestseller"
-                    size="small"
-                    icon={<Star sx={{ fontSize: 14 }} />}
-                    sx={{
-                      bgcolor: colors.secondary,
-                      color: colors.dark,
-                      fontWeight: 600,
-                      fontSize: "0.7rem"
-                    }}
-                  />
-                </Box>
-
-                {/* FAVORITE BUTTON */}
-                <IconButton
-                  onClick={(e) => toggleFavorite(item.id, e)}
-                  sx={{
-                    position: "absolute",
-                    top: 12,
-                    right: 12,
-                    bgcolor: colors.light,
-                    "&:hover": {
-                      bgcolor: colors.light,
-                      transform: "scale(1.1)",
-                    },
-                    transition: "all 0.2s ease",
-                    zIndex: 2
-                  }}
-                >
-                  <FavoriteTwoTone
-                    sx={{
-                      color: favorites.includes(item.id)
-                        ? "#f44336"
-                        : colors.textSecondary
-                    }}
-                  />
-                </IconButton>
-              </Box>
-
-              {/* CONTENT SECTION */}
-              <Box
-                sx={{
-                  p: 2.5,
-                  display: "flex",
-                  flexDirection: "column",
-                  height: 280,
-                  bgcolor: colors.light
+                  maxWidth: {
+                    xs: CARD_WIDTH.xs,
+                    sm: CARD_WIDTH.sm,
+                    md: CARD_WIDTH.md,
+                  },
+                  width: "100%",
+                  scrollSnapAlign: "start",
+                  display: "flex", // Ensure Box takes full height available and passes it down
                 }}
               >
-                {/* TITLE & RATING */}
-                <Box
-                  onClick={() => handleCardClick(item.id)}
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    mb: 1
+                <GlassCard
+                  $hovered={hoveredCard === index}
+                  onMouseEnter={() => setHoveredCard(index)}
+                  onMouseLeave={() => setHoveredCard(null)}
+                  sx={{ 
+                    height: '100%', // Take full height of parent Box
+                    display: 'flex', 
+                    flexDirection: 'column',
+                    width: '100%'
                   }}
                 >
-                  <Typography
-                    variant="h6"
+                  {/* IMAGE SECTION */}
+                  <Box
                     sx={{
-                      fontWeight: 700,
-                      fontSize: "1.25rem",
-                      color: colors.dark,
+                      position: "relative",
+                      height: 140,
                       overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                      maxWidth: "70%"
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => handleCardClick(item.id)}
+                  >
+                    <Box
+                      component="img"
+                       src={getImgUrl(item?.image) || "https://via.placeholder.com/300x140?text=No+Image"}
+                      alt={item?.category || "Category"}
+                      sx={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        transition: "transform 0.5s ease",
+                        transform: hoveredCard === index ? "scale(1.15)" : "scale(1)",
+                      }}
+                    />
+
+                    {/* Gradient Overlay */}
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: 'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.6) 100%)',
+                        pointerEvents: 'none',
+                      }}
+                    />
+
+                    {/* Badges */}
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        top: 16,
+                        left: 16,
+                        display: "flex",
+                        gap: 1,
+                      }}
+                    >
+                      <Chip
+                        label="Bestseller"
+                        size="small"
+                        icon={<Star sx={{ fontSize: 14 }} />}
+                        sx={{
+                          bgcolor: 'rgba(211, 243, 107, 0.9)',
+                          color: '#0a1a05',
+                          fontWeight: 700,
+                          fontSize: "0.7rem",
+                          backdropFilter: 'blur(4px)',
+                        }}
+                      />
+                      <Chip
+                        label="New"
+                        size="small"
+                        sx={{
+                          bgcolor: 'var(--green-light)',
+                          color: 'var(--green-dark)',
+                          fontWeight: 700,
+                          fontSize: "0.7rem",
+                          backdropFilter: 'blur(4px)',
+                        }}
+                      />
+                    </Box>
+
+                    {/* Favorite Button */}
+                    <IconButton
+                      onClick={(e) => toggleFavorite(item.id, e)}
+                      sx={{
+                        position: "absolute",
+                        top: 16,
+                        right: 16,
+                        bgcolor: 'rgba(61, 184, 67, 0.1)',
+                        backdropFilter: 'blur(10px)',
+                        WebkitBackdropFilter: 'blur(10px)',
+                        border: '1px solid var(--green-mid)',
+                        '&:hover': {
+                          bgcolor: 'rgba(255, 255, 255, 0.3)',
+                          transform: 'scale(1.1)',
+                        },
+                        transition: 'all 0.2s ease',
+                        zIndex: 2,
+                      }}
+                    >
+                      <FavoriteTwoTone
+                        sx={{
+                          color: favorites.includes(item.id)
+                            ? "#ff4d4d"
+                            : "red",
+                          fontSize: 20,
+                        }}
+                      />
+                    </IconButton>
+                  </Box>
+
+                  {/* CONTENT SECTION */}
+                  <Box
+                    sx={{
+                      p: 2,
+                      display: "flex",
+                      flexDirection: "column",
+                      flex: 1, // Grow to fill the GlassCard
+                      minHeight: 260, // Maintain a minimum height for consistency
                     }}
                   >
-                    {item.category}
-                  </Typography>
+                    {/* Title & Rating */}
+                    <Box
+                      onClick={() => handleCardClick(item.id)}
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "flex-start",
+                        gap: 0.5,
+                        mb: 1,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          fontWeight: 700,
+                          fontSize: "1.2rem",
+                          color: 'black',
+                          lineHeight: 1.3,
+                        }}
+                      >
+                        {item?.category || "N/A"}
+                      </Typography>
 
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <Star
-                      sx={{ fontSize: 16, color: colors.secondary, mr: 0.5 }}
-                    />
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                        <Rating value={4.8} precision={0.1} readOnly size="small" sx={{ color: 'var(--green)' }} />
+                        <Typography variant="body2" fontWeight={600} sx={{ color: 'black' }}>
+                          (4.8)
+                        </Typography>
+                      </Box>
+                    </Box>
+
+                    {/* Description */}
                     <Typography
                       variant="body2"
-                      fontWeight={600}
-                      color={colors.dark}
+                      sx={{
+                        color: 'black',
+                        mb: 1,
+                        fontSize: "0.9rem",
+                        height: 60,
+                        overflow: "hidden",
+                        display: "-webkit-box",
+                        WebkitLineClamp: 3,
+                        WebkitBoxOrient: "vertical",
+                      }}
                     >
-                      4.8
+                      {item.description ||
+                        "Learn from industry experts and master the skills you need to succeed in your career."}
                     </Typography>
+
+                    {/* Instructor */}
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <Avatar
+                        sx={{
+                          width: 24,
+                          height: 24,
+                          bgcolor: 'var(--green-light)',
+                          border: '1px solid var(--green-mid)',
+                        }}
+                      >
+                        <School sx={{ fontSize: 14, color: '#D3F36B' }} />
+                      </Avatar>
+                      <Typography variant="caption" sx={{ color: 'black' }}>
+                        Expert Instructor
+                      </Typography>
+                      <Verified sx={{ fontSize: 14, color: 'var(--green)' }} />
+                    </Box>
+
+                    {/* Footer */}
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        mt: "auto",
+                        pt: 1.5,
+                        borderTop: '1px solid var(--green-light)',
+                      }}
+                    >
+                      <Box>
+                        <Typography variant="caption" sx={{ color: 'black' }}>
+                          Starting from
+                        </Typography>
+                        <Typography variant="h6" sx={{ color: 'var(--green)', fontWeight: 700 }}>
+                          Free
+                        </Typography>
+                      </Box>
+
+                      <AnimatedButton
+                        onClick={() => handleOpen(item)}
+                        size="small"
+                      >
+                        Enroll Now
+                      </AnimatedButton>
+                    </Box>
                   </Box>
-                </Box>
-
-                {/* DESCRIPTION */}
-                <Typography
-                  variant="body1"
-                  sx={{
-                    color: colors.textSecondary,
-                    mb: 2,
-                    fontSize: "0.95rem",
-                    height: 70,
-                    overflow: "hidden",
-                    display: "-webkit-box",
-                    WebkitLineClamp: 3,
-                    WebkitBoxOrient: "vertical"
-                  }}
-                >
-                  {item.description ||
-                    "Learn from industry experts and master the skills you need to succeed in your career."}
-                </Typography>
-
-                {/* COURSE STATS */}
-                <Box
-                  onClick={() => handleCardClick(item.id)}
-                  sx={{
-                    display: "flex",
-                    gap: 2,
-                    mb: 2
-                  }}
-                >
-                  <Box
-                    sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
-                  >
-                    <AccessTime sx={{ fontSize: 16, color: colors.primary }} />
-                    <Typography variant="body2" color={colors.textSecondary} sx={{ fontSize: "0.85rem" }}>
-                      20 hours
-                    </Typography>
-                  </Box>
-
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                    <People sx={{ fontSize: 16, color: colors.primary }} />
-                    <Typography variant="body2" color={colors.textSecondary} sx={{ fontSize: "0.85rem" }}>
-                      1.2k students
-                    </Typography>
-                  </Box>
-                </Box>
-
-                {/* FOOTER */}
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    mt: "auto"
-                  }}
-                >
-                  <Button
-                    onClick={() => handleOpen(item)}
-                    variant="contained"
-                    sx={{
-                      bgcolor: colors.primary,
-                      color: colors.light,
-                      borderRadius: 50,
-                      px: 2.5,
-                      py: 0.75,
-                      fontSize: "0.9rem",
-                      "&:hover": {
-                        bgcolor: alpha(colors.primary, 0.9),
-                        transform: "scale(1.05)",
-                      },
-                      transition: "all 0.2s ease"
-                    }}
-                  >
-                    Register Now
-                  </Button>
-                </Box>
+                </GlassCard>
               </Box>
-
-              {/* DECORATIVE BOTTOM BORDER */}
-              <Box
-                sx={{
-                  position: "absolute",
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  height: 3,
-                  background: `linear-gradient(90deg, ${colors.primary} 0%, ${colors.secondary} 100%)`,
-                  opacity: hoveredCard === index ? 1 : 0,
-                  transition: "opacity 0.3s ease"
-                }}
-              />
-            </Paper>
-          </Fade>
-        ))}
-      </Box>
-
-      {/* SCROLL INDICATOR */}
-      {cats.length > 0 && (
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            mt: 2,
-            gap: 1
-          }}
-        >
-          <Typography variant="caption" color={colors.textSecondary}>
-            Swipe to see more courses →
-          </Typography>
+            </Grow>
+          ))}
         </Box>
-      )}
+
+        {/* Scroll Indicator */}
+        {cats.length > 0 && (
+          <Fade in={true}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                mt: 3,
+                gap: 1,
+              }}
+            >
+
+            </Box>
+          </Fade>
+        )}
+      </Container>
 
       {/* REGISTRATION MODAL */}
       <Dialog
@@ -632,10 +691,16 @@ const Ads = () => {
         onClose={handleClose}
         maxWidth="sm"
         fullWidth
+        TransitionComponent={Slide}
+        transitionDuration={500}
         PaperProps={{
           sx: {
-            borderRadius: 3,
+            borderRadius: 4,
             overflow: "hidden",
+            background: 'rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
           }
         }}
       >
@@ -643,29 +708,32 @@ const Ads = () => {
           <>
             <DialogTitle
               sx={{
-                bgcolor: colors.primary,
-                color: colors.light,
-                py: 3,
-                position: "relative"
+                background: 'linear-gradient(135deg, #1a2e0f, #2d4a1e)',
+                color: 'white',
+                py: 4,
+                position: "relative",
               }}
             >
               <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                 <Avatar
-                  src={`${BASE_URL}/${selectedCourse.image}`}
+                  src={getImgUrl(selectedCourse?.image) || "https://via.placeholder.com/70x70?text=No+Img"}
                   sx={{
-                    width: 56,
-                    height: 56,
-                    border: `2px solid ${colors.light}`,
-                    bgcolor: colors.light
+                    width: 70,
+                    height: 70,
+                    border: `3px solid ${colors.secondary}`,
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
                   }}
                 />
                 <Box>
-                  <Typography variant="h6" fontWeight={600}>
-                    {selectedCourse.category}
+                  <Typography variant="h5" fontWeight={800}>
+                    {selectedCourse?.category || "Course"}
                   </Typography>
-                  <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                    Complete your registration
-                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
+                    <Rating value={4.8} size="small" readOnly sx={{ color: colors.secondary }} />
+                    <Typography variant="caption" sx={{ opacity: 0.8 }}>
+                      (120+ reviews)
+                    </Typography>
+                  </Box>
                 </Box>
               </Box>
               <IconButton
@@ -674,22 +742,21 @@ const Ads = () => {
                   position: "absolute",
                   right: 16,
                   top: 16,
-                  color: colors.light
+                  color: 'white',
+                  bgcolor: 'rgba(255,255,255,0.1)',
+                  '&:hover': {
+                    bgcolor: 'rgba(255,255,255,0.2)',
+                    transform: 'rotate(90deg)',
+                  },
+                  transition: 'all 0.3s ease',
                 }}
               >
                 <Close />
               </IconButton>
             </DialogTitle>
 
-            <DialogContent sx={{ py: 3 }}>
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 2.5,
-                  mt: 1
-                }}
-              >
+            <DialogContent sx={{ py: 4 }}>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
                 <TextField
                   label="Full Name"
                   name="fullName"
@@ -698,7 +765,23 @@ const Ads = () => {
                   fullWidth
                   variant="outlined"
                   InputProps={{
-                    sx: { borderRadius: 2 }
+                    sx: {
+                      borderRadius: 2,
+                      bgcolor: 'rgba(255,255,255,0.05)',
+                      color: 'white',
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'rgba(255,255,255,0.2)',
+                      },
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: colors.secondary,
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: colors.secondary,
+                      },
+                    }
+                  }}
+                  InputLabelProps={{
+                    sx: { color: 'rgba(255,255,255,0.7)' }
                   }}
                 />
 
@@ -711,7 +794,17 @@ const Ads = () => {
                   fullWidth
                   variant="outlined"
                   InputProps={{
-                    sx: { borderRadius: 2 }
+                    sx: {
+                      borderRadius: 2,
+                      bgcolor: 'rgba(255,255,255,0.05)',
+                      color: 'white',
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'rgba(255,255,255,0.2)',
+                      },
+                    }
+                  }}
+                  InputLabelProps={{
+                    sx: { color: 'rgba(255,255,255,0.7)' }
                   }}
                 />
 
@@ -723,7 +816,17 @@ const Ads = () => {
                   fullWidth
                   variant="outlined"
                   InputProps={{
-                    sx: { borderRadius: 2 }
+                    sx: {
+                      borderRadius: 2,
+                      bgcolor: 'rgba(255,255,255,0.05)',
+                      color: 'white',
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'rgba(255,255,255,0.2)',
+                      },
+                    }
+                  }}
+                  InputLabelProps={{
+                    sx: { color: 'rgba(255,255,255,0.7)' }
                   }}
                 />
 
@@ -736,14 +839,25 @@ const Ads = () => {
                   fullWidth
                   variant="outlined"
                   InputProps={{
-                    sx: { borderRadius: 2 }
+                    sx: {
+                      borderRadius: 2,
+                      bgcolor: 'rgba(255,255,255,0.05)',
+                      color: 'white',
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'rgba(255,255,255,0.2)',
+                      },
+                    }
+                  }}
+                  InputLabelProps={{
+                    sx: { color: 'rgba(255,255,255,0.7)' }
+                  }}
+                  SelectProps={{
+                    sx: { color: 'white' }
                   }}
                 >
                   {cats.map((course) => (
                     <MenuItem key={course.id} value={course.id}>
-                      <Box
-                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                      >
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                         <School sx={{ fontSize: 20, color: colors.primary }} />
                         {course.category}
                       </Box>
@@ -751,78 +865,53 @@ const Ads = () => {
                   ))}
                 </TextField>
 
-                {/* COURSE PREVIEW */}
+                {/* Course Benefits */}
                 <Paper
                   sx={{
-                    p: 2,
-                    bgcolor: alpha(colors.primary, 0.05),
-                    borderRadius: 2,
-                    border: `1px solid ${alpha(colors.primary, 0.1)}`
+                    p: 3,
+                    bgcolor: 'rgba(191, 219, 129, 0.05)',
+                    borderRadius: 3,
+                    border: `1px solid rgba(191, 219, 129, 0.2)`,
                   }}
                 >
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ color: colors.primary, mb: 1 }}
-                  >
-                    Course Benefits:
+                  <Typography variant="subtitle2" sx={{ color: colors.secondary, fontWeight: 600 }}>
+                    🎓 What You'll Get:
                   </Typography>
-                  <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
-                    <Box
-                      sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
-                    >
-                      <CheckCircle
-                        sx={{ fontSize: 16, color: colors.primary }}
-                      />
-                      <Typography
-                        variant="caption"
-                        color={colors.textSecondary}
-                      >
-                        Certificate
-                      </Typography>
-                    </Box>
-                    <Box
-                      sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
-                    >
-                      <CheckCircle
-                        sx={{ fontSize: 16, color: colors.primary }}
-                      />
-                      <Typography
-                        variant="caption"
-                        color={colors.textSecondary}
-                      >
-                        Live Sessions
-                      </Typography>
-                    </Box>
-                    <Box
-                      sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
-                    >
-                      <CheckCircle
-                        sx={{ fontSize: 16, color: colors.primary }}
-                      />
-                      <Typography
-                        variant="caption"
-                        color={colors.textSecondary}
-                      >
-                        Projects
-                      </Typography>
-                    </Box>
+                  <Box sx={{ display: "grid", gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+                    {[
+                      'Certificate',
+                      'Live Sessions',
+                      'Projects',
+                      'Mentorship',
+                      'Job Support',
+                      'Lifetime Access'
+                    ].map((benefit, i) => (
+                      <Box key={i} sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                        <CheckCircle sx={{ fontSize: 16, color: colors.secondary }} />
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          {benefit}
+                        </Typography>
+                      </Box>
+                    ))}
                   </Box>
                 </Paper>
               </Box>
             </DialogContent>
 
-            <DialogActions sx={{ p: 3, pt: 0, gap: 1 }}>
+            <DialogActions sx={{ p: 4, pt: 0, gap: 2 }}>
               <Button
                 onClick={handleClose}
                 variant="outlined"
                 sx={{
-                  borderRadius: 2,
-                  px: 3,
-                  borderColor: alpha(colors.dark, 0.2),
-                  color: colors.textSecondary,
-                  "&:hover": {
-                    borderColor: colors.textSecondary,
-                  }
+                  borderRadius: 3,
+                  px: 4,
+                  py: 1.5,
+                  borderColor: 'rgba(255,255,255,0.2)',
+                  color: 'rgba(255,255,255,0.8)',
+                  '&:hover': {
+                    borderColor: colors.secondary,
+                    bgcolor: 'rgba(255,255,255,0.05)',
+                  },
                 }}
               >
                 Cancel
@@ -832,13 +921,16 @@ const Ads = () => {
                 onClick={handleSubmit}
                 variant="contained"
                 sx={{
-                  bgcolor: colors.primary,
-                  color: colors.light,
-                  borderRadius: 2,
-                  px: 3,
-                  "&:hover": {
-                    bgcolor: alpha(colors.primary, 0.9),
-                  }
+                  background: 'linear-gradient(135deg, #bfdb81, #8fb56b)',
+                  color: '#0a1a05',
+                  borderRadius: 3,
+                  px: 4,
+                  py: 1.5,
+                  fontWeight: 700,
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 15px 30px rgba(191, 219, 129, 0.3)',
+                  },
                 }}
                 startIcon={<CheckCircle />}
               >

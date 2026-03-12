@@ -6,51 +6,72 @@ import FloatingEnquiry from "./components/FloatingEnquiry";
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#48723e",
-      dark: "#1a4718",
-      light: "#83a561",
+      main: "#3DB843",
+      dark: "#2e9133",
+      light: "#e8f7e9",
     },
     secondary: {
-      main: "#bfdb81",
+      main: "#c2eac4",
+    },
+    text: {
+      primary: "#1a2b1b",
+      secondary: "#6b8f6d",
     },
     background: {
-      default: "#f7f7f7",
-      paper: "#ffffff",
+      default: "#ffffff",
+      paper: "#f7fdf7",
     },
-    typography: {
-      fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif',
-      h1: { fontFamily: '"Urbanist", sans-serif', fontWeight: 800 },
-      h2: { fontFamily: '"Urbanist", sans-serif', fontWeight: 800 },
-      h3: { fontFamily: '"Urbanist", sans-serif', fontWeight: 700 },
-      h4: { fontFamily: '"Urbanist", sans-serif', fontWeight: 700 },
-      h5: { fontFamily: '"Urbanist", sans-serif', fontWeight: 600 },
-      h6: { fontFamily: '"Urbanist", sans-serif', fontWeight: 600 },
-      subtitle1: { fontFamily: '"Plus Jakarta Sans", sans-serif' },
-      subtitle2: { fontFamily: '"Plus Jakarta Sans", sans-serif' },
-      body1: { fontFamily: '"Plus Jakarta Sans", sans-serif' },
-      body2: { fontFamily: '"Plus Jakarta Sans", sans-serif' },
-      button: { fontFamily: '"Urbanist", sans-serif', fontWeight: 700, textTransform: 'none' },
-      caption: { fontFamily: '"Plus Jakarta Sans", sans-serif' },
-      overline: { fontFamily: '"Plus Jakarta Sans", sans-serif' },
-    },
+  },
+  typography: {
+    fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif',
+    h1: { fontFamily: '"Bricolage Grotesque", sans-serif', fontWeight: 800 },
+    h2: { fontFamily: '"Bricolage Grotesque", sans-serif', fontWeight: 800 },
+    h3: { fontFamily: '"Bricolage Grotesque", sans-serif', fontWeight: 700 },
+    h4: { fontFamily: '"Bricolage Grotesque", sans-serif', fontWeight: 700 },
+    h5: { fontFamily: '"Bricolage Grotesque", sans-serif', fontWeight: 600 },
+    h6: { fontFamily: '"Bricolage Grotesque", sans-serif', fontWeight: 600 },
+    subtitle1: { fontFamily: '"Plus Jakarta Sans", sans-serif' },
+    subtitle2: { fontFamily: '"Plus Jakarta Sans", sans-serif' },
+    body1: { fontFamily: '"Plus Jakarta Sans", sans-serif' },
+    body2: { fontFamily: '"Plus Jakarta Sans", sans-serif' },
+    button: { fontFamily: '"Bricolage Grotesque", sans-serif', fontWeight: 700, textTransform: 'none' },
+    caption: { fontFamily: '"Plus Jakarta Sans", sans-serif' },
+    overline: { fontFamily: '"Plus Jakarta Sans", sans-serif' },
   },
   components: {
     MuiCssBaseline: {
       styleOverrides: `
+        :root {
+          --green: #3DB843;
+          --green-dark: #2e9133;
+          --green-deep: #1f6b24;
+          --green-light: #e8f7e9;
+          --green-mid: #c2eac4;
+          --green-pale: #f2fbf2;
+          --dark: #111c12;
+          --text: #1a2b1b;
+          --text-mid: #3d5c3f;
+          --text-muted: #6b8f6d;
+          --border: #d4ead5;
+          --white: #ffffff;
+          --off-white: #f7fdf7;
+          --yellow: #f5c842;
+          --orange: #f47c2f;
+        }
         ::-webkit-scrollbar {
-          width: 10px;
-          height: 10px;
+          width: 8px;
+          height: 8px;
         }
         ::-webkit-scrollbar-track {
-          background: #f1f5f9;
+          background: #f7fdf7;
         }
         ::-webkit-scrollbar-thumb {
-          background: #48723e;
+          background: #c2eac4;
           border-radius: 10px;
-          border: 2px solid #f1f5f9;
+          border: 2px solid #f7fdf7;
         }
         ::-webkit-scrollbar-thumb:hover {
-          background: #1a4718;
+          background: #3DB843;
         }
         ::-webkit-scrollbar-button {
           display: none !important;
@@ -62,7 +83,16 @@ const theme = createTheme({
         }
         * {
           scrollbar-width: thin;
-          scrollbar-color: #48723e #f1f5f9;
+          scrollbar-color: #c2eac4 #f7fdf7;
+        }
+        body {
+          font-family: "Plus Jakarta Sans", sans-serif !important;
+          background-color: #ffffff;
+          color: #1a2b1b;
+        }
+        h1, h2, h3, h4, h5, h6 {
+          font-family: "Bricolage Grotesque", sans-serif !important;
+          color: #111c12;
         }
       `,
     },

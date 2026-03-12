@@ -96,17 +96,19 @@ const ServiceCard = ({
         "&:hover": {
           transform: "translateY(-6px)",
           boxShadow: "0 20px 40px rgba(0,0,0,0.12)",
-        } }}
+        }
+      }}
     >
       <CardContent>
         <Avatar
           sx={{
-            bgcolor: "#48723e",
+            bgcolor: "var(--green)",
             color: "#fff",
             width: 80,
             height: 80,
             mx: "auto",
-            mb: 2 }}
+            mb: 2
+          }}
         >
           {icon}
         </Avatar>
@@ -132,7 +134,7 @@ const ServiceCard = ({
         <Stack spacing={1} alignItems="flex-start" mb={3}>
           {features.map((item, index) => (
             <Box key={index} sx={{ display: "flex", alignItems: "center" }}>
-              <CheckCircleIcon sx={{ color: "#00c853", fontSize: 18, mr: 1 }} />
+              <CheckCircleIcon sx={{ color: "var(--green)", fontSize: 18, mr: 1 }} />
               <Typography variant="body2" sx={{}}>
                 {item}
               </Typography>
@@ -147,12 +149,13 @@ const ServiceCard = ({
             borderRadius: 2,
             textTransform: "none",
             px: 3,
-            borderColor: "#48723e",
-            color: "#48723e",
+            borderColor: "var(--green)",
+            color: "var(--green)",
             "&:hover": {
-              bgcolor: "#48723e",
+              bgcolor: "var(--green)",
               color: "#fff",
-            } }}
+            }
+          }}
         >
           {buttonText}
         </Button>
@@ -248,7 +251,8 @@ const ServicesCards = () => {
           alignItems: "center",
           gap: 4,
           flexWrap: "wrap",
-          p: 4 }}
+          p: 4
+        }}
       >
         {servicesData.map((service, index) => (
           <Box key={index} data-aos="fade-up" data-aos-delay={index * 150}>
@@ -263,7 +267,7 @@ const ServicesCards = () => {
         {selectedService && (
           <>
             <DialogTitle
-              sx={{ bgcolor: "#48723e", color: "#fff", position: "relative" }}
+              sx={{ bgcolor: "var(--green-dark)", color: "#fff", position: "relative" }}
             >
               <Typography variant="h6">{selectedService.title}</Typography>
 
@@ -338,9 +342,10 @@ const ServicesCards = () => {
                 variant="contained"
                 startIcon={<CheckCircleIcon />}
                 sx={{
-                  bgcolor: "#48723e",
+                  bgcolor: "var(--green)",
                   color: "#fff",
-                  "&:hover": { bgcolor: "#1a4718" } }}
+                  "&:hover": { bgcolor: "var(--green-dark)" }
+                }}
               >
                 Register Now
               </Button>

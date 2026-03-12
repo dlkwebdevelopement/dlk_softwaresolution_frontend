@@ -26,6 +26,8 @@ import BlogBanner from "../pages/blog/BlogBanner";
 import BlogContentPage from "../pages/blog/BlogContentPage";
 import NotFound from "../pages/NotFound";
 
+import Help from "../pages/help/Help";
+
 const AppRoute = () => {
   return (
     <>
@@ -39,20 +41,22 @@ const AppRoute = () => {
               <Navbar />
               <Box sx={{ mt: 10 }}></Box>
               <Banner />
-              <Category />
               <LiveClass />
               <QuickEnquiry />
+              <Category />
               <Ads />
               {/* <Companies /> */}
               <LogoCarousel />
               <Comments />
               <Blog />
-              <FAQSection />
               <BottomInfo />
               <Footer />
             </>
           }
         />
+
+        {/* HELP PAGE */}
+        <Route path="/help" element={<Help />} />
 
         {/*PRODUCT PAGE */}
         <Route

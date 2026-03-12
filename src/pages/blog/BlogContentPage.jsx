@@ -3,7 +3,7 @@ import { Box, Typography, Stack, Divider } from "@mui/material";
 import { useParams, useNavigate } from "react-router-dom";
 import { GetRequest } from "../../api/config";
 import { ADMIN_GET_BLOGS_SLUG, GET_ALL_BLOGS } from "../../api/endpoints";
-import { BASE_URL } from "../../api/api";
+import { BASE_URL, getImgUrl } from "../../api/api";
 
 export default function BlogContentPage() {
   const { slug } = useParams();
@@ -184,7 +184,7 @@ export default function BlogContentPage() {
               >
                 <Box
                   component="img"
-                  src={`${BASE_URL}/${post.image}`}
+                  src={getImgUrl(blog.image)}
                   alt={post.title}
                   sx={{
                     width: "100%",

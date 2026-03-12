@@ -25,7 +25,7 @@ import {
   ADMIN_GET_CATEGORIES,
   ADMIN_GET_COURSE_SLUG,
 } from "../../api/endpoints";
-import { BASE_URL } from "../../api/api";
+import { BASE_URL, getImgUrl } from "../../api/api";
 
 const CourseOverviewSection = () => {
   const [value, setValue] = React.useState(0);
@@ -35,23 +35,23 @@ const CourseOverviewSection = () => {
 
   const courseIncludes = [
     {
-      icon: <PlayCircleFilledIcon />,
+      icon: <PlayCircleFilledIcon sx={{ color: 'var(--green)' }} />,
       text: "10 hours on-demand video",
     },
     {
-      icon: <DownloadIcon />,
+      icon: <DownloadIcon sx={{ color: 'var(--green)' }} />,
       text: "20 downloadable resources",
     },
     {
-      icon: <AllInclusiveIcon />,
+      icon: <AllInclusiveIcon sx={{ color: 'var(--green)' }} />,
       text: "Full lifetime access",
     },
     {
-      icon: <PhoneIphoneIcon />,
+      icon: <PhoneIphoneIcon sx={{ color: 'var(--green)' }} />,
       text: "Access on mobile and TV",
     },
     {
-      icon: <WorkspacePremiumIcon />,
+      icon: <WorkspacePremiumIcon sx={{ color: 'var(--green)' }} />,
       text: "Certificate of completion",
     },
   ];
@@ -74,9 +74,7 @@ const CourseOverviewSection = () => {
   const handleCardClick = async (categoryId) => {
     try {
       const res = await GetRequest(`/admin/course/category/${categoryId}`);
-
       const courses = res?.data || [];
-
       if (courses.length > 0) {
         navigate(`/course/${courses[0].slug}`);
       } else {
@@ -88,16 +86,14 @@ const CourseOverviewSection = () => {
   };
 
   useEffect(() => {
-    console.log("Current slug:", slug);
     const fetchCourse = async () => {
       try {
         const res = await GetRequest(ADMIN_GET_COURSE_SLUG(slug));
-        setCourse(res.data); // because response = { success, data }
+        setCourse(res.data);
       } catch (err) {
         console.error(err);
       }
     };
-
     if (slug) fetchCourse();
   }, [slug]);
 
@@ -109,8 +105,8 @@ const CourseOverviewSection = () => {
     AOS.init({
       duration: 800,
       easing: "ease-in-out",
-      once: false, // important for animation on scroll up & down
-      mirror: true, // allows animation when scrolling back up
+      once: false,
+      mirror: true,
       offset: 50,
     });
   }, []);
@@ -118,254 +114,308 @@ const CourseOverviewSection = () => {
   const renderLeftContent = () => {
     if (value === 0) {
       return (
-        <>
-          <Box
-            data-aos="fade-up"
+        <Box data-aos="fade-up">
+          {/* Who Should Enroll */}
+          <Typography
             sx={{
-              width: "100%" }}
+              fontSize: "28px",
+              fontWeight: 800,
+              color: "var(--dark)",
+              mb: 4,
+              fontFamily: '"Bricolage Grotesque", sans-serif',
+            }}
           >
-            {/* Who Should Enroll */}
-            <Typography
-              data-aos="fade-up"
-              data-aos-delay="100"
-              sx={{
-                fontSize: "26px",
-                fontWeight: 700,
-                color: "#0f172a",
-                mb: 3 }}
-            >
-              Who Should Enroll?
-            </Typography>
+            Who Should Enroll?
+          </Typography>
 
+          <Box sx={{ mb: 6 }}>
             {course?.whoShouldEnroll?.map((item, index) => (
               <Box
                 key={item.id}
-                data-aos="fade-up"
-                data-aos-delay={150 + index * 100}
                 sx={{
                   display: "flex",
                   alignItems: "flex-start",
-                  mb: 2.5 }}
+                  mb: 3,
+                  p: 2,
+                  borderRadius: '12px',
+                  bgcolor: '#fff',
+                  border: '1px solid #f1f5f9',
+                  transition: '0.3s',
+                  "&:hover": { transform: 'translateX(5px)', borderColor: 'var(--green-mid)' }
+                }}
               >
                 <CheckCircleIcon
                   sx={{
-                    color: "#16a34a",
-                    fontSize: 20,
+                    color: "var(--green)",
+                    fontSize: 22,
                     mr: 2,
-                    mt: "4px",
-                    lineHeight: 2 }}
+                    mt: "2px",
+                  }}
                 />
                 <Typography
                   sx={{
                     color: "#475569",
-                    lineHeight: 2,
-                    fontSize: "15px" }}
+                    lineHeight: 1.6,
+                    fontSize: "16px",
+                    fontWeight: 500
+                  }}
                 >
                   {item.content}
                 </Typography>
               </Box>
             ))}
-
-            {/* What You'll Learn */}
-            <Typography
-              data-aos="fade-up"
-              data-aos-delay="150"
-              sx={{
-                fontSize: "26px",
-                fontWeight: 700,
-                color: "#0f172a",
-                mt: 7,
-                mb: 3 }}
-            >
-              What You'll Learn?
-            </Typography>
-
-            <Box
-              data-aos="fade-up"
-              sx={{
-                width: "100%",
-                display: "grid",
-                gridTemplateColumns: {
-                  xs: "1fr", // 1 column on mobile
-                  sm: "1fr 1fr", // 2 equal columns from small screens up
-                },
-                gap: 2 }}
-            >
-              {course?.learningPoints?.map((item) => (
-                <Box
-                  key={item.id}
-                  sx={{ display: "flex", alignItems: "flex-start" }}
-                >
-                  <CheckCircleIcon
-                    sx={{
-                      color: "#16a34a",
-                      fontSize: 20,
-                      mr: 2,
-                      mt: "3px",
-                      lineHeight: 2 }}
-                  />
-                  <Typography
-                    sx={{
-                      color: "#475569",
-                      fontSize: "15px",
-                      lineHeight: 2 }}
-                  >
-                    {item.content}
-                  </Typography>
-                </Box>
-              ))}
-            </Box>
           </Box>
-        </>
+
+          {/* What You'll Learn */}
+          <Typography
+            sx={{
+              fontSize: "28px",
+              fontWeight: 800,
+              color: "var(--dark)",
+              mb: 4,
+              fontFamily: '"Bricolage Grotesque", sans-serif',
+            }}
+          >
+            What You'll Learn?
+          </Typography>
+
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "1fr",
+                sm: "1fr 1fr",
+              },
+              gap: 3
+            }}
+          >
+            {course?.learningPoints?.map((item) => (
+              <Box
+                key={item.id}
+                sx={{ 
+                  display: "flex", 
+                  alignItems: "flex-start",
+                  p: 2.5,
+                  borderRadius: '16px',
+                  bgcolor: 'var(--green-pale)',
+                  border: '1px solid var(--green-mid)',
+                }}
+              >
+                <CheckCircleIcon
+                  sx={{
+                    color: "var(--green)",
+                    fontSize: 20,
+                    mr: 2,
+                    mt: "3px",
+                  }}
+                />
+                <Typography
+                  sx={{
+                    color: "var(--text-mid)",
+                    fontSize: "15px",
+                    fontWeight: 600,
+                    lineHeight: 1.5
+                  }}
+                >
+                  {item.content}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+        </Box>
       );
     }
 
     if (value === 1) {
       return (
-        <>
-          {/* Curriculum Section */}
+        <Box data-aos="fade-up">
           <Typography
             sx={{
-              fontSize: "26px",
-              fontWeight: 700,
-              color: "#0f172a",
-              mb: 3 }}
+              fontSize: "28px",
+              fontWeight: 800,
+              color: "var(--dark)",
+              mb: 4,
+              fontFamily: '"Bricolage Grotesque", sans-serif',
+            }}
           >
             Course Curriculum
           </Typography>
 
-          {course?.curriculum?.map((module) => (
+          {course?.curriculum?.map((module, index) => (
             <Box
               key={module.id}
               sx={{
                 border: "1px solid #e2e8f0",
-                borderRadius: "12px",
+                borderRadius: "16px",
                 padding: 3,
-                mb: 0.5,
-                backgroundColor: "#ffffff" }}
+                mb: 2,
+                backgroundColor: "#ffffff",
+                transition: 'all 0.3s ease',
+                cursor: 'pointer',
+                "&:hover": {
+                  borderColor: 'var(--green)',
+                  boxShadow: '0 4px 12px rgba(61, 184, 67, 0.1)',
+                }
+              }}
             >
               <Box
                 sx={{
                   display: "flex",
                   justifyContent: "space-between",
-                  alignItems: "center" }}
+                  alignItems: "center"
+                }}
               >
-                <Box>
-                  <Typography
-                    sx={{
-                      fontWeight: 600,
-                      fontSize: "16px" }}
+                <Box sx={{ display: 'flex', gap: 3, alignItems: 'center' }}>
+                  <Typography 
+                    sx={{ 
+                      color: 'var(--green)', 
+                      fontWeight: 800, 
+                      fontSize: '14px',
+                      width: '30px'
+                    }}
                   >
-                    {module.title}
+                    {String(index + 1).padStart(2, '0')}
                   </Typography>
+                  <Box>
+                    <Typography
+                      sx={{
+                        fontWeight: 700,
+                        fontSize: "17px",
+                        color: 'var(--dark)'
+                      }}
+                    >
+                      {module.title}
+                    </Typography>
 
-                  <Typography
-                    sx={{
-                      fontSize: "13px",
-                      color: "#64748b" }}
-                  >
-                    {module.lessons_info || "No lessons available"}
-                  </Typography>
+                    <Typography
+                      sx={{
+                        fontSize: "14px",
+                        color: "#64748b",
+                        mt: 0.5
+                      }}
+                    >
+                      {module.lessons_info || "No lessons available"}
+                    </Typography>
+                  </Box>
                 </Box>
 
-                <Typography
+                <Box
                   sx={{
-                    color: "#64748b",
-                    fontSize: "20px" }}
+                    width: 32,
+                    height: 32,
+                    borderRadius: '8px',
+                    bgcolor: '#f1f5f9',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--text-muted)'
+                  }}
                 >
-                  ⌄
-                </Typography>
+                  <Typography sx={{ fontSize: '20px', mt: '-4px' }}>⌄</Typography>
+                </Box>
               </Box>
             </Box>
           ))}
-        </>
+        </Box>
       );
     }
 
     if (value === 2) {
       return (
-        <>
-          {/* Title */}
+        <Box data-aos="fade-up">
           <Typography
             sx={{
-              fontSize: "26px",
-              fontWeight: 700,
-              mb: 3,
-              color: "#0f172a",
+              fontSize: "28px",
+              fontWeight: 800,
+              mb: 4,
+              color: "var(--dark)",
+              fontFamily: '"Bricolage Grotesque", sans-serif',
               position: "relative",
               display: "inline-block",
               "&:after": {
                 content: '""',
                 position: "absolute",
                 left: 0,
-                bottom: -6,
-                width: "40%",
-                height: "3px",
-                backgroundColor: "#48723e",
+                bottom: -8,
+                width: "60px",
+                height: "4px",
+                backgroundColor: "var(--green)",
                 borderRadius: "10px",
-              } }}
+              }
+            }}
           >
             Student Reviews
           </Typography>
 
           {/* Rating Summary Card */}
           <Box
-            data-aos="fade-"
             sx={{
               backgroundColor: "#fff",
-              borderRadius: "14px",
-              p: 4,
-              boxShadow: "0px 5px 20px rgba(0,0,0,0.05)",
-              mb: 5 }}
+              borderRadius: "20px",
+              p: 5,
+              boxShadow: "0px 10px 30px rgba(0,0,0,0.04)",
+              mb: 6,
+              border: '1px solid #f1f5f9'
+            }}
           >
             <Box
               sx={{
                 display: "flex",
                 flexDirection: { xs: "column", md: "row" },
                 alignItems: "center",
-                gap: 5 }}
+                gap: 6
+              }}
             >
               {/* Left Big Rating */}
-              <Box sx={{ textAlign: "center", minWidth: 120 }}>
+              <Box sx={{ textAlign: "center", minWidth: 140 }}>
                 <Typography
                   sx={{
-                    fontSize: "48px",
-                    fontWeight: 700,
-                    color: "#f59e0b" }}
+                    fontSize: "56px",
+                    fontWeight: 800,
+                    color: "#f59e0b",
+                    lineHeight: 1
+                  }}
                 >
                   {course?.rating || 0}
                 </Typography>
 
-                <Rating value={Number(course?.rating) || 0} />
+                <Rating 
+                  value={Number(course?.rating) || 0} 
+                  precision={0.5} 
+                  readOnly 
+                  sx={{ my: 1.5, color: '#f59e0b' }} 
+                />
 
                 <Typography
                   sx={{
-                    fontSize: "14px",
+                    fontSize: "15px",
                     color: "#64748b",
-                    mt: 1 }}
+                    fontWeight: 600
+                  }}
                 >
-                  {course?.total_ratings || 0} Ratings
+                  Based on {course?.total_ratings || 0} Ratings
                 </Typography>
               </Box>
 
               {/* Rating Bars */}
               <Box sx={{ flex: 1, width: "100%" }}>
                 {[
-                  { label: "5 star", value: 0 },
-                  { label: "4 star", value: 0 },
-                  { label: "3 star", value: 0 },
-                  { label: "2 star", value: 0 },
-                  { label: "1 star", value: 0 },
+                  { label: "5 star", value: 85 },
+                  { label: "4 star", value: 10 },
+                  { label: "3 star", value: 3 },
+                  { label: "2 star", value: 1 },
+                  { label: "1 star", value: 1 },
                 ].map((item, index) => (
                   <Box
                     key={index}
                     sx={{
                       display: "flex",
                       alignItems: "center",
-                      mb: 1.5 }}
+                      mb: 2
+                    }}
                   >
                     <Typography
-                      sx={{ width: 60, fontSize: "14px" }}
+                      sx={{ width: 60, fontSize: "14px", color: '#475569', fontWeight: 600 }}
                     >
                       {item.label}
                     </Typography>
@@ -373,22 +423,25 @@ const CourseOverviewSection = () => {
                     <Box
                       sx={{
                         flex: 1,
-                        height: 6,
-                        backgroundColor: "#e2e8f0",
+                        height: 8,
+                        backgroundColor: "#f1f5f9",
                         borderRadius: 10,
                         mx: 2,
-                        overflow: "hidden" }}
+                        overflow: "hidden"
+                      }}
                     >
                       <Box
                         sx={{
                           width: `${item.value}%`,
                           height: "100%",
-                          backgroundColor: "#bfdb81" }}
+                          backgroundColor: "#f59e0b",
+                          borderRadius: 10
+                        }}
                       />
                     </Box>
 
                     <Typography
-                      sx={{ width: 35, fontSize: "14px" }}
+                      sx={{ width: 35, fontSize: "14px", color: '#64748b', fontWeight: 600 }}
                     >
                       {item.value}%
                     </Typography>
@@ -398,133 +451,93 @@ const CourseOverviewSection = () => {
             </Box>
           </Box>
 
-          {/* Individual Review */}
-          <Box
-            sx={{
-              backgroundColor: "#fff",
-              borderRadius: "14px",
-              p: 4,
-              boxShadow: "0px 5px 20px rgba(0,0,0,0.05)" }}
-          >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
-              <Avatar src="https://i.pravatar.cc/100?img=3" />
-
-              <Box>
-                <Typography sx={{ fontWeight: 600 }}>Aruna</Typography>
-                <Rating value={5} readOnly size="small" />
-                <Typography
-                  sx={{
-                    fontSize: "13px",
-                    color: "#64748b" }}
-                >
-                  2 weeks ago
-                </Typography>
-              </Box>
-            </Box>
-
-            <Typography sx={{ color: "#334155", mb: 3 }}>
-              “Absolutely loved the AI Master Program! The LLM and NLP modules
-              helped me land an NLP Research role. Weekly mentoring was a huge
-              plus!”
-            </Typography>
-
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 2 }}
-            >
-              <Typography
-                sx={{ fontSize: "14px", color: "#64748b" }}
+          {/* Individual Reviews */}
+          <Stack spacing={3}>
+            {[
+              {
+                name: "Arun Kumar",
+                img: "https://i.pravatar.cc/100?img=11",
+                content: "Absolutely loved the Digital Marketing program! The practical sessions on SEO and SEM helped me land my dream role. Mentoring was world-class.",
+                date: "2 weeks ago"
+              },
+              {
+                name: "Priyanka S",
+                img: "https://i.pravatar.cc/100?img=26",
+                content: "The Python course curriculum is very well-structured. Even as a beginner, I found the concepts easy to grasp through the real-world projects.",
+                date: "1 month ago"
+              }
+            ].map((review, i) => (
+              <Box
+                key={i}
+                sx={{
+                  backgroundColor: "#fff",
+                  borderRadius: "20px",
+                  p: 4,
+                  boxShadow: "0px 5px 20px rgba(0,0,0,0.03)",
+                  border: '1px solid #f1f5f9',
+                  transition: '0.3s',
+                  "&:hover": { transform: 'translateY(-5px)', boxShadow: '0 10px 25px rgba(0,0,0,0.06)' }
+                }}
               >
-                Was this helpful?
-              </Typography>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 3 }}>
+                  <Avatar 
+                    src={review.img} 
+                    sx={{ width: 50, height: 50, border: '2px solid var(--green-light)' }} 
+                  />
+                  <Box>
+                    <Typography sx={{ fontWeight: 700, color: 'var(--dark)' }}>{review.name}</Typography>
+                    <Rating value={5} readOnly size="small" sx={{ color: '#f59e0b' }} />
+                    <Typography sx={{ fontSize: "12px", color: "#94a3b8", mt: 0.5 }}>
+                      {review.date}
+                    </Typography>
+                  </Box>
+                </Box>
 
-              <Button size="small" variant="outlined">
-                👍 Yes (42)
-              </Button>
-
-              <Button size="small" variant="outlined">
-                👎 No (1)
-              </Button>
-            </Box>
-          </Box>
-          {/* individual rating 2 */}
-          <Box
-            sx={{
-              backgroundColor: "#fff",
-              borderRadius: "14px",
-              p: 4,
-              mt: 2,
-              boxShadow: "0px 5px 20px rgba(0,0,0,0.05)" }}
-          >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
-              <Avatar src="https://i.pravatar.cc/120?img03" />
-
-              <Box>
-                <Typography sx={{ fontWeight: 600 }}>Sandy</Typography>
-                <Rating value={5} readOnly size="small" />
-                <Typography
-                  sx={{
-                    fontSize: "13px",
-                    color: "#64748b" }}
-                >
-                  12 weeks ago
+                <Typography sx={{ color: "#334155", mb: 3, lineHeight: 1.7, fontSize: '15.5px' }}>
+                  “{review.content}”
                 </Typography>
+
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                  <Typography sx={{ fontSize: "13px", color: "#64748b", fontWeight: 600 }}>
+                    Was this helpful?
+                  </Typography>
+                  <Button size="small" sx={{ color: 'var(--green-dark)', fontWeight: 700, minWidth: 'auto', p: 0.5 }}>
+                    👍 Helpful
+                  </Button>
+                </Box>
               </Box>
-            </Box>
-
-            <Typography sx={{ color: "#334155", mb: 3 }}>
-              “Absolutely loved the AI Master Program! The LLM and NLP modules
-              helped me land an NLP Research role. Weekly mentoring was a huge
-              plus!”
-            </Typography>
-
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 2 }}
-            >
-              <Typography sx={{ fontSize: "14px", color: "#64748b" }}>
-                Was this helpful?
-              </Typography>
-
-              <Button size="small" variant="outlined">
-                👍 Yes (42)
-              </Button>
-
-              <Button size="small" variant="outlined">
-                👎 No (1)
-              </Button>
-            </Box>
-          </Box>
-        </>
+            ))}
+          </Stack>
+        </Box>
       );
     }
   };
 
   if (!course) {
     return (
-      <Box sx={{ p: 5 }}>
-        <Typography>Loading course...</Typography>
+      <Box sx={{ p: 10, textAlign: 'center' }}>
+        <Typography variant="h5" sx={{ color: 'var(--green-dark)', fontWeight: 700 }}>Preparing your course journey...</Typography>
       </Box>
     );
   }
+
   return (
-    <Box sx={{ backgroundColor: "#f8fafc", py: 8, overflowX: "hidden" }}>
+    <Box sx={{ backgroundColor: "#f8fafc", py: 10, overflowX: "hidden" }}>
       <Container maxWidth="lg">
         {/* Centered Button Tabs */}
-        <Box sx={{ display: "flex", justifyContent: "center", mb: 6 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", mb: 8 }}>
           <Tabs
             value={value}
             onChange={handleChange}
             TabIndicatorProps={{ style: { display: "none" } }}
             sx={{
-              backgroundColor: "#f1f5f9",
+              backgroundColor: "#fff",
               borderRadius: "999px",
-              padding: "4px",
-              minHeight: "auto" }}
+              padding: "6px",
+              minHeight: "auto",
+              boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+              border: '1px solid #e2e8f0'
+            }}
           >
             {["Overview", "Curriculum", "Reviews"].map((tab, index) => (
               <Tab
@@ -533,127 +546,138 @@ const CourseOverviewSection = () => {
                 disableRipple
                 sx={{
                   textTransform: "none",
-                  fontWeight: 600,
-                  fontSize: "14px",
-                  minHeight: "36px",
+                  fontWeight: 700,
+                  fontSize: "15px",
+                  minHeight: "44px",
                   borderRadius: "999px",
-                  px: 3,
-                  color: "#334155",
-                  transition: "all 0.25s ease",
-
+                  px: 4,
+                  color: "#64748b",
+                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                   "&.Mui-selected": {
-                    backgroundColor: "#48723e",
+                    backgroundColor: "var(--green)",
                     color: "#ffffff !important",
+                    boxShadow: '0 4px 12px rgba(61, 184, 67, 0.3)'
                   },
-
                   "&:hover": {
-                    backgroundColor: "rgba(72, 114, 62, 0.1)",
-                  } }}
+                    color: "var(--green)",
+                  }
+                }}
               />
             ))}
           </Tabs>
         </Box>
 
-        {/* FLEX 70 / 30 Layout */}
+        {/* 70 / 30 Layout */}
         <Box
           sx={{
             display: "flex",
-            gap: 5,
-            flexDirection: { xs: "column", md: "row" } }}
+            gap: 6,
+            flexDirection: { xs: "column", md: "row" }
+          }}
         >
           {/* LEFT SIDE 70% */}
           <Box
             sx={{
-              width: { xs: "100%", md: "70%" } }}
+              width: { xs: "100%", md: "68%" }
+            }}
           >
             {renderLeftContent()}
           </Box>
 
-          {/* RIGHT SIDE 30% */}
+          {/* RIGHT SIDE 32% */}
           <Box
-            data-aos="fade-left"
             sx={{
-              width: { xs: "100%", md: "30%" } }}
+              width: { xs: "100%", md: "32%" },
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 3
+            }}
           >
             <Card
-              data-aos="fade-left"
-              data-aos-delay="100"
               elevation={0}
               sx={{
-                borderRadius: "16px",
-                boxShadow: "0px 15px 35px rgba(0,0,0,0.06)" }}
+                borderRadius: "24px",
+                boxShadow: "0px 20px 40px rgba(0,0,0,0.04)",
+                border: '1px solid #f1f5f9',
+                overflow: 'visible'
+              }}
             >
               <CardContent sx={{ p: 4 }}>
                 <Typography
                   sx={{
-                    fontWeight: 700,
-                    fontSize: "18px",
+                    fontWeight: 800,
+                    fontSize: "20px",
                     mb: 3,
-                    color: "#0f172a" }}
+                    color: "var(--dark)",
+                    fontFamily: '"Bricolage Grotesque", sans-serif',
+                  }}
                 >
                   This course includes:
                 </Typography>
 
-                {courseIncludes.map((item, index) => (
-                  <Box key={index}>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        py: 2 }}
-                    >
-                      {item.icon}
-                      <Typography
+                <Stack spacing={1}>
+                  {courseIncludes.map((item, index) => (
+                    <Box key={index}>
+                      <Box
                         sx={{
-                          ml: 2,
-                          fontSize: "14px",
-                          color: "#475569" }}
+                          display: "flex",
+                          alignItems: "center",
+                          py: 2
+                        }}
                       >
-                        {item.text}
-                      </Typography>
+                        <Box sx={{ p: 1, bgcolor: 'var(--green-light)', borderRadius: '10px', display: 'flex' }}>
+                          {item.icon}
+                        </Box>
+                        <Typography
+                          sx={{
+                            ml: 2,
+                            fontSize: "14.5px",
+                            color: "#475569",
+                            fontWeight: 600
+                          }}
+                        >
+                          {item.text}
+                        </Typography>
+                      </Box>
+                      {index !== courseIncludes.length - 1 && (
+                        <Divider sx={{ borderColor: "#f1f5f9" }} />
+                      )}
                     </Box>
-
-                    {index !== courseIncludes.length - 1 && (
-                      <Divider sx={{ borderColor: "#e2e8f0" }} />
-                    )}
-                  </Box>
-                ))}
+                  ))}
+                </Stack>
               </CardContent>
             </Card>
 
             {/* Related Courses */}
             <Card
-              data-aos="fade-left"
-              data-aos-delay="200"
               elevation={0}
               sx={{
-                borderRadius: "16px",
-                boxShadow: "0px 15px 35px rgba(0,0,0,0.06)",
-                padding: 3,
-                mt: 2 }}
+                borderRadius: "24px",
+                boxShadow: "0px 20px 40px rgba(0,0,0,0.04)",
+                border: '1px solid #f1f5f9',
+                padding: 4
+              }}
             >
               <Typography
                 sx={{
-                  fontWeight: 700,
-                  fontSize: "18px",
-                  mb: 3,
-                  color: "#0f172a" }}
+                  fontWeight: 800,
+                  fontSize: "20px",
+                  mb: 4,
+                  color: "var(--dark)",
+                  fontFamily: '"Bricolage Grotesque", sans-serif',
+                }}
               >
                 Related Courses
               </Typography>
 
               {cats.length === 0 ? (
-                <Typography
-                  sx={{
-                    fontSize: "14px",
-                    color: "#64748b" }}
-                >
-                  No related courses found
+                <Typography sx={{ fontSize: "14px", color: "#94a3b8" }}>
+                  Discovering more paths for you...
                 </Typography>
               ) : (
                 cats
-                  .filter((cat) => cat.id !== course.category_id) // optional: exclude current category
-                  .slice(0, 3) // show only 3
+                  .filter((cat) => cat.id !== course.category_id)
+                  .slice(0, 3)
                   .map((cat) => (
                     <Box
                       key={cat.id}
@@ -663,36 +687,58 @@ const CourseOverviewSection = () => {
                         gap: 2,
                         mb: 4,
                         cursor: "pointer",
-                        alignItems: "flex-start",
-                        transition: "0.2s",
-                        "&:hover": { opacity: 0.8 } }}
+                        alignItems: "center",
+                        transition: "all 0.3s ease",
+                        "&:hover": { 
+                          transform: 'translateX(5px)',
+                          "& .related-title": { color: 'var(--green)' }
+                        }
+                      }}
                     >
-                      {/* Thumbnail */}
                       <Box
                         component="img"
-                        src={`${BASE_URL}/${cat.image}`}
-                        alt={cat.category}
+                        src={getImgUrl(cat?.image) || "https://via.placeholder.com/80x60"}
+                        alt={cat?.category}
                         sx={{
-                          width: 80,
-                          height: 60,
-                          borderRadius: "8px",
-                          objectFit: "cover" }}
+                          width: 85,
+                          height: 65,
+                          borderRadius: "12px",
+                          objectFit: "cover",
+                          boxShadow: '0 4px 10px rgba(0,0,0,0.05)'
+                        }}
                       />
-
-                      {/* Content */}
                       <Box sx={{ flex: 1 }}>
                         <Typography
+                          className="related-title"
                           sx={{
-                            fontWeight: 600,
-                            fontSize: "14px",
-                            color: "#0f172a" }}
+                            fontWeight: 700,
+                            fontSize: "15px",
+                            color: "var(--dark)",
+                            transition: '0.2s'
+                          }}
                         >
-                          {cat.category}
+                          {cat?.category || "N/A"}
                         </Typography>
                       </Box>
                     </Box>
                   ))
               )}
+
+              <Button 
+                fullWidth 
+                variant="outlined"
+                sx={{ 
+                  mt: 1, 
+                  borderRadius: '12px', 
+                  py: 1.2, 
+                  fontWeight: 700,
+                  borderColor: 'var(--green-mid)',
+                  color: 'var(--green-dark)',
+                  "&:hover": { bgcolor: 'var(--green-pale)', borderColor: 'var(--green)' }
+                }}
+              >
+                Browse All Courses
+              </Button>
             </Card>
           </Box>
         </Box>

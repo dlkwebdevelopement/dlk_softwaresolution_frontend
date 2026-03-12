@@ -27,7 +27,7 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import { PostRequest } from "../../api/config";
 import { ADMIN_POST_REGISTRATIONS } from "../../api/endpoints";
-import { BASE_URL } from "../../api/api";
+import { BASE_URL, getImgUrl } from "../../api/api";
 
 /* ---------------- PRICING DATA ---------------- */
 
@@ -37,7 +37,7 @@ const pricingData = [
     title: "AI Starter Program",
     subtitle: "Foundation in Python, Statistics & Visualization",
     price: "₹35,000",
-    highlightColor: "#48723e",
+    highlightColor: "var(--green)",
     buttonText: "Enroll in Starter",
     buttonVariant: "outlined",
     features: [
@@ -55,7 +55,7 @@ const pricingData = [
     title: "AI Professional Program",
     subtitle: "Hands-on ML, DL, and Data Visualization",
     price: "₹55,000",
-    highlightColor: "#48723e",
+    highlightColor: "var(--green-dark)",
     buttonText: "Enroll in Professional",
     buttonVariant: "contained",
     features: [
@@ -74,7 +74,7 @@ const pricingData = [
     title: "AI Master Program",
     subtitle: "Full-Stack AI with LLMs & Real-Time Projects",
     price: "₹1,05,000",
-    highlightColor: "#48723e",
+    highlightColor: "var(--green-deep)",
     buttonText: "Enroll in Master",
     buttonVariant: "contained",
     features: [
@@ -109,14 +109,16 @@ const PricingCard = ({
         height: "100%",
         borderRadius: 4,
         border: `2px solid ${highlightColor}`,
-        boxShadow: "0 12px 35px rgba(0,0,0,0.08)" }}
+        boxShadow: "0 12px 35px rgba(0,0,0,0.08)"
+      }}
     >
       <CardContent
         sx={{
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          textAlign: "center" }}
+          textAlign: "center"
+        }}
       >
         <Chip
           label={duration}
@@ -124,7 +126,8 @@ const PricingCard = ({
             bgcolor: highlightColor,
             color: "#fff",
             mx: "auto",
-            mb: 2 }}
+            mb: 2
+          }}
         />
 
         <Typography variant="h6" fontWeight="bold" sx={{}}>
@@ -135,7 +138,7 @@ const PricingCard = ({
           {subtitle}
         </Typography>
 
-        <Typography variant="h4" fontWeight="bold" sx={{}} color="#1e5bff">
+        <Typography variant="h4" fontWeight="bold" sx={{}} color="var(--green-dark)">
           {price}
           <Typography component="span" variant="body2" sx={{}} color="text.secondary">
             /course
@@ -148,7 +151,7 @@ const PricingCard = ({
           {features.map((item, index) => (
             <Box key={index} sx={{ display: "flex", alignItems: "center" }}>
               {item.available ? (
-                <CheckIcon sx={{ color: "#00c853", mr: 1 }} />
+                <CheckIcon sx={{ color: "var(--green)", mr: 1 }} />
               ) : (
                 <CloseIcon sx={{ color: "#f44336", mr: 1 }} />
               )}
@@ -178,7 +181,8 @@ const PricingCard = ({
             "&:hover": {
               bgcolor: highlightColor,
               color: "#fff",
-            } }}
+            }
+          }}
         >
           {buttonText}
         </Button>
@@ -272,13 +276,14 @@ const PricingPlans = () => {
       <Box
         sx={{
           minHeight: "100vh",
-          bgcolor: "#f5f7fb",
+          bgcolor: "var(--green-pale)",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
           gap: 4,
           flexWrap: "wrap",
-          p: 4 }}
+          p: 4
+        }}
       >
         {pricingData.map((plan, index) => (
           <Box key={index} data-aos="fade-up" data-aos-delay={index * 200}>
@@ -296,13 +301,15 @@ const PricingPlans = () => {
               sx={{
                 bgcolor: selectedPlan.highlightColor,
                 color: "#fff",
-                position: "relative" }}
+                position: "relative"
+              }}
             >
               <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                 <Avatar
                   sx={{
                     bgcolor: "#fff",
-                    color: selectedPlan.highlightColor }}
+                    color: selectedPlan.highlightColor
+                  }}
                 >
                   <School />
                 </Avatar>
@@ -322,7 +329,8 @@ const PricingPlans = () => {
                   position: "absolute",
                   right: 16,
                   top: 16,
-                  color: "#fff" }}
+                  color: "#fff"
+                }}
               >
                 <Close />
               </IconButton>
@@ -369,6 +377,8 @@ const PricingPlans = () => {
                       <Box
                         sx={{ display: "flex", alignItems: "center", gap: 1 }}
                       >
+                        {/* Assuming course objects might have an image property, and fixing the syntax */}
+                        {course.image && <img src={getImgUrl(course.image)} alt={course.category} style={{ width: 24, height: 24, borderRadius: '50%' }} />}
                         <School sx={{ fontSize: 20 }} />
                         {course.category}
                       </Box>
@@ -398,7 +408,8 @@ const PricingPlans = () => {
                   bgcolor: selectedPlan.highlightColor,
                   "&:hover": {
                     bgcolor: selectedPlan.highlightColor,
-                  } }}
+                  }
+                }}
               >
                 Register Now
               </Button>

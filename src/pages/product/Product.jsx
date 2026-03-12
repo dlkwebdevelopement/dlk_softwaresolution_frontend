@@ -31,30 +31,79 @@ const Product = () => {
   return (
     <Box
       sx={{
-        background: "linear-gradient(135deg, #3a6b49 0%, #b8fd72 100%)",
+        background: "linear-gradient(135deg, var(--green-deep) 0%, var(--green-dark) 40%, var(--green) 100%)",
         color: "#fff",
-        py: { xs: 6, md: 10 },
+        py: { xs: 8, md: 12 },
         px: { xs: 3, md: 8 },
         mt: { xs: -2.4, md: -2 },
+        position: 'relative',
+        overflow: 'hidden',
       }}
     >
+      {/* Decorative Circles */}
+      <Box
+        sx={{
+          position: 'absolute',
+          top: '-10%',
+          right: '-5%',
+          width: '400px',
+          height: '400px',
+          background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)',
+          borderRadius: '50%',
+          pointerEvents: 'none',
+        }}
+      />
+      <Box
+        sx={{
+          position: 'absolute',
+          bottom: '-10%',
+          left: '-5%',
+          width: '300px',
+          height: '300px',
+          background: 'radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%)',
+          borderRadius: '50%',
+          pointerEvents: 'none',
+        }}
+      />
+
       <Box
         sx={{
           display: "flex",
           flexDirection: { xs: "column", md: "row" },
-          gap: 6,
+          gap: 8,
           maxWidth: "1200px",
           margin: "auto",
           alignItems: "center",
+          position: 'relative',
+          zIndex: 1,
         }}
       >
         {/* LEFT SIDE */}
-        <Box sx={{ flex: 1 }}>
+        <Box 
+          sx={{ 
+            flex: 1,
+            animation: 'fadeInLeft 0.8s ease-out'
+          }}
+        >
+          <Box sx={{ mb: 2 }}>
+            <Chip 
+              label="Bestseller" 
+              sx={{ 
+                bgcolor: 'var(--yellow)', 
+                color: 'var(--dark)', 
+                fontWeight: 700,
+                fontSize: '12px',
+                mb: 2
+              }} 
+            />
+          </Box>
           <Typography
             sx={{
-              fontSize: { xs: "32px", md: "42px" },
-              fontWeight: 700,
+              fontSize: { xs: "36px", md: "52px" },
+              fontWeight: 800,
               mb: 3,
+              lineHeight: 1.1,
+              fontFamily: '"Bricolage Grotesque", sans-serif',
             }}
           >
             {course?.title}
@@ -62,82 +111,89 @@ const Product = () => {
 
           <Typography
             sx={{
-              fontSize: "16px",
+              fontSize: "18px",
               opacity: 0.9,
-              lineHeight: 1.7,
-              mb: 3,
+              lineHeight: 1.6,
+              mb: 4,
+              maxWidth: "600px",
+              fontWeight: 500,
             }}
           >
             {course?.full_description}
           </Typography>
 
           {/* Rating Row */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 3, mb: 3 }}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <StarIcon sx={{ color: "#facc15" }} />
-              <Typography>{`${course?.rating} (${course?.total_ratings} ratings)`}</Typography>
+          <Box sx={{ display: "flex", flexWrap: 'wrap', alignItems: "center", gap: 4, mb: 5 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+              <Box sx={{ bgcolor: 'rgba(255,255,255,0.2)', p: 0.5, borderRadius: '8px', display: 'flex' }}>
+                <StarIcon sx={{ color: "#facc15", fontSize: 20 }} />
+              </Box>
+              <Typography sx={{ fontWeight: 600 }}>{`${course?.rating} (${course?.total_ratings} reviews)`}</Typography>
             </Box>
 
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <PeopleIcon sx={{ color: "#22d3ee" }} />
-              <Typography>{`${course?.total_students} students`}</Typography>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+              <Box sx={{ bgcolor: 'rgba(255,255,255,0.2)', p: 0.5, borderRadius: '8px', display: 'flex' }}>
+                <PeopleIcon sx={{ color: "#fff", fontSize: 20 }} />
+              </Box>
+              <Typography sx={{ fontWeight: 600 }}>{`${course?.total_students} students`}</Typography>
             </Box>
 
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <CircleIcon sx={{ color: "#22c55e", fontSize: 12 }} />
-              <Typography>{course?.mode} Mode</Typography>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+              <Box sx={{ bgcolor: 'rgba(255,255,255,0.2)', p: 0.5, borderRadius: '8px', display: 'flex' }}>
+                <CircleIcon sx={{ color: "#fff", fontSize: 10 }} />
+              </Box>
+              <Typography sx={{ fontWeight: 600 }}>{course?.mode} Mode</Typography>
             </Box>
           </Box>
 
           <Button
             onClick={() => navigate("/contact")}
-            variant="outlined"
+            variant="contained"
             sx={{
-              borderColor: "#fff",
-              color: "#fff",
-              px: 4,
-              py: 1.2,
-              borderRadius: "10px",
+              bgcolor: "#fff",
+              color: "var(--green-dark)",
+              px: 5,
+              py: 1.8,
+              borderRadius: "14px",
+              fontWeight: 800,
+              fontSize: '16px',
+              boxShadow: '0 10px 20px rgba(0,0,0,0.1)',
               "&:hover": {
-                backgroundColor: "#fff",
-                color: "#48723e",
+                backgroundColor: "var(--green-pale)",
+                transform: 'translateY(-3px)',
+                boxShadow: '0 15px 30px rgba(0,0,0,0.2)',
               },
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             }}
           >
-            Join Now →
+            Start Learning Now →
           </Button>
         </Box>
-
-        {/* Divider */}
-        <Box
-          sx={{
-            width: "1px",
-            height: { xs: 0, md: "400px" },
-            bgcolor: "rgba(255,255,255,0.3)",
-            display: { xs: "none", md: "block" },
-          }}
-        />
 
         {/* RIGHT CARD */}
         <Box
           sx={{
-            width: { xs: "100%", md: "380px" },
+            width: { xs: "100%", md: "420px" },
             bgcolor: "#fff",
             color: "#0f172a",
-            borderRadius: "18px",
+            borderRadius: "24px",
             overflow: "hidden",
-            p: 3,
-            boxShadow: "0px 15px 40px rgba(0,0,0,0.2)",
+            p: 4,
+            boxShadow: "0px 30px 60px rgba(0,0,0,0.3)",
+            animation: 'fadeInRight 0.8s ease-out',
+            border: '1px solid rgba(255,255,255,0.2)',
           }}
         >
           <Box
             sx={{
               width: "100%",
-              height: 220,
+              height: 240,
               position: "relative",
               overflow: "hidden",
-              borderRadius: "12px",
-              bgcolor: "#f5f5f5",
+              borderRadius: "16px",
+              bgcolor: "#f8fafc",
+              mb: 3,
+              border: '1px solid #e2e8f0',
             }}
           >
             <Box
@@ -149,97 +205,142 @@ const Product = () => {
                 top: "50%",
                 left: "50%",
                 transform: "translate(-50%, -50%)",
-                maxWidth: "100%",
-                maxHeight: "100%",
+                width: "90%",
+                height: "90%",
                 objectFit: "contain",
-                transition: "transform 0.4s ease",
+                transition: "transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
                 "&:hover": {
-                  transform: "translate(-50%, -50%) scale(1.05)",
+                  transform: "translate(-50%, -50%) scale(1.1)",
                 },
               }}
             />
           </Box>
-          {/* Price */}
-          <Typography
-            sx={{
-              fontSize: "30px",
-              fontWeight: 700,
-              color: "#ef4444",
-            }}
-          >
-            ₹{course?.price?.toLocaleString("en-IN")}
-            <Typography
-              component="span"
+
+          {/* Price Section */}
+          <Box sx={{ mb: 4 }}>
+            <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1.5 }}>
+              <Typography
+                sx={{
+                  fontSize: "36px",
+                  fontWeight: 800,
+                  color: "#e11d48",
+                  fontFamily: '"Bricolage Grotesque", sans-serif',
+                }}
+              >
+                ₹{course?.price?.toLocaleString("en-IN")}
+              </Typography>
+              <Typography
+                sx={{
+                  fontSize: "18px",
+                  textDecoration: "line-through",
+                  color: "#64748b",
+                  fontWeight: 500
+                }}
+              >
+                ₹{course?.original_price?.toLocaleString("en-IN")}
+              </Typography>
+            </Box>
+            
+            <Chip
+              label={`${course?.discount_percentage}% OFF - LIMITED OFFER`}
               sx={{
-                fontSize: "14px",
-                textDecoration: "line-through",
-                color: "#64748b",
-                ml: 1,
+                bgcolor: "#fff1f2",
+                color: "#e11d48",
+                fontWeight: 800,
+                fontSize: '11px',
+                borderRadius: '8px',
+                height: '28px',
+                mt: 1,
+                border: '1px solid #fecdd3'
+              }}
+            />
+          </Box>
+
+          <Stack spacing={2}>
+            <Button
+              onClick={() => navigate("/contact")}
+              fullWidth
+              variant="contained"
+              sx={{
+                bgcolor: "var(--green)",
+                color: "#fff",
+                py: 2,
+                borderRadius: "16px",
+                fontWeight: 700,
+                fontSize: '16px',
+                "&:hover": { 
+                  bgcolor: "var(--green-dark)",
+                  transform: 'scale(1.02)'
+                },
+                transition: 'all 0.3s ease',
               }}
             >
-              ₹{course?.original_price?.toLocaleString("en-IN")}
-            </Typography>
+              <SchoolIcon sx={{ mr: 1.5 }} />
+              Enroll in Course
+            </Button>
+
+            <Button
+              fullWidth
+              variant="outlined"
+              onClick={() => {
+                const pdfUrl = course?.syllabus_pdf_url;
+                if (!pdfUrl) return;
+                const link = document.createElement("a");
+                link.href = pdfUrl;
+                link.setAttribute("download", course?.title?.replace(/\s+/g, '_') + "_Syllabus.pdf");
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+              }}
+              sx={{
+                borderColor: "var(--green-mid)",
+                color: "var(--green-dark)",
+                py: 1.8,
+                borderRadius: "16px",
+                fontWeight: 700,
+                borderWidth: '2px',
+                "&:hover": { 
+                  bgcolor: "var(--green-pale)",
+                  borderColor: "var(--green)",
+                  borderWidth: '2px',
+                },
+              }}
+            >
+              <DownloadIcon sx={{ mr: 1.5 }} />
+              Download Curriculum
+            </Button>
+          </Stack>
+          
+          <Typography 
+            sx={{ 
+              textAlign: 'center', 
+              mt: 3, 
+              fontSize: '13px', 
+              color: '#64748b',
+              fontWeight: 500
+            }}
+          >
+            Secure Checkout • 30-Day Money Back Guarantee
           </Typography>
-
-          <Chip
-            label={`${course?.discount_percentage}% off - Limited time!`}
-            sx={{
-              bgcolor: "#ef4444",
-              color: "#fff",
-              mt: 2,
-              mb: 3,
-            }}
-          />
-
-          <Button
-            onClick={() => navigate("/contact")}
-            fullWidth
-            sx={{
-              bgcolor: "#7c3aed",
-              color: "#fff",
-              py: 1.3,
-              borderRadius: "12px",
-              mb: 2,
-              "&:hover": { bgcolor: "#6d28d9" },
-            }}
-          >
-            <SchoolIcon sx={{ mr: 1 }} />
-            Enroll Now
-          </Button>
-
-          <Button
-            fullWidth
-            onClick={() => {
-              fetch(course?.syllabus_pdf_url)
-                .then((res) => res.blob())
-                .then((blob) => {
-                  const url = window.URL.createObjectURL(new Blob([blob]));
-                  const link = document.createElement("a");
-                  link.href = url;
-                  link.setAttribute(
-                    "download",
-                    course?.syllabus_pdf?.split("/").pop() || "syllabus.pdf",
-                  );
-                  document.body.appendChild(link);
-                  link.click();
-                  link.parentNode.removeChild(link);
-                  window.URL.revokeObjectURL(url);
-                });
-            }}
-            sx={{
-              bgcolor: "#f43f5e",
-              color: "#fff",
-              py: 1.3,
-              borderRadius: "12px",
-              "&:hover": { bgcolor: "#e11d48" },
-            }}
-          >
-            <DownloadIcon sx={{ mr: 1 }} />
-            Download Syllabus
-          </Button>
         </Box>
       </Box>
+
+      <style>
+        {`
+          @keyframes fadeInLeft {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+          }
+          @keyframes fadeInRight {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+          }
+        `}
+      </style>
     </Box>
+  );
+};
+
   );
 };
 

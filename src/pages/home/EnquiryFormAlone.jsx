@@ -1,7 +1,51 @@
 import React, { useState } from "react";
-import { Box, Typography, TextField, Button } from "@mui/material";
+import { Box, Typography, TextField, Button, alpha } from "@mui/material";
+import { styled, keyframes } from "@mui/material/styles";
 import { PostRequest } from "../../api/config";
 import { ADMIN_POST_ENQUIRIES } from "../../api/endpoints";
+import SendIcon from '@mui/icons-material/Send';
+
+// Animations
+const fadeIn = keyframes`
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+`;
+
+// Styled Components
+const GlassFormCard = styled(Box)(({ theme }) => ({
+  background: 'rgba(255, 255, 255, 0.7)',
+  backdropFilter: 'blur(20px)',
+  WebkitBackdropFilter: 'blur(20px)',
+  borderRadius: '24px',
+  border: '1px solid rgba(255, 255, 255, 0.5)',
+  boxShadow: '0 20px 40px rgba(0, 0, 0, 0.05)',
+  padding: theme.spacing(4),
+  animation: `${fadeIn} 0.8s ease-out forwards`,
+  [theme.breakpoints.down('sm')]: {
+    padding: theme.spacing(3),
+  },
+}));
+
+const StyledTextField = styled(TextField)(({ theme }) => ({
+  '& .MuiOutlinedInput-root': {
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    borderRadius: '12px',
+    transition: 'all 0.3s ease',
+    '& fieldset': {
+      borderColor: 'var(--green-light)',
+    },
+    '&:hover fieldset': {
+      borderColor: 'var(--green-mid)',
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: 'var(--green)',
+      borderWidth: '2px',
+    },
+  },
+  '& .MuiInputBase-input': {
+    fontSize: '0.95rem',
+  },
+}));
 
 export default function EnquiryFormAlone() {
   const [formData, setFormData] = useState({
@@ -35,8 +79,7 @@ export default function EnquiryFormAlone() {
     }
 
     try {
-      const response = await PostRequest(ADMIN_POST_ENQUIRIES, formData);
-
+      await PostRequest(ADMIN_POST_ENQUIRIES, formData);
       setSuccess("Enquiry submitted successfully!");
       setFormData({
         name: "",
@@ -46,8 +89,6 @@ export default function EnquiryFormAlone() {
         location: "",
         timeslot: "",
       });
-
-      console.log(response);
     } catch (err) {
       setError("Failed to submit enquiry: " + err.message);
     } finally {
@@ -56,63 +97,63 @@ export default function EnquiryFormAlone() {
   };
 
   return (
-    <Box
-      sx={{
-        flex: 1,
-        backgroundColor: "white",
-        boxShadow:
-          "0px 10px 30px rgba(0,0,0,0.08), 0px 4px 12px rgba(0,0,0,0.05)",
-        padding: "30px",
-        borderRadius: "15px" }}
-    >
-      <Typography variant="h4" sx={{ fontWeight: 700, mb: 3 }}>
-        Quick{" "}
-        <Box component="span" sx={{ color: "#48723e" }}>
-          Enquiry
-        </Box>
-      </Typography>
+    <GlassFormCard>
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="h4" sx={{
+          fontWeight: 800,
+          color: "var(--green-deep)",
+          fontSize: { xs: '1.8rem', md: '2.2rem' },
+          mb: 1
+        }}>
+          Quick <span style={{ color: "var(--green)" }}>Enquiry</span>
+        </Typography>
+        <Typography sx={{ color: "text.secondary", fontSize: '0.9rem' }}>
+          Intersted in our courses? Let us know!
+        </Typography>
+      </Box>
 
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-        <TextField
+        <StyledTextField
           fullWidth
           placeholder="Your Name *"
           name="name"
           value={formData.name}
           onChange={handleChange}
         />
-        <TextField
+        <StyledTextField
           fullWidth
           placeholder="Your Email Address *"
           name="email"
+          type="email"
           value={formData.email}
           onChange={handleChange}
         />
-        <TextField
+        <StyledTextField
           fullWidth
           placeholder="Mobile Number *"
           name="mobile"
           value={formData.mobile}
           onChange={handleChange}
         />
-        <TextField
+        <StyledTextField
           fullWidth
-          placeholder="Course you are interested in ? *"
+          placeholder="Course of Interest *"
           name="course"
           value={formData.course}
           onChange={handleChange}
         />
 
-        <Box sx={{ display: "flex", gap: 2 }}>
-          <TextField
+        <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}>
+          <StyledTextField
             fullWidth
             placeholder="Your Location *"
             name="location"
             value={formData.location}
             onChange={handleChange}
           />
-          <TextField
+          <StyledTextField
             fullWidth
-            placeholder="Preferred timeslot to call *"
+            placeholder="Preferred Call Time *"
             name="timeslot"
             value={formData.timeslot}
             onChange={handleChange}
@@ -120,12 +161,20 @@ export default function EnquiryFormAlone() {
         </Box>
 
         {error && (
-          <Typography color="error" sx={{ mt: 1 }}>
+          <Typography color="error" sx={{
+            fontSize: '0.8rem',
+            fontWeight: 500,
+            mt: 0.5
+          }}>
             {error}
           </Typography>
         )}
         {success && (
-          <Typography color="success.main" sx={{ mt: 1 }}>
+          <Typography color="success.main" sx={{
+            fontSize: '0.8rem',
+            fontWeight: 500,
+            mt: 0.5
+          }}>
             {success}
           </Typography>
         )}
@@ -133,20 +182,31 @@ export default function EnquiryFormAlone() {
         <Button
           onClick={handleSubmit}
           disabled={loading}
+          endIcon={<SendIcon />}
           sx={{
-            mt: 2,
-            py: 1.5,
-            fontSize: "16px",
-            fontWeight: 600,
-            borderRadius: "10px",
+            mt: 1,
+            py: 1.8,
+            fontSize: "1rem",
+            fontWeight: 700,
+            borderRadius: "12px",
             textTransform: "none",
-            background: "#48723e",
+            background: "linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%)",
             color: "white",
-            "&:hover": { background: "#000", color: "white" } }}
+            boxShadow: '0 8px 16px var(--green-light)',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              background: "linear-gradient(135deg, var(--green-dark) 0%, var(--green-deep) 100%)",
+              transform: 'translateY(-2px)',
+              boxShadow: '0 12px 24px var(--green-light)',
+            },
+            '&:active': {
+              transform: 'translateY(0)',
+            }
+          }}
         >
-          {loading ? "Submitting..." : "Let’s get Started!"}
+          {loading ? "Submitting..." : "Get Started Now"}
         </Button>
       </Box>
-    </Box>
+    </GlassFormCard>
   );
 }

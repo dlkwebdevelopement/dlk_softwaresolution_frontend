@@ -11,18 +11,286 @@ import {
   List,
   ListItemButton,
   ListItemText,
+  ListItemIcon,
   Collapse,
   Paper,
   Chip,
+  Avatar,
+  Badge,
+  Divider,
+  Fade,
+  Grow,
+  Zoom,
+  alpha,
+  Container,
 } from "@mui/material";
+import { styled, keyframes } from "@mui/material/styles";
 import CloseIcon from "@mui/icons-material/Close";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useNavigate } from "react-router-dom";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import SchoolIcon from "@mui/icons-material/School";
+import WorkIcon from "@mui/icons-material/Work";
+import EventIcon from "@mui/icons-material/Event";
+import MapIcon from "@mui/icons-material/Map";
+import MenuBookIcon from "@mui/icons-material/MenuBook";
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import StarIcon from "@mui/icons-material/Star";
+import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
+import LiveHelpIcon from "@mui/icons-material/LiveHelp";
 import { GetRequest } from "../api/config";
 import { ADMIN_GET_ALL_CATEGORIES_WITH_SUB } from "../api/endpoints";
+
+// Animations
+const floatAnimation = keyframes`
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+  100% { transform: translateY(0px); }
+`;
+
+const pulseGlow = keyframes`
+  0% { box-shadow: 0 0 0 0 rgba(61, 184, 67, 0.4); }
+  70% { box-shadow: 0 0 0 15px rgba(61, 184, 67, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(61, 184, 67, 0); }
+`;
+
+const shimmer = keyframes`
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+`;
+
+const rotateGradient = keyframes`
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+`;
+
+const slideInRight = keyframes`
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+`;
+
+const slideInLeft = keyframes`
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+`;
+
+const scaleIn = keyframes`
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+`;
+
+// Color scheme
+const colors = {
+  primary: "#3DB843",
+  secondary: "#D3F36B",
+  accent: "#fbfdf3",
+  dark: "#1a4718",
+  light: "#ffffff",
+  text: {
+    primary: "#111c12",
+    secondary: "#2e9133",
+    light: "#f8faf7",
+  },
+  gradient: {
+    main: "linear-gradient(135deg, #1a4718 0%, #3DB843 50%, #D3F36B 100%)",
+    dark: "linear-gradient(135deg, #1a4718 0%, #3DB843 100%)",
+    accent: "linear-gradient(135deg, #3DB843, #D3F36B)",
+  }
+};
+
+// Styled Components
+const GlassAppBar = styled(AppBar)({
+  background: 'rgba(255, 255, 255, 0.7)',
+  backdropFilter: 'blur(15px)',
+  WebkitBackdropFilter: 'blur(15px)',
+  borderBottom: `1px solid ${alpha(colors.primary, 0.1)}`,
+  boxShadow: '0 4px 30px rgba(0, 0, 0, 0.05)',
+  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: '-100%',
+    width: '100%',
+    height: '100%',
+    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)',
+    animation: `${shimmer} 3s infinite`,
+    pointerEvents: 'none',
+  },
+});
+
+const LogoContainer = styled(Box)({
+  display: "flex",
+  alignItems: "center",
+  background: "transparent",
+  cursor: "pointer",
+  transition: "all 0.3s ease",
+  '&:hover': {
+    transform: "scale(1.04)",
+  },
+});
+
+const NavItem = styled(Box)({
+  display: "flex",
+  alignItems: "center",
+  cursor: "pointer",
+  padding: "6px 14px",
+  borderRadius: "50px",
+  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+  position: "relative",
+  '&:hover': {
+    background: alpha(colors.primary, 0.08),
+    transform: "translateY(-1px)",
+    '& .nav-text': {
+      color: colors.primary,
+    },
+    '& .nav-icon': {
+      color: colors.primary,
+      transform: "rotate(15deg)",
+    },
+  },
+});
+
+const NavText = styled(Typography)({
+  color: colors.dark,
+  fontSize: "0.95rem",
+  fontWeight: 600,
+  letterSpacing: "0.2px",
+  transition: "color 0.3s ease",
+});
+
+const MegaMenuContainer = styled(Paper)({
+  position: "absolute",
+  top: "100%",
+  left: "50%",
+  transform: "translateX(-50%)",
+  width: "1000px",
+  maxWidth: "95vw",
+  height: "500px",
+  borderRadius: "24px",
+  zIndex: 1400,
+  display: "flex",
+  overflow: "hidden",
+  background: 'rgba(255, 255, 255, 0.95)',
+  backdropFilter: 'blur(20px)',
+  WebkitBackdropFilter: 'blur(20px)',
+  border: `1px solid ${alpha(colors.primary, 0.1)}`,
+  boxShadow: '0 30px 60px rgba(0, 0, 0, 0.12)',
+});
+
+const CategoryItem = styled(Box)(({ active }) => ({
+  padding: "12px 18px",
+  borderRadius: "12px",
+  fontWeight: 600,
+  cursor: "pointer",
+  transition: "all 0.3s ease",
+  backgroundColor: active ? alpha(colors.primary, 0.1) : "transparent",
+  color: active ? colors.primary : '#111c12',
+  border: active ? `1px solid ${alpha(colors.primary, 0.1)}` : '1px solid transparent',
+  '&:hover': {
+    backgroundColor: alpha(colors.primary, 0.05),
+    color: colors.primary,
+    transform: "translateX(5px)",
+  },
+}));
+
+const SubCategoryChip = styled(Chip)({
+  borderRadius: "30px",
+  padding: "6px 4px",
+  backgroundColor: alpha(colors.primary, 0.05),
+  border: `1px solid ${alpha(colors.primary, 0.1)}`,
+  color: colors.text.primary,
+  fontWeight: 600,
+  fontSize: "0.85rem",
+  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+  '&:hover': {
+    backgroundColor: colors.primary,
+    color: colors.light,
+    transform: "translateY(-2px)",
+    boxShadow: `0 4px 12px ${alpha(colors.primary, 0.2)}`,
+    '& .MuiChip-icon': {
+      color: colors.light,
+    }
+  },
+  '& .MuiChip-icon': {
+    fontSize: 14,
+    color: colors.primary,
+    transition: 'color 0.3s ease',
+  }
+});
+
+const CTAGradientButton = styled(Button)({
+  background: colors.primary,
+  color: colors.light,
+  fontWeight: 700,
+  textTransform: "none",
+  padding: "8px 12px",
+  borderRadius: "50px",
+  fontSize: "0.95rem",
+  letterSpacing: "0.5px",
+  transition: "all 0.3s ease",
+  position: "relative",
+  overflow: "hidden",
+  animation: `${pulseGlow} 2s infinite`,
+  border: '1px solid rgba(255, 255, 255, 0.3)',
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: '-100%',
+    width: '100%',
+    height: '100%',
+    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
+    transition: 'left 0.5s ease',
+  },
+  '&:hover': {
+    transform: 'translateY(-3px) scale(1.05)',
+    boxShadow: `0 20px 40px ${alpha(colors.secondary, 0.3)}`,
+    '&::before': {
+      left: '100%',
+    },
+  },
+  '&:active': {
+    transform: 'translateY(0) scale(0.95)',
+  },
+});
+
+const MobileMenuItem = styled(ListItemButton)({
+  borderRadius: "12px",
+  marginBottom: "6px",
+  padding: "10px 16px",
+  transition: "all 0.3s ease",
+  '&:hover': {
+    backgroundColor: alpha(colors.primary, 0.05),
+    transform: "translateX(5px)",
+    '& .MuiListItemIcon-root': {
+      color: colors.primary,
+    }
+  },
+});
 
 const MegaMenu = ({ open, onClose, handleCardClick }) => {
   const [cats, setCats] = useState([]);
@@ -46,124 +314,114 @@ const MegaMenu = ({ open, onClose, handleCardClick }) => {
   if (!open) return null;
 
   return (
-    <Paper
-      elevation={6}
-      onMouseLeave={onClose}
-      sx={{
-        position: "absolute",
-        top: "45px",
-        left: "50%",
-        transform: "translateX(-50%)",
-        width: "900px",
-        maxWidth: "90vw",
-        height: "450px",
-        borderRadius: "12px",
-        zIndex: 1400,
-        display: "flex",
-        overflow: "hidden" }}
-    >
+    <MegaMenuContainer elevation={0}>
       {/* LEFT COLUMN - Categories */}
-      <Box
-        sx={{
-          width: "280px",
-          bgcolor: "#f8f9fa",
-          borderRight: "1px solid #e0e0e0",
-          overflowY: "auto",
-          p: 2 }}
-      >
-        <Stack spacing={0.5}>
-          {cats.map((item) => (
-            <Box
-              key={item.id}
-              onMouseEnter={() => setActiveCat(item)}
-              sx={{
-                px: 2,
-                py: 1.2,
-                borderRadius: "8px",
-                fontWeight: 600,
-                cursor: "pointer",
-                transition: "all 0.2s",
-                
-                backgroundColor:
-                  activeCat?.id === item.id ? "#eae69e" : "transparent",
-                color: activeCat?.id === item.id ? "#1a4718" : "#1e1e1e",
-                "&:hover": {
-                  backgroundColor: "#eae69e",
-                  color: "#1a4718",
-                } }}
-            >
-              {item.category}
-            </Box>
-          ))}
-        </Stack>
-      </Box>
-
-      {/* RIGHT COLUMN - Subcategories */}
-      <Box
-        sx={{
-          flex: 1,
-          p: 3,
-          overflowY: "auto",
-          bgcolor: "#ffffff" }}
-      >
-        {activeCat ? (
-          <>
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: 700,
-                mb: 3,
-                color: "#1e1e1e",
-                borderBottom: "2px solid #48723e",
-                pb: 1,
-                display: "inline-block" }}
-            >
-              {activeCat.category}
-            </Typography>
-
-            {activeCat?.subcategories?.length > 0 ? (
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5 }}>
-                {activeCat.subcategories.map((sub) => (
-                  <Chip
-                    key={sub.id}
-                    label={sub.subcategory}
-                    clickable
-                    onClick={() => handleCardClick(activeCat.id)}
-                    sx={{
-                      borderRadius: "20px",
-                      px: 1,
-                      backgroundColor: "#f5f5f5",
-                      fontWeight: 500,
-                      transition: "all 0.2s",
-                      
-                      "&:hover": {
-                        backgroundColor: "#48723e",
-                        color: "#ffffff",
-                        transform: "translateY(-2px)",
-                        boxShadow: 2,
-                      } }}
-                  />
-                ))}
-              </Box>
-            ) : (
-              <Typography
-                color="text.secondary"
-                sx={{ fontStyle: "italic" }}
-              >
-                No subcategories available
-              </Typography>
-            )}
-          </>
-        ) : (
+        <Box
+          sx={{
+            width: "280px",
+            background: alpha(colors.primary, 0.02),
+            borderRight: `1px solid ${alpha(colors.primary, 0.08)}`,
+            overflowY: "auto",
+            p: 1.5,
+          }}
+        >
           <Typography
-            color="text.secondary"
-            sx={{ textAlign: "center", mt: 4 }}
+            sx={{
+              color: '#111c12',
+              fontSize: "0.75rem",
+              fontWeight: 700,
+              letterSpacing: "1.2px",
+              mb: 2,
+              px: 1,
+              textTransform: "uppercase",
+            }}
           >
-            Select a category to view subcategories
+            Course Categories
           </Typography>
-        )}
-      </Box>
-    </Paper>
+          <Stack spacing={0.5}>
+            {cats.map((item, index) => (
+              <CategoryItem
+                  active={activeCat?.id === item.id}
+                  onMouseEnter={() => setActiveCat(item)}
+                >
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <MenuBookIcon sx={{ fontSize: 18, color: colors.primary }} />
+                    {item.category}
+                  </Box>
+                </CategoryItem>
+            ))}
+          </Stack>
+        </Box>
+
+        {/* RIGHT COLUMN - Subcategories */}
+        <Box
+          sx={{
+            flex: 1,
+            p: 4,
+            overflowY: "auto",
+            background: 'white',
+          }}
+        >
+          {activeCat ? (
+            <>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2.5, mb: 4 }}>
+                <Avatar
+                  sx={{
+                    bgcolor: alpha(colors.primary, 0.1),
+                    color: colors.primary,
+                    width: 56,
+                    height: 56,
+                  }}
+                >
+                  <SchoolIcon sx={{ fontSize: 28 }} />
+                </Avatar>
+                <Box>
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      fontWeight: 800,
+                      color: colors.dark,
+                      mb: 0.5,
+                      fontSize: '1.4rem'
+                    }}
+                  >
+                    {activeCat.category}
+                  </Typography>
+                  <Typography sx={{ color: colors.text.secondary, fontSize: "0.95rem", fontWeight: 500 }}>
+                    Discover {activeCat?.subcategories?.length || 0} expert-led specializations
+                  </Typography>
+                </Box>
+              </Box>
+
+              <Divider sx={{ borderColor: alpha(colors.primary, 0.08), mb: 4 }} />
+
+              {activeCat?.subcategories?.length > 0 ? (
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5 }}>
+                  {activeCat.subcategories.map((sub, index) => (
+                      <SubCategoryChip
+                        label={sub.subcategory}
+                        onClick={() => handleCardClick(activeCat.id)}
+                        icon={<ChevronRightIcon />}
+                      />
+                  ))}
+                </Box>
+              ) : (
+                <Box sx={{ textAlign: "center", py: 6 }}>
+                  <Typography sx={{ color: colors.text.secondary, fontStyle: "italic", fontSize: '1rem' }}>
+                    New courses coming soon for this category
+                  </Typography>
+                </Box>
+              )}
+            </>
+          ) : (
+            <Box sx={{ textAlign: "center", mt: 6 }}>
+              <Typography sx={{ color: colors.text.secondary, fontWeight: 500 }}>
+                Explore our catalog by selecting a category
+              </Typography>
+            </Box>
+          )}
+        </Box>
+    </MegaMenuContainer>
   );
 };
 
@@ -203,27 +461,14 @@ const Navbar = () => {
     setOpen(false);
   };
 
-  const linkStyle = {
-    color: "#ffffff",
-    fontSize: "15px",
-    fontWeight: 550,
-    cursor: "pointer",
-    transition: "opacity 0.2s",
-    
-    "&:hover": {
-      opacity: 0.9,
-    },
-  };
-
   const handleCardClick = async (categoryId) => {
     try {
       const res = await GetRequest(`/admin/course/category/${categoryId}`);
-
       const courses = res?.data || [];
 
       if (courses.length > 0) {
         navigate(`/course/${courses[0].slug}`);
-        setOpen(false); // close drawer if mobile
+        setOpen(false);
       } else {
         alert("Course not found for this category");
       }
@@ -233,223 +478,175 @@ const Navbar = () => {
   };
 
   return (
-    <AppBar
-      position="fixed"
-      sx={{
-         background: "linear-gradient(340deg, #48723e 0%, #d8ea9e 100%)",
-        px: { xs: 2, md: 4 },
-        py: 0.5,
-        top: 0,
-        zIndex: 1300,
-        boxShadow: 3 }}
-    >
-      <Toolbar
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          minHeight: { xs: "70px", md: "80px" },
-          p: "0 !important" }}
-      >
-        {/* LOGO */}
-        <Box
-          onClick={() => navigate("/")}
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            backgroundColor: "#ffffff",
-            px: 1.5,
-            py: 0.5,
-            borderRadius: "10px",
-            cursor: "pointer",
-            transition: "transform 0.2s",
-            "&:hover": {
-              transform: "scale(1.02)",
-            } }}
-        >
-          <img
-            src="/photos/dlk_logo.webp"
-            height="50"
-            alt="DLK Logo"
-            style={{ display: "block" }}
-          />
-        </Box>
-
-        {/* DESKTOP NAVIGATION */}
-        <Stack
-          direction="row"
-          spacing={3}
-          sx={{
-            display: { xs: "none", md: "flex" },
-            alignItems: "center" }}
-        >
-          {/* All Courses with MegaMenu */}
-          <Box
-            sx={{ position: "relative" }}
-            onMouseEnter={() => {
-              setCourseOpen(true);
-              setFortuneOpen(false);
-            }}
-            onMouseLeave={() => setCourseOpen(false)}
-          >
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                cursor: "pointer",
-                py: 2 }}
-            >
-              <Typography sx={linkStyle}>All Courses</Typography>
-              <ArrowDropDownIcon sx={{ color: "#ffffff", ml: 0.5 }} />
-            </Box>
-            <MegaMenu
-              open={courseOpen}
-              onClose={() => setCourseOpen(false)}
-              handleCardClick={handleCardClick}
-            />
-          </Box>
-
-          {/* Fortune Dropdown */}
-          <Box
-            sx={{ position: "relative" }}
-            onMouseEnter={() => {
-              setFortuneOpen(true);
-              setCourseOpen(false);
-            }}
-            onMouseLeave={() => setFortuneOpen(false)}
-          >
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                cursor: "pointer",
-                py: 2 }}
-            >
-              <Typography sx={linkStyle}>Fortune</Typography>
-              <ArrowDropDownIcon sx={{ color: "#ffffff", ml: 0.5 }} />
-            </Box>
-
-            {fortuneOpen && (
-              <Paper
-                elevation={4}
-                sx={{
-                  position: "absolute",
-                  top: "100%",
-                  left: 0,
-                  minWidth: "220px",
-                  mt: 0.5,
-                  borderRadius: "8px",
-                  overflow: "hidden",
-                  zIndex: 1400 }}
-              >
-                <Typography
-                  sx={{
-                    px: 2.5,
-                    py: 1.5,
-                    cursor: "pointer",
-                    color: "#1e1e1e",
-                    fontSize: "14px",
-                    transition: "all 0.2s",
-                    
-                    "&:hover": {
-                      backgroundColor: "#eae69e",
-                      color: "#1a4718",
-                      pl: 3,
-                    } }}
-                  onClick={() => handleNavigation("/become-instructor")}
-                >
-                  Become an Instructor
-                </Typography>
-                <Typography
-                  sx={{
-                    px: 2.5,
-                    py: 1.5,
-                    cursor: "pointer",
-                    color: "#1e1e1e",
-                    fontSize: "14px",
-                    borderTop: "1px solid #e0e0e0",
-                    transition: "all 0.2s",
-                    
-                    "&:hover": {
-                      backgroundColor: "#eae69e",
-                      color: "#1a4718",
-                      pl: 3,
-                    } }}
-                  onClick={() => handleNavigation("/career")}
-                >
-                  Career
-                </Typography>
-              </Paper>
-            )}
-          </Box>
-
-          <Typography
-            onClick={() => handleNavigation("/workshop")}
-            sx={linkStyle}
-          >
-            Workshop
-          </Typography>
-
-          <Typography
-            onClick={() => handleNavigation("/roadmap")}
-            sx={linkStyle}
-          >
-            Roadmap
-          </Typography>
-
-          <Button
-            onClick={() => navigate("/contact")}
-            variant="contained"
+    <>
+      <GlassAppBar position="fixed" elevation={0}>
+        <Container maxWidth="xl">
+          <Toolbar
             sx={{
-              backgroundColor: "#bfdb81",
-              color: "#1e1e1e",
-              fontWeight: 700,
-              textTransform: "none",
-              px: 4,
-              py: 1.5,
-              borderRadius: "10px",
-              boxShadow: 3,
-              
-              position: "relative",
-              animation: "pulse 1.2s infinite",
-
-              "@keyframes pulse": {
-                "0%": {
-                  boxShadow: "0 0 0 0 rgba(229, 229, 229, 0.7)",
-                },
-                "70%": {
-                  boxShadow: "0 0 0 12px rgba(179, 20, 20, 0)",
-                },
-                "100%": {
-                  boxShadow: "0 0 0 0 rgba(229, 215, 69, 0)",
-                },
-              },
-
-              "&:hover": {
-                backgroundColor: "#bfdb81",
-                transform: "scale(1.05)",
-                opacity: 0.9,
-              } }}
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              minHeight: { xs: "70px", md: "80px" },
+              p: "0 !important",
+            }}
           >
-            Book Free Demo
-          </Button>
-        </Stack>
+            {/* LOGO */}
+            <LogoContainer onClick={() => navigate("/")}>
+              <img
+                src="/photos/dlk_logo.png"
+                height="60"
+                alt="DLK Logo"
+                style={{ display: "block" }}
+              />
+            </LogoContainer>
 
-        {/* MOBILE MENU BUTTON */}
-        <IconButton
-          sx={{
-            display: { xs: "flex", md: "none" },
-            color: "#ffffff",
-            backgroundColor: "rgba(255,255,255,0.1)",
-            
-            "&:hover": {
-              backgroundColor: "rgba(255,255,255,0.2)",
-            } }}
-          onClick={() => setOpen(!open)}
-        >
-          {open ? <CloseIcon /> : <MenuIcon />}
-        </IconButton>
-      </Toolbar>
+            {/* DESKTOP NAVIGATION */}
+            <Stack
+              direction="row"
+              spacing={1}
+              sx={{
+                display: { xs: "none", md: "flex" },
+                alignItems: "center",
+              }}
+            >
+              {/* All Courses with MegaMenu */}
+              <Box
+                sx={{ position: "relative" }}
+                onMouseEnter={() => {
+                  setCourseOpen(true);
+                  setFortuneOpen(false);
+                }}
+                onMouseLeave={() => setCourseOpen(false)}
+              >
+                <NavItem>
+                  <MenuBookIcon className="nav-icon" sx={{ fontSize: 20, mr: 1, color: colors.dark, transition: "all 0.4s ease" }} />
+                  <NavText className="nav-text">All Courses</NavText>
+                  <ArrowDropDownIcon className="nav-icon" sx={{ color: colors.dark, ml: 0.2, transition: "transform 0.4s ease" }} />
+                </NavItem>
+                <MegaMenu
+                  open={courseOpen}
+                  onClose={() => setCourseOpen(false)}
+                  handleCardClick={handleCardClick}
+                />
+              </Box>
+
+              {/* Fortune Dropdown */}
+              <Box
+                sx={{ position: "relative" }}
+                onMouseEnter={() => {
+                  setFortuneOpen(true);
+                  setCourseOpen(false);
+                }}
+                onMouseLeave={() => setFortuneOpen(false)}
+              >
+                <NavItem>
+                  <EmojiEventsIcon className="nav-icon" sx={{ fontSize: 20, mr: 1, color: colors.dark, transition: "all 0.4s ease" }} />
+                  <NavText className="nav-text">Fortune</NavText>
+                  <ArrowDropDownIcon className="nav-icon" sx={{ color: colors.dark, ml: 0.2, transition: "transform 0.4s ease" }} />
+                </NavItem>
+
+                <Fade in={fortuneOpen}>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      position: "absolute",
+                      top: "100%",
+                      left: 0,
+                      minWidth: "260px",
+                      mt: 1,
+                      borderRadius: "20px",
+                      overflow: "hidden",
+                      zIndex: 1400,
+                      background: 'rgba(255, 255, 255, 0.98)',
+                      backdropFilter: 'blur(20px)',
+                      WebkitBackdropFilter: 'blur(20px)',
+                      border: `1px solid ${alpha(colors.primary, 0.1)}`,
+                      boxShadow: '0 15px 45px rgba(0, 0, 0, 0.1)',
+                    }}
+                  >
+                    {[
+                      { icon: <SchoolIcon />, text: "Become an Instructor", path: "/become-instructor" },
+                      { icon: <WorkIcon />, text: "Career", path: "/career" },
+                    ].map((item, index) => (
+                      <ListItemButton
+                        key={index}
+                        onClick={() => handleNavigation(item.path)}
+                        sx={{
+                          px: 3,
+                          py: 1.8,
+                          '&:hover': {
+                            backgroundColor: alpha(colors.primary, 0.05),
+                            '& .MuiListItemIcon-root': {
+                              color: colors.primary,
+                            },
+                            '& .MuiListItemText-primary': {
+                              color: colors.primary,
+                            }
+                          },
+                        }}
+                      >
+                        <ListItemIcon sx={{ color: colors.text.secondary, minWidth: 36 }}>
+                          {item.icon}
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={item.text}
+                          primaryTypographyProps={{
+                            color: colors.text.primary,
+                            fontWeight: 600,
+                            fontSize: '0.9rem'
+                          }}
+                        />
+                      </ListItemButton>
+                    ))}
+                  </Paper>
+                </Fade>
+              </Box>
+
+              <NavItem onClick={() => handleNavigation("/workshop")}>
+                <EventIcon className="nav-icon" sx={{ fontSize: 20, mr: 1, color: colors.dark, transition: "all 0.4s ease" }} />
+                <NavText className="nav-text">Workshop</NavText>
+              </NavItem>
+
+              <NavItem onClick={() => handleNavigation("/roadmap")}>
+                <MapIcon className="nav-icon" sx={{ fontSize: 20, mr: 1, color: colors.dark, transition: "all 0.4s ease" }} />
+                <NavText className="nav-text">Roadmap</NavText>
+              </NavItem>
+
+              <NavItem onClick={() => handleNavigation("/help")}>
+                <LiveHelpIcon className="nav-icon" sx={{ fontSize: 20, mr: 1, color: colors.dark, transition: "all 0.4s ease" }} />
+                <NavText className="nav-text">Help</NavText>
+              </NavItem>
+
+              <CTAGradientButton
+                onClick={() => navigate("/contact")}
+                startIcon={<RocketLaunchIcon />}
+              >
+                Book Free Demo
+              </CTAGradientButton>
+            </Stack>
+
+            {/* MOBILE MENU BUTTON */}
+            <IconButton
+              sx={{
+                display: { xs: "flex", md: "none" },
+                color: colors.primary,
+                backgroundColor: alpha(colors.primary, 0.05),
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
+                border: `1px solid ${alpha(colors.primary, 0.1)}`,
+                '&:hover': {
+                  backgroundColor: alpha(colors.primary, 0.1),
+                  transform: 'scale(1.05)',
+                },
+                transition: 'all 0.3s ease',
+              }}
+              onClick={() => setOpen(!open)}
+            >
+              {open ? <CloseIcon /> : <MenuIcon />}
+            </IconButton>
+          </Toolbar>
+        </Container>
+      </GlassAppBar>
 
       {/* MOBILE DRAWER */}
       <Drawer
@@ -458,289 +655,271 @@ const Navbar = () => {
         onClose={() => setOpen(false)}
         PaperProps={{
           sx: {
-            backgroundColor: "#48723e",
-            pt: 10,
+            background: 'rgba(255, 255, 255, 0.98)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            pt: 11,
             pb: 4,
-            maxHeight: "90vh",
+            maxHeight: "100vh",
             overflowY: "auto",
-            
-          } }}
+            borderBottomLeftRadius: "30px",
+            borderBottomRightRadius: "30px",
+            borderBottom: `2px solid ${alpha(colors.primary, 0.1)}`,
+          }
+        }}
       >
-        <Stack spacing={1} alignItems="center" sx={{ width: "100%", px: 2 }}>
-          {/* All Courses Section */}
-          <List sx={{ width: "100%", maxWidth: 400 }}>
-            <ListItemButton
-              onClick={() => setMobileAllCoursesOpen(!mobileAllCoursesOpen)}
-              sx={{
-                backgroundColor: "#1a4718",
-                borderRadius: 2,
-                
-                mb: 0.5,
-                "&:hover": {
-                  backgroundColor: "#1a4718",
-                } }}
-            >
-              <ListItemText
-                primary="All Courses"
-                primaryTypographyProps={{
-                  fontWeight: 600,
-                  color: "#ffffff",
-                  fontSize: "16px" }}
-              />
-              {mobileAllCoursesOpen ? (
-                <ExpandLessIcon sx={{ color: "#ffffff" }} />
-              ) : (
-                <ExpandMoreIcon sx={{ color: "#ffffff" }} />
-              )}
-            </ListItemButton>
+        <Container maxWidth="sm">
+          <Stack spacing={1} alignItems="center" sx={{ width: "100%" }}>
+            {/* All Courses Section */}
+            <List sx={{ width: "100%" }}>
+              <MobileMenuItem
+                onClick={() => setMobileAllCoursesOpen(!mobileAllCoursesOpen)}
+                sx={{
+                  backgroundColor: alpha(colors.primary, 0.04),
+                  borderRadius: "16px",
+                  border: `1px solid ${alpha(colors.primary, 0.08)}`,
+                }}
+              >
+                <ListItemIcon sx={{ color: colors.primary, minWidth: 40 }}>
+                  <MenuBookIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary="All Courses"
+                  primaryTypographyProps={{
+                    fontWeight: 700,
+                    color: colors.dark,
+                    fontSize: "1.05rem"
+                  }}
+                />
+                {mobileAllCoursesOpen ? (
+                  <ExpandLessIcon sx={{ color: colors.primary }} />
+                ) : (
+                  <ExpandMoreIcon sx={{ color: colors.primary }} />
+                )}
+              </MobileMenuItem>
 
-            <Collapse in={mobileAllCoursesOpen} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-                {cats.map((cat) => (
-                  <Box key={cat.id}>
-                    <ListItemButton
-                      onClick={() => toggleMobileCat(cat.id)}
-                      sx={{ pl: 3 }}
-                    >
-                      <ListItemText
-                        primary={cat.category}
-                        primaryTypographyProps={{
-                          fontWeight: 500,
-                          color: "#ffffff",
-                          fontSize: "15px" }}
-                      />
-                      {mobileCatOpen[cat.id] ? (
-                        <ExpandLessIcon
-                          sx={{ color: "#ffffff" }}
+              <Collapse in={mobileAllCoursesOpen} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding sx={{ pl: 2 }}>
+                  {cats.map((cat) => (
+                    <Box key={cat.id}>
+                      <MobileMenuItem
+                        onClick={() => toggleMobileCat(cat.id)}
+                        sx={{ pl: 3 }}
+                      >
+                        <ListItemText
+                          primary={cat.category}
+                          primaryTypographyProps={{
+                            fontWeight: 600,
+                            color: colors.text.primary,
+                            fontSize: "0.95rem"
+                          }}
                         />
-                      ) : (
-                        <ExpandMoreIcon
-                          sx={{ color: "#ffffff" }}
-                        />
-                      )}
-                    </ListItemButton>
-
-                    <Collapse
-                      in={mobileCatOpen[cat.id]}
-                      timeout="auto"
-                      unmountOnExit
-                    >
-                      <List component="div" disablePadding>
-                        {cat.subcategories?.length > 0 ? (
-                          cat.subcategories.map((sub) => (
-                            <ListItemButton
-                              key={sub.id}
-                              sx={{ pl: 5, py: 0.5 }}
-                              onClick={() => handleCardClick(cat.id)}
-                            >
-                              <ListItemText
-                                primary={sub.subcategory}
-                                primaryTypographyProps={{
-                                  color: "#ffffff",
-                                  
-                                  fontSize: "14px" }}
-                              />
-                            </ListItemButton>
-                          ))
+                        {mobileCatOpen[cat.id] ? (
+                          <ExpandLessIcon sx={{ color: colors.primary, fontSize: 20 }} />
                         ) : (
-                          <ListItemText
-                            primary="No subcategories available"
-                            sx={{
-                              pl: 5,
-                              color: "#ffffff",
-                              opacity: 0.8 }}
-                          />
+                          <ExpandMoreIcon sx={{ color: colors.primary, fontSize: 20 }} />
                         )}
-                      </List>
-                    </Collapse>
-                  </Box>
-                ))}
-              </List>
-            </Collapse>
-          </List>
+                      </MobileMenuItem>
 
-          {/* Fortune Mobile Section */}
-          <List sx={{ width: "100%", maxWidth: 400 }}>
-            <ListItemButton
-              onClick={() => setMobileFortuneOpen(!mobileFortuneOpen)}
+                      <Collapse in={mobileCatOpen[cat.id]} timeout="auto" unmountOnExit>
+                        <List component="div" disablePadding sx={{ pl: 4 }}>
+                          {cat.subcategories?.length > 0 ? (
+                            cat.subcategories.map((sub) => (
+                              <MobileMenuItem
+                                key={sub.id}
+                                sx={{ py: 0.8 }}
+                                onClick={() => handleCardClick(cat.id)}
+                              >
+                                <ListItemIcon sx={{ minWidth: 32 }}>
+                                  <ChevronRightIcon sx={{ color: alpha(colors.primary, 0.4), fontSize: 18 }} />
+                                </ListItemIcon>
+                                <ListItemText
+                                  primary={sub.subcategory}
+                                  primaryTypographyProps={{
+                                    color: colors.text.secondary,
+                                    fontSize: "0.9rem",
+                                    fontWeight: 500
+                                  }}
+                                />
+                              </MobileMenuItem>
+                            ))
+                          ) : (
+                            <ListItemText
+                              primary="No subcategories available"
+                              sx={{
+                                pl: 2,
+                                color: alpha(colors.light, 0.6),
+                                fontSize: "14px"
+                              }}
+                            />
+                          )}
+                        </List>
+                      </Collapse>
+                    </Box>
+                  ))}
+                </List>
+              </Collapse>
+            </List>
+
+            {/* Fortune Mobile Section */}
+            <List sx={{ width: "100%" }}>
+              <MobileMenuItem
+                onClick={() => setMobileFortuneOpen(!mobileFortuneOpen)}
+                sx={{
+                  backgroundColor: alpha(colors.primary, 0.04),
+                  borderRadius: "16px",
+                  border: `1px solid ${alpha(colors.primary, 0.08)}`,
+                }}
+              >
+                <ListItemIcon sx={{ color: colors.primary, minWidth: 40 }}>
+                  <EmojiEventsIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Fortune"
+                  primaryTypographyProps={{
+                    fontWeight: 700,
+                    color: colors.dark,
+                    fontSize: "1.05rem"
+                  }}
+                />
+                {mobileFortuneOpen ? (
+                  <ExpandLessIcon sx={{ color: colors.primary }} />
+                ) : (
+                  <ExpandMoreIcon sx={{ color: colors.primary }} />
+                )}
+              </MobileMenuItem>
+
+              <Collapse in={mobileFortuneOpen} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding sx={{ pl: 4 }}>
+                  {[
+                    { icon: <SchoolIcon />, text: "Become an Instructor", path: "/become-instructor" },
+                    { icon: <WorkIcon />, text: "Career", path: "/career" },
+                  ].map((item, index) => (
+                    <MobileMenuItem
+                      key={index}
+                      sx={{ pl: 2, py: 1.2 }}
+                      onClick={() => handleNavigation(item.path)}
+                    >
+                      <ListItemIcon sx={{ color: alpha(colors.primary, 0.6), minWidth: 40 }}>
+                        {item.icon}
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={item.text}
+                        primaryTypographyProps={{
+                          color: colors.text.primary,
+                          fontSize: "0.95rem",
+                          fontWeight: 500
+                        }}
+                      />
+                    </MobileMenuItem>
+                  ))}
+                </List>
+              </Collapse>
+            </List>
+
+            {/* Workshop Mobile Section */}
+            <MobileMenuItem
+              onClick={() => handleNavigation("/workshop")}
               sx={{
-                backgroundColor: "#1a4718",
-                borderRadius: 2,
-                
-                mb: 0.5,
-                "&:hover": {
-                  backgroundColor: "#1a4718",
-                } }}
+                backgroundColor: alpha(colors.primary, 0.04),
+                borderRadius: "16px",
+                border: `1px solid ${alpha(colors.primary, 0.08)}`,
+              }}
             >
-              <ListItemText
-                primary="Fortune"
-                primaryTypographyProps={{
-                  fontWeight: 600,
-                  color: "#ffffff",
-                  
-                  fontSize: "16px" }}
-              />
-              {mobileFortuneOpen ? (
-                <ExpandLessIcon sx={{ color: "#ffffff" }} />
-              ) : (
-                <ExpandMoreIcon sx={{ color: "#ffffff" }} />
-              )}
-            </ListItemButton>
-
-            <Collapse in={mobileFortuneOpen} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-                <ListItemButton
-                  sx={{ pl: 3 }}
-                  onClick={() => handleNavigation("/become-instructor")}
-                >
-                  <ListItemText
-                    primary="Become an Instructor"
-                    primaryTypographyProps={{
-                      color: "#ffffff",
-                      fontSize: "15px" }}
-                  />
-                </ListItemButton>
-                <ListItemButton
-                  sx={{ pl: 3 }}
-                  onClick={() => handleNavigation("/career")}
-                >
-                  <ListItemText
-                    primary="Career"
-                    primaryTypographyProps={{
-                      color: "#ffffff",
-                      fontSize: "15px" }}
-                  />
-                </ListItemButton>
-              </List>
-            </Collapse>
-          </List>
-
-          {/* Workshop Mobile Section */}
-          <List sx={{ width: "100%", maxWidth: 400 }}>
-            <ListItemButton
-              onClick={() => setWorkShopOpen(!workShop)}
-              sx={{
-                backgroundColor: "#1a4718",
-                borderRadius: 2,
-                mb: 0.5,
-                "&:hover": {
-                  backgroundColor: "#1a4718",
-                } }}
-            >
+              <ListItemIcon sx={{ color: colors.primary, minWidth: 40 }}>
+                <EventIcon />
+              </ListItemIcon>
               <ListItemText
                 primary="Workshop"
                 primaryTypographyProps={{
-                  fontWeight: 600,
-                  color: "#ffffff",
-                  fontSize: "16px" }}
+                  fontWeight: 700,
+                  color: colors.dark,
+                  fontSize: "1.05rem"
+                }}
               />
-              {workShop ? (
-                <ExpandLessIcon sx={{ color: "#ffffff" }} />
-              ) : (
-                <ExpandMoreIcon sx={{ color: "#ffffff" }} />
-              )}
-            </ListItemButton>
+            </MobileMenuItem>
 
-            <Collapse in={workShop} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-                <ListItemButton
-                  sx={{ pl: 3 }}
-                  onClick={() => handleNavigation("/workshop1")}
-                >
-                  <ListItemText
-                    primary="Workshop 1"
-                    primaryTypographyProps={{
-                      color: "#ffffff",
-                      fontSize: "15px" }}
-                  />
-                </ListItemButton>
-                <ListItemButton
-                  sx={{ pl: 3 }}
-                  onClick={() => handleNavigation("/workshop2")}
-                >
-                  <ListItemText
-                    primary="Workshop 2"
-                    primaryTypographyProps={{
-                      color: "#ffffff",
-                      fontSize: "15px" }}
-                  />
-                </ListItemButton>
-              </List>
-            </Collapse>
-          </List>
-
-          {/* Roadmap Mobile Section */}
-          <List sx={{ width: "100%", maxWidth: 400 }}>
-            <ListItemButton
-              onClick={() => setRoadMapOpen(!roadMap)}
+            {/* Roadmap Mobile Section */}
+            <MobileMenuItem
+              onClick={() => handleNavigation("/roadmap")}
               sx={{
-                backgroundColor: "#1a4718",
-                borderRadius: 2,
-                mb: 0.5,
-
-                "&:hover": {
-                  backgroundColor: "#1a4718",
-                } }}
+                backgroundColor: alpha(colors.primary, 0.04),
+                borderRadius: "16px",
+                border: `1px solid ${alpha(colors.primary, 0.08)}`,
+              }}
             >
+              <ListItemIcon sx={{ color: colors.primary, minWidth: 40 }}>
+                <MapIcon />
+              </ListItemIcon>
               <ListItemText
                 primary="Roadmap"
                 primaryTypographyProps={{
-                  fontWeight: 600,
-                  color: "#ffffff",
-                  
-                  fontSize: "16px" }}
+                  fontWeight: 700,
+                  color: colors.dark,
+                  fontSize: "1.05rem"
+                }}
               />
-              {roadMap ? (
-                <ExpandLessIcon sx={{ color: "#ffffff" }} />
-              ) : (
-                <ExpandMoreIcon sx={{ color: "#ffffff" }} />
-              )}
-            </ListItemButton>
+            </MobileMenuItem>
 
-            <Collapse in={roadMap} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-                <ListItemButton
-                  sx={{ pl: 3 }}
-                  onClick={() => handleNavigation("/comingsoon")}
-                >
-                  <ListItemText
-                    primary="Coming Soon"
-                    primaryTypographyProps={{
-                      color: "#ffffff",
-                      fontSize: "15px" }}
-                  />
-                </ListItemButton>
-              </List>
-            </Collapse>
-          </List>
+            {/* Help Mobile Section */}
+            <MobileMenuItem
+              onClick={() => handleNavigation("/help")}
+              sx={{
+                backgroundColor: alpha(colors.primary, 0.04),
+                borderRadius: "16px",
+                border: `1px solid ${alpha(colors.primary, 0.08)}`,
+              }}
+            >
+              <ListItemIcon sx={{ color: colors.primary, minWidth: 40 }}>
+                <LiveHelpIcon /> {/* Changed to LiveHelpIcon if imported or EmojiEventsIcon as placeholder */}
+              </ListItemIcon>
+              <ListItemText
+                primary="Help"
+                primaryTypographyProps={{
+                  fontWeight: 700,
+                  color: colors.dark,
+                  fontSize: "1.05rem"
+                }}
+              />
+            </MobileMenuItem>
 
-          {/* Book Demo Button - Mobile */}
-          <Box
-            onClick={() => handleNavigation("/contact")}
-            sx={{
-              backgroundColor: "#bfdb81",
-              px: 4,
-              py: 1.5,
-              borderRadius: 2,
-              fontSize: "16px",
-              fontWeight: 600,
-              color: "#1e1e1e",
-              cursor: "pointer",
-              width: "100%",
-              maxWidth: 400,
-              textAlign: "center",
-              mt: 2,
-              transition: "all 0.2s",
-              "&:hover": {
-                backgroundColor: "#bfdb81",
-                transform: "scale(1.02)",
-              } }}
-          >
-            Book Free Demo
-          </Box>
-        </Stack>
+            {/* Book Demo Button - Mobile */}
+            <Box sx={{ width: "100%", mt: 3 }}>
+              <CTAGradientButton
+                fullWidth
+                onClick={() => handleNavigation("/contact")}
+                startIcon={<RocketLaunchIcon />}
+              >
+                Book Free Demo
+              </CTAGradientButton>
+            </Box>
+
+            {/* Decorative Elements */}
+            <Box
+              sx={{
+                display: 'flex',
+                gap: 1,
+                mt: 3,
+              }}
+            >
+              {[1, 2, 3].map((i) => (
+                <Chip
+                  key={i}
+                  size="small"
+                  label={`${i}00+ Students`}
+                  sx={{
+                    backgroundColor: alpha(colors.secondary, 0.1),
+                    color: colors.secondary,
+                    border: `1px solid ${alpha(colors.secondary, 0.2)}`,
+                  }}
+                />
+              ))}
+            </Box>
+          </Stack>
+        </Container>
       </Drawer>
-    </AppBar>
+
+    </>
   );
 };
 

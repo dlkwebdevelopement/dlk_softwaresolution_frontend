@@ -1,10 +1,105 @@
 import React, { useState } from "react";
-import { Box, Typography, TextField, Button } from "@mui/material";
+import { Box, Typography, TextField, Button, Container, alpha } from "@mui/material";
+import { styled, keyframes } from "@mui/material/styles";
 import { PostRequest } from "../../api/config";
 import { ADMIN_POST_ENQUIRIES } from "../../api/endpoints";
+import SendIcon from '@mui/icons-material/Send';
+import InfoIcon from '@mui/icons-material/Info';
+import VerifiedIcon from '@mui/icons-material/Verified';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import SpeedIcon from '@mui/icons-material/Speed';
+import GroupIcon from '@mui/icons-material/Group';
+
+// Animations
+const fadeIn = keyframes`
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+`;
+
+const float = keyframes`
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+`;
+
+const pulse = keyframes`
+  0% { box-shadow: 0 0 0 0 rgba(61, 184, 67, 0.4); }
+  70% { box-shadow: 0 0 0 20px rgba(61, 184, 67, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(61, 184, 67, 0); }
+`;
+
+// Styled Components
+const GlassContainer = styled(Box)(({ theme }) => ({
+  background: 'rgba(255, 255, 255, 0.7)',
+  backdropFilter: 'blur(20px)',
+  WebkitBackdropFilter: 'blur(20px)',
+  borderRadius: '30px',
+  border: '1px solid rgba(255, 255, 255, 0.5)',
+  boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.1)',
+  padding: theme.spacing(4),
+  animation: `${fadeIn} 0.8s ease-out forwards`,
+  [theme.breakpoints.down('sm')]: {
+    padding: theme.spacing(3),
+    borderRadius: '20px',
+  },
+}));
+
+const StyledTextField = styled(TextField)(({ theme }) => ({
+  '& .MuiOutlinedInput-root': {
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    borderRadius: '12px',
+    transition: 'all 0.3s ease',
+    '&fieldset': {
+      borderColor: 'rgba(61, 184, 67, 0.1)',
+    },
+    '&:hover fieldset': {
+      borderColor: 'rgba(61, 184, 67, 0.3)',
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: 'var(--green)',
+      borderWidth: '2px',
+    },
+  },
+  '& .MuiInputBase-input': {
+    fontSize: '1rem',
+    [theme.breakpoints.down('sm')]: {
+      fontSize: '0.9rem',
+    },
+  },
+}));
+
+const InfoCard = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(2),
+  animation: `${fadeIn} 0.8s ease-out 0.2s forwards`,
+  opacity: 0,
+  [theme.breakpoints.down('md')]: {
+    padding: theme.spacing(2, 1),
+  },
+}));
+
+const FloatingBadge = styled(Box)({
+  animation: `${float} 3s ease-in-out infinite`,
+  display: 'inline-flex',
+});
+
+const FeatureItem = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: theme.spacing(0.5),
+  padding: theme.spacing(1.5),
+  borderRadius: '16px',
+  background: 'rgba(255, 255, 255, 0.5)',
+  border: '1px solid var(--green-mid)',
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    background: 'rgba(255, 255, 255, 0.8)',
+    transform: 'translateY(-5px)',
+    boxShadow: '0 10px 20px rgba(0, 0, 0, 0.05)',
+    borderColor: 'var(--green)',
+  },
+}));
 
 export default function QuickEnquiry() {
-  // Form state
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -18,18 +113,15 @@ export default function QuickEnquiry() {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
 
-  // Handle input change
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Handle form submission
   const handleSubmit = async () => {
     setLoading(true);
     setError("");
     setSuccess("");
 
-    // Basic validation
     const { name, email, mobile, course, location, timeslot } = formData;
     if (!name || !email || !mobile || !course || !location || !timeslot) {
       setError("Please fill all fields");
@@ -38,7 +130,7 @@ export default function QuickEnquiry() {
     }
 
     try {
-      const response = await PostRequest(ADMIN_POST_ENQUIRIES, formData);
+      await PostRequest(ADMIN_POST_ENQUIRIES, formData);
       setSuccess("Enquiry submitted successfully!");
       setFormData({
         name: "",
@@ -48,7 +140,6 @@ export default function QuickEnquiry() {
         location: "",
         timeslot: "",
       });
-      console.log(response);
     } catch (err) {
       setError("Failed to submit enquiry: " + err.message);
     } finally {
@@ -57,162 +148,203 @@ export default function QuickEnquiry() {
   };
 
   return (
-    <Box sx={{ maxWidth: "1200px", mx: "auto", px: { xs: 2, md: 4 }, py: 8 }}>
-      <Box
-        sx={{
+    <Box sx={{
+      width: "100%",
+      background: 'linear-gradient(180deg, #f8faf7 0%, #ffffff 100%)',
+      py: { xs: 4, md: 6 },
+      position: 'relative',
+      overflow: 'hidden'
+    }}>
+      {/* Background Decorative Elements */}
+      <Box sx={{
+        position: 'absolute',
+        top: '-10%',
+        right: '-5%',
+        width: '400px',
+        height: '400px',
+        background: 'radial-gradient(circle, rgba(61,184,67,0.05) 0%, transparent 70%)',
+        borderRadius: '50%',
+        zIndex: 0
+      }} />
+
+      <Container maxWidth="lg">
+        <Box sx={{
           display: "flex",
-          flexDirection: { xs: "column", md: "row" },
-          gap: 6,
-          alignItems: { xs: "center", md: "flex-start" } }}
-      >
-        {/* LEFT FORM */}
-        <Box
-          sx={{
-            flex: 1,
-            backgroundColor: "white",
-            boxShadow:
-              "0px 10px 30px rgba(0,0,0,0.08), 0px 4px 12px rgba(0,0,0,0.05)",
-            padding: "30px",
-            borderRadius: "15px" }}
+          justifyContent: "center",
+          alignItems: "center",
+          textAlign: "center"
+        }}
         >
-          <Typography variant="h4" sx={{ fontWeight: 700, mb: 3, color: "#1a4718" }}>
-            Quick{" "}
-            <Box component="span" sx={{ color: "#83a561" }}>
-              Enquiry
-            </Box>
-          </Typography>
+          {/* CONTENT SECTION */}
+          <Box sx={{ maxWidth: '800px', mx: 'auto' }}>
+            <InfoCard>
+              <Box sx={{ mb: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <FloatingBadge>
+                  <Box sx={{
+                    bgcolor: 'var(--green-light)',
+                    p: '6px 16px',
+                    borderRadius: '50px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    mb: 2,
+                    border: '1px solid var(--green-mid)'
+                  }}>
+                    <VerifiedIcon sx={{ color: 'var(--green-dark)', fontSize: 16 }} />
+                    <Typography variant="caption" sx={{ color: 'var(--dark)', fontWeight: 800, letterSpacing: 0.5 }}>
+                      WHY CHOOSE US?
+                    </Typography>
+                  </Box>
+                </FloatingBadge>
+                <Typography variant="h4" sx={{
+                  fontWeight: 900,
+                  mb: 2,
+                  color: "var(--dark)",
+                  fontSize: { xs: '2rem', md: '2.8rem' },
+                  lineHeight: 1.2,
+                  letterSpacing: '-0.02em'
+                }}>
+                  The Best <span style={{
+                    background: 'linear-gradient(135deg, var(--green-dark) 0%, var(--green) 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                  }}>Software Training</span> Academy
+                </Typography>
+                <Typography sx={{ color: "#4b5563", lineHeight: 1.8, fontSize: '1.1rem', mb: 3 }}>
+                  DLK is <strong>the Best Software Training Institute in Chennai</strong>, led by IT experts with 20+ years of experience and a track record of 100% placement guidance.
+                </Typography>
+              </Box>
 
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            <TextField
-              fullWidth
-              placeholder="Your Name *"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-            />
-            <TextField
-              fullWidth
-              placeholder="Your Email Address *"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-            />
-            <TextField
-              fullWidth
-              placeholder="Mobile Number *"
-              name="mobile"
-              value={formData.mobile}
-              onChange={handleChange}
-            />
-            <TextField
-              fullWidth
-              placeholder="Course you are interested in ? *"
-              name="course"
-              value={formData.course}
-              onChange={handleChange}
-            />
+              <Box sx={{
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+                gap: 2,
+                mb: 3,
+                textAlign: 'left'
+              }}>
+                <FeatureItem>
+                  <Box sx={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: '12px',
+                    bgcolor: 'var(--green-light)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--green-dark)'
+                  }}>
+                    <EmojiEventsIcon fontSize="small" />
+                  </Box>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'var(--dark)' }}>
+                    100% Placement
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', lineHeight: 1.4 }}>
+                    Real-world job opportunities with top MNC partners.
+                  </Typography>
+                </FeatureItem>
 
-            <Box sx={{ display: "flex", gap: 2 }}>
-              <TextField
-                fullWidth
-                placeholder="Your Location *"
-                name="location"
-                value={formData.location}
-                onChange={handleChange}
-              />
-              <TextField
-                fullWidth
-                placeholder="Preferred timeslot to call *"
-                name="timeslot"
-                value={formData.timeslot}
-                onChange={handleChange}
-              />
-            </Box>
+                <FeatureItem>
+                  <Box sx={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: '12px',
+                    bgcolor: 'var(--green-light)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--green-dark)'
+                  }}>
+                    <GroupIcon fontSize="small" />
+                  </Box>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'var(--dark)' }}>
+                    Expert Trainers
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', lineHeight: 1.4 }}>
+                    Learn from professionals with 20+ years of IT experience.
+                  </Typography>
+                </FeatureItem>
 
-            {error && (
-              <Typography color="error" sx={{ mt: 1 }}>
-                {error}
-              </Typography>
-            )}
-            {success && (
-              <Typography color="success.main" sx={{ mt: 1 }}>
-                {success}
-              </Typography>
-            )}
+                <FeatureItem>
+                  <Box sx={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: '12px',
+                    bgcolor: 'var(--green-light)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--green-dark)'
+                  }}>
+                    <SpeedIcon fontSize="small" />
+                  </Box>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'var(--dark)' }}>
+                    70+ Technologies
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', lineHeight: 1.4 }}>
+                    Master the latest tools and tech and stay ahead.
+                  </Typography>
+                </FeatureItem>
 
-            <Button
-              onClick={handleSubmit}
-              disabled={loading}
-              sx={{
-                mt: 2,
-                py: 1.5,
-                fontSize: "16px",
-                fontWeight: 600,
-                borderRadius: "10px",
-                textTransform: "none",
-                background: "#48723e",
-                color: "white",
-                "&:hover": { background: "#000000ff", color: "white" } }}
-            >
-              {loading ? "Submitting..." : "Let’s get Started!"}
-            </Button>
+                <FeatureItem>
+                  <Box sx={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: '12px',
+                    bgcolor: 'var(--green-light)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--green-dark)'
+                  }}>
+                    <VerifiedIcon fontSize="small" />
+                  </Box>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'var(--dark)' }}>
+                    Global Certification
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', lineHeight: 1.4 }}>
+                    Earn certificates recognized by global top companies.
+                  </Typography>
+                </FeatureItem>
+              </Box>
+
+              <Box sx={{
+                p: 2,
+                background: 'linear-gradient(135deg, var(--green-light) 0%, var(--green-pale) 100%)',
+                borderRadius: '24px',
+                border: '1px solid var(--green-mid)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 2,
+                maxWidth: '450px',
+                mx: 'auto'
+              }}>
+                <Box sx={{
+                  minWidth: 50,
+                  height: 50,
+                  borderRadius: '15px',
+                  bgcolor: 'white',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 4px 10px rgba(0,0,0,0.05)',
+                  color: 'var(--green)'
+                }}>
+                  <VerifiedIcon />
+                </Box>
+                <Box>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'var(--dark)', lineHeight: 1.2 }}>
+                    ISO 9001:2015 Certified
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                    Quality education matching international standards.
+                  </Typography>
+                </Box>
+              </Box>
+            </InfoCard>
           </Box>
         </Box>
-
-        {/* RIGHT CONTENT */}
-        <Box
-          sx={{
-            flex: 1,
-            pl: { md: 4 },
-            borderLeft: { md: "0.5px solid #999" } }}
-        >
-          <Typography variant="h4" sx={{ fontWeight: 700, mb: 2, color: "#1a4718" }}>
-            The Best{" "}
-            <Box component="span" sx={{ color: "#83a561" }}>
-              Software Training
-            </Box>
-          </Typography>
-
-          <Typography
-            sx={{ color: "#555", mb: 2, lineHeight: 1.7, textAlign: "justify" }}
-          >
-            DLK is{" "}
-            <strong> the Best Software Training Institute in Chennai </strong>
-            for its Prominent IT Training and Placement Institute steered by IT
-            experts with 100% placement guidance. With over 20 years of
-            experience in Training and Placement, our institute is acclaimed for
-            its practical approach, enabling students to master 70+ technologies
-            effortlessly.
-          </Typography>
-
-          <Typography
-            sx={{ color: "#555", lineHeight: 1.7, textAlign: "justify" }}
-          >
-            Our training is led by IT working professionals from prestigious
-            MNCs, offering an authentic corporate experience. We are dedicated
-            to nurturing skilled professionals to thrive in the ever-evolving IT
-            field with our 500+ hiring partners.
-          </Typography>
-
-          <Typography
-            sx={{ color: "#555", mb: 2, lineHeight: 1.7, textAlign: "justify" }}
-          >
-            Our state-of-the-art infrastructure and supportive learning
-            environment create the perfect platform for aspiring IT
-            professionals to grow. From beginners to experienced professionals
-            looking to upskill.
-          </Typography>
-
-          <Typography
-            sx={{ color: "#555", lineHeight: 1.7, textAlign: "justify" }}
-          >
-            With a strong network of corporate partnerships and consistent
-            placement support, DLK continues to shape successful careers across
-            various domains including Full Stack Development, Data Science,
-            Cloud Computing, Testing, and Digital Technologies.
-          </Typography>
-        </Box>
-      </Box>
+      </Container>
     </Box>
   );
 }

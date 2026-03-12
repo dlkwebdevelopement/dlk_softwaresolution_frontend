@@ -1,6 +1,8 @@
 import axios from "axios";
 
-export const BASE_URL = "https://backend.dlksoftwaresolutions.co.in";
+export const BASE_URL = import.meta.env.DEV
+  ? "http://localhost:5000"
+  : "https://backend.dlksoftwaresolutions.co.in";
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -12,5 +14,15 @@ api.interceptors.request.use((config) => {
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
+
+/**
+ * Helper to get full image URL.
+ * Since backend now provides absolute URLs, we just return the path.
+ * @param {string} path - Image path from backend.
+ * @returns {string} - Complete URL for <img> src.
+ */
+export const getImgUrl = (path) => {
+  return path || "";
+};
 
 export default api;

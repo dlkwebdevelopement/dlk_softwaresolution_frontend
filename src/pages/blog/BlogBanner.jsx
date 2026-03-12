@@ -8,7 +8,7 @@ import {
 import { useParams } from "react-router-dom";
 import { GetRequest } from "../../api/config";
 import { ADMIN_GET_BLOGS_SLUG } from "../../api/endpoints";
-import { BASE_URL } from "../../api/api";
+import { BASE_URL, getImgUrl } from "../../api/api";
 
 export default function BlogBanner() {
   const { slug } = useParams();
@@ -55,7 +55,7 @@ export default function BlogBanner() {
             rgba(30, 130, 130, 0.6) 40%,
             rgba(255, 255, 255, 0.1) 100%
           ),
-          url("${BASE_URL}/${blog.image}")
+          url("${getImgUrl(blog?.image)}")
         `,
         backgroundSize: "cover",
         backgroundPosition: "center" }}
