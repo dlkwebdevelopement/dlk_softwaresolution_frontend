@@ -346,7 +346,7 @@ const MegaMenu = ({ open, onClose, handleCardClick }) => {
                 >
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <MenuBookIcon sx={{ fontSize: 18, color: colors.primary }} />
-                    {item.category}
+                    {item.categoryName}
                   </Box>
                 </CategoryItem>
             ))}
@@ -385,7 +385,7 @@ const MegaMenu = ({ open, onClose, handleCardClick }) => {
                       fontSize: '1.4rem'
                     }}
                   >
-                    {activeCat.category}
+                    {activeCat.categoryName}
                   </Typography>
                   <Typography sx={{ color: colors.text.secondary, fontSize: "0.95rem", fontWeight: 500 }}>
                     Discover {activeCat?.subcategories?.length || 0} expert-led specializations
@@ -399,8 +399,9 @@ const MegaMenu = ({ open, onClose, handleCardClick }) => {
                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5 }}>
                   {activeCat.subcategories.map((sub, index) => (
                       <SubCategoryChip
+                        key={sub.id}
                         label={sub.subcategory}
-                        onClick={() => handleCardClick(activeCat.id)}
+                        onClick={() => navigate(`/course/${sub.slug}`)}
                         icon={<ChevronRightIcon />}
                       />
                   ))}
@@ -707,7 +708,7 @@ const Navbar = () => {
                         sx={{ pl: 3 }}
                       >
                         <ListItemText
-                          primary={cat.category}
+                          primary={cat.categoryName}
                           primaryTypographyProps={{
                             fontWeight: 600,
                             color: colors.text.primary,
@@ -728,7 +729,10 @@ const Navbar = () => {
                               <MobileMenuItem
                                 key={sub.id}
                                 sx={{ py: 0.8 }}
-                                onClick={() => handleCardClick(cat.id)}
+                                onClick={() => {
+                                  navigate(`/course/${sub.slug}`);
+                                  setOpen(false);
+                                }}
                               >
                                 <ListItemIcon sx={{ minWidth: 32 }}>
                                   <ChevronRightIcon sx={{ color: alpha(colors.primary, 0.4), fontSize: 18 }} />

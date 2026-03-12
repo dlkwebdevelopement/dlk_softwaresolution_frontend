@@ -457,10 +457,10 @@ const Footer = () => {
               {/* Contact Info */}
               <Box sx={{ mt: 2 }}>
                 <ContactInfo icon={LocationOnIcon} text="Chennai, Tamil Nadu" subtext="India" />
-                <ContactInfo icon={PhoneIcon} text="+91 98765 43210" subtext="Mon-Sat, 9AM-8PM" />
-                <ContactInfo icon={EmailIcon} text="info@dlk.com" subtext="Support 24/7" />
+                <ContactInfo icon={PhoneIcon} text="+91 77081 50152" subtext="Mon-Sat, 9AM-8PM" />
+                <ContactInfo icon={EmailIcon} text="dlksoftwaresolutions@gmail.com" subtext="Support 24/7" />
               </Box>
-            </Box>
+            </Box> 
           </Grow>
 
           {/* FOOTER COLUMNS */}
@@ -546,7 +546,7 @@ const Footer = () => {
                 gap: 0.5,
               }}
             >
-              © {new Date().getFullYear()} DLK. All rights reserved.
+              © {new Date().getFullYear()} DLK Technologies All rights reserved.
             </Typography>
 
             <Box sx={{ display: 'flex', gap: 3 }}>

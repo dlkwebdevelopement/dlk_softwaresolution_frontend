@@ -20,17 +20,13 @@ import {
 import { styled, keyframes } from "@mui/material/styles";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
-import ShareIcon from "@mui/icons-material/Share";
-import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { useTheme, useMediaQuery } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { GetRequest } from "../../api/config";
 import { GET_ALL_BLOGS } from "../../api/endpoints";
-import { BASE_URL, getImgUrl } from "../../api/api";
+import { getImgUrl } from "../../api/api";
 
 // Animations
 const floatAnimation = keyframes`
@@ -425,7 +421,7 @@ const Blog = () => {
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, color: colors.textPrimary }}>
                         <CalendarMonthIcon sx={{ fontSize: 16, color: colors.primary }} />
                         <Typography variant="caption" sx={{ fontWeight: 600 }}>
-                          {blog.created_at ? new Date(blog.created_at).toLocaleDateString("en-US", { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent'}
+                          {blog.createdAt ? new Date(blog.createdAt).toLocaleDateString("en-US", { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent'}
                         </Typography>
                       </Box>
                       <Box sx={{ width: 4, height: 4, borderRadius: '50%', bgcolor: 'divider' }} />
