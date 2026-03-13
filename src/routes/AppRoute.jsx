@@ -68,7 +68,7 @@ const AppRoute = () => {
               <Product />
               <OverviewSection />
               <ServicesCards />
-              <PricingPlans />
+              {/* <PricingPlans /> */}
               <BottomInfo />
               <Footer />
             </>

@@ -278,69 +278,54 @@ const Product = () => {
                 },
               }}
             />
-            {/* Play Button Overlay */}
-            <Box sx={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              width: 60,
-              height: 60,
-              bgcolor: 'rgba(255,255,255,0.9)',
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
-              transition: 'all 0.3s',
-              "&:hover": { transform: 'translate(-50%, -50%) scale(1.1)'}
-            }}>
-               <PlayArrowIcon sx={{ color: 'var(--green-dark)', fontSize: 32, ml: 0.5 }} />
-            </Box>
           </Box>
-
-          {/* Price Section */}
-          <Box sx={{ mb: 4, textAlign: 'center' }}>
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'baseline', gap: 1.5 }}>
-              <Typography
-                sx={{
-                  fontSize: "42px",
-                  fontWeight: 800,
-                  color: "#0f172a",
-                  fontFamily: '"Bricolage Grotesque", sans-serif',
-                  lineHeight: 1
-                }}
-              >
-                ₹{course?.price?.toLocaleString("en-IN") || "29,999"}
-              </Typography>
-              <Typography
-                sx={{
-                  fontSize: "20px",
-                  textDecoration: "line-through",
-                  color: "#94a3b8",
-                  fontWeight: 500
-                }}
-              >
-                ₹{course?.original_price?.toLocaleString("en-IN") || "45,000"}
-              </Typography>
+          
+          {course?.price && (
+            <Box sx={{ mb: 4, textAlign: 'center' }}>
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'baseline', gap: 1.5 }}>
+                <Typography
+                  sx={{
+                    fontSize: "42px",
+                    fontWeight: 800,
+                    color: "#0f172a",
+                    fontFamily: '"Bricolage Grotesque", sans-serif',
+                    lineHeight: 1
+                  }}
+                >
+                  ₹{course?.price?.toLocaleString("en-IN")}
+                </Typography>
+                {course?.original_price && (
+                  <Typography
+                    sx={{
+                      fontSize: "20px",
+                      textDecoration: "line-through",
+                      color: "#94a3b8",
+                      fontWeight: 500
+                    }}
+                  >
+                    ₹{course?.original_price?.toLocaleString("en-IN")}
+                  </Typography>
+                )}
+              </Box>
+              
+              {course?.discount_percentage && (
+                <Chip
+                  label={`${course?.discount_percentage}% OFF - LIMITED TIME`}
+                  icon={<CircleIcon sx={{ fontSize: '8px !important', color: '#fff', ml: 1 }} />}
+                  sx={{
+                    bgcolor: "#ef4444",
+                    color: "#fff",
+                    fontWeight: 800,
+                    fontSize: '12px',
+                    borderRadius: '8px',
+                    height: '32px',
+                    mt: 2,
+                    boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)'
+                  }}
+                />
+              )}
             </Box>
-            
-            <Chip
-              label={`${course?.discount_percentage || "30"}% OFF - LIMITED TIME`}
-              icon={<CircleIcon sx={{ fontSize: '8px !important', color: '#fff', ml: 1 }} />}
-              sx={{
-                bgcolor: "#ef4444",
-                color: "#fff",
-                fontWeight: 800,
-                fontSize: '12px',
-                borderRadius: '8px',
-                height: '32px',
-                mt: 2,
-                boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)'
-              }}
-            />
-          </Box>
+          )}
 
           <Stack spacing={2.5}>
             <Button
