@@ -67,6 +67,9 @@ const MarqueeContainer = styled(({ $duration, ...other }) => <Box {...other} />)
   '&:hover': {
     animationPlayState: 'paused',
   },
+  '&:active': {
+    animationPlayState: 'paused',
+  },
 }));
 
 const SectionTitle = styled(Typography)({
@@ -160,10 +163,12 @@ const Category = () => {
         <Box
           sx={{
             position: 'relative',
-            overflow: 'hidden',
+            overflowX: { xs: 'auto', md: 'hidden' },
             width: '100%',
-            maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)',
-            WebkitMaskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)',
+            maskImage: { md: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' },
+            WebkitMaskImage: { md: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' },
+            scrollbarWidth: 'none',
+            '&::-webkit-scrollbar': { display: 'none' },
           }}
         >
           {/* Categories Container */}

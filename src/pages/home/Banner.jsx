@@ -141,6 +141,7 @@ const NavigationArrow = styled(({ $direction, ...other }) => <Box {...other} />)
 
 const SlideContent = styled(({ $isActive, ...other }) => <Box {...other} />)(({ $isActive }) => ({
   opacity: 0,
+  overflow: 'hidden',
   animation: $isActive
     ? `${slideInLeft} 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards`
     : "none",
@@ -248,6 +249,8 @@ const MainHeading = styled(Typography)(({ theme }) => ({
   letterSpacing: '-0.03em',
   color: '#111c12',
   marginBottom: '16px',
+  wordBreak: 'break-word',
+  overflowWrap: 'break-word',
   [theme.breakpoints.down('sm')]: {
     fontSize: '1.8rem',
   }
@@ -430,6 +433,7 @@ export default function Banner() {
         position: "relative",
         background: '#c2eac4',
         pb: '50px', // Added padding to prevent ticker overlap
+        maxWidth: "100vw",
       }}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}

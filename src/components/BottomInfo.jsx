@@ -97,6 +97,7 @@ const GlassBar = styled(Box)(({ theme }) => ({
   boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.08)',
   padding: theme.spacing(0.5, 0),
   overflow: 'hidden',
+  maxWidth: "100vw",
   '&::before': {
     content: '""',
     position: 'absolute',
@@ -170,8 +171,8 @@ const CTABox = styled(Box)(({ theme }) => ({
 }));
 
 const IconWrapper = styled(Box)({
-  width: 28,
-  height: 28,
+  width: { xs: 24, sm: 28 },
+  height: { xs: 24, sm: 28 },
   borderRadius: '50%',
   background: alpha(colors.light, 0.2),
   display: 'flex',
@@ -223,7 +224,8 @@ const BottomInfo = () => {
             sx={{
               display: "flex",
               alignItems: "center",
-              gap: { xs: 3, md: 5 },
+              justifyContent: { xs: "space-between", md: "flex-start" },
+              gap: { xs: 0, md: 5 },
               width: "100%",
             }}
           >
@@ -234,7 +236,7 @@ const BottomInfo = () => {
               </IconWrapper>
               <AnimatedText
                 sx={{
-                  fontSize: { xs: '0.8rem', md: '0.85rem' },
+                  fontSize: { xs: '0.75rem', md: '0.85rem' },
                   fontWeight: 800,
                   whiteSpace: 'nowrap',
                   color: colors.dark,
@@ -248,49 +250,47 @@ const BottomInfo = () => {
               </AnimatedText>
             </Stack>
 
-            {/* Email - Hidden on extra small screens if needed, but let's keep it clean */}
-            {!isMobile && (
-              <Stack 
-                direction="row" 
-                spacing={1} 
-                alignItems="center" 
-                sx={{ 
-                  flexShrink: 0, 
-                  cursor: 'pointer',
-                  '&:hover': {
-                    '& .MuiTypography-root': {
-                      color: colors.primary,
-                    },
-                    '& .IconWrapper-root': {
-                      background: colors.primary,
-                      '& svg': { color: colors.light }
-                    }
+            {/* Email Section */}
+            <Stack 
+              direction="row" 
+              spacing={1} 
+              alignItems="center" 
+              sx={{ 
+                flexShrink: 0, 
+                cursor: 'pointer',
+                '&:hover': {
+                  '& .MuiTypography-root': {
+                    color: colors.primary,
+                  },
+                  '& .IconWrapper-root': {
+                    background: colors.primary,
+                    '& svg': { color: colors.light }
                   }
-                }}
-                onClick={() => {
-                  const subject = encodeURIComponent("Enquiry from Website");
-                  const body = encodeURIComponent("Hello DLK Software Solutions,\n\nI am interested in your training programs and would like to get more details.\n\nRegards,");
-                  const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=dlksoftwaresolutions@gmail.com&su=${subject}&body=${body}`;
-                  window.open(gmailUrl, "_blank");
+                }
+              }}
+              onClick={() => {
+                const subject = encodeURIComponent("Enquiry from Website");
+                const body = encodeURIComponent("Hello DLK Software Solutions,\n\nI am interested in your training programs and would like to get more details.\n\nRegards,");
+                const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=dlksoftwaresolutions@gmail.com&su=${subject}&body=${body}`;
+                window.open(gmailUrl, "_blank");
+              }}
+            >
+              <IconWrapper className="IconWrapper-root">
+                <EmailIcon />
+              </IconWrapper>
+              <Typography
+                sx={{
+                  color: colors.dark,
+                  fontSize: { xs: '0.75rem', md: '0.9rem' },
+                  fontWeight: 600,
+                  whiteSpace: 'nowrap',
+                  opacity: 0.9,
+                  transition: 'color 0.3s ease',
                 }}
               >
-                <IconWrapper className="IconWrapper-root">
-                  <EmailIcon />
-                </IconWrapper>
-                <Typography
-                  sx={{
-                    color: colors.dark,
-                    fontSize: { xs: '0.8rem', md: '0.9rem' },
-                    fontWeight: 600,
-                    whiteSpace: 'nowrap',
-                    opacity: 0.9,
-                    transition: 'color 0.3s ease',
-                  }}
-                >
-                  dlksoftwaresolutions@gmail.com
-                </Typography>
-              </Stack>
-            )}
+                {isMobile ? "Email Us" : "dlksoftwaresolutions@gmail.com"}
+              </Typography>
+            </Stack>
 
             
           </Box>

@@ -401,33 +401,48 @@ const Gallery = () => {
       <Box
         sx={{
           display: 'grid',
-          gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+          gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : '1fr 1fr',
           gap: 1,
         }}
       >
-        {/* LEFT SECTION */}
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-          {/* Top (Full width of Left) */}
-          {albums[0] && <GalleryItem album={albums[0]} onOpen={() => handleOpenLightbox(albums[0].images)} height={420} />}
+        {isMobile ? (
+          // MOBILE LAYOUT: Simple 2-column grid
+          albums.map((album, idx) => (
+            <GalleryItem 
+              key={idx} 
+              album={album} 
+              onOpen={() => handleOpenLightbox(album.images)} 
+              height={220} // Larger height for better visibility on mobile
+            />
+          ))
+        ) : (
+          // DESKTOP LAYOUT: Complex split grid
+          <>
+            {/* LEFT SECTION */}
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              {/* Top (Full width of Left) */}
+              {albums[0] && <GalleryItem album={albums[0]} onOpen={() => handleOpenLightbox(albums[0].images)} height={420} />}
 
-          {/* Bottom (Split L/R) */}
-          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1 }}>
-            {albums[2] && <GalleryItem album={albums[2]} onOpen={() => handleOpenLightbox(albums[2].images)} />}
-            {albums[4] && <GalleryItem album={albums[4]} onOpen={() => handleOpenLightbox(albums[4].images)} />}
-          </Box>
-        </Box>
+              {/* Bottom (Split L/R) */}
+              <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1 }}>
+                {albums[2] && <GalleryItem album={albums[2]} onOpen={() => handleOpenLightbox(albums[2].images)} />}
+                {albums[4] && <GalleryItem album={albums[4]} onOpen={() => handleOpenLightbox(albums[4].images)} />}
+              </Box>
+            </Box>
 
-        {/* RIGHT SECTION */}
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-          {/* Top (Split L/R) */}
-          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1 }}>
-            {albums[3] && <GalleryItem album={albums[3]} onOpen={() => handleOpenLightbox(albums[3].images)} />}
-            {albums[5] && <GalleryItem album={albums[5]} onOpen={() => handleOpenLightbox(albums[5].images)} />}
-          </Box>
+            {/* RIGHT SECTION */}
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              {/* Top (Split L/R) */}
+              <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1 }}>
+                {albums[3] && <GalleryItem album={albums[3]} onOpen={() => handleOpenLightbox(albums[3].images)} />}
+                {albums[5] && <GalleryItem album={albums[5]} onOpen={() => handleOpenLightbox(albums[5].images)} />}
+              </Box>
 
-          {/* Bottom (Full width of Right) */}
-          {albums[1] && <GalleryItem album={albums[1]} onOpen={() => handleOpenLightbox(albums[1].images)} height={420} />}
-        </Box>
+              {/* Bottom (Full width of Right) */}
+              {albums[1] && <GalleryItem album={albums[1]} onOpen={() => handleOpenLightbox(albums[1].images)} height={420} />}
+            </Box>
+          </>
+        )}
       </Box>
 
       {/* Lightbox Slider */}

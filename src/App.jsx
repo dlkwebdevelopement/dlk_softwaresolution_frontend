@@ -86,6 +86,17 @@ const theme = createTheme({
           scrollbar-width: thin;
           scrollbar-color: #c2eac4 #f7fdf7;
         }
+        html, body {
+          overflow-x: hidden !important;
+          width: 100%;
+          position: relative;
+          margin: 0;
+          padding: 0;
+        }
+        #root {
+          overflow-x: hidden !important;
+          width: 100%;
+        }
         body {
           font-family: "Plus Jakarta Sans", sans-serif !important;
           background-color: #ffffff;

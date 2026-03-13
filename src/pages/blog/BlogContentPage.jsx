@@ -3,9 +3,7 @@ import {
   Box, 
   Typography, 
   Stack, 
-  Divider, 
-  IconButton, 
-  Tooltip,
+  Divider,
   Container,
   Button,
   TextField,
@@ -19,16 +17,11 @@ import {
 } from "@mui/material";
 import { 
   Calendar, 
-  Clock, 
-  Share2, 
-  Twitter, 
-  Linkedin, 
-  Link as LinkIcon,
-  ChevronRight,
-  TrendingUp,
-  School,
-  Phone,
-  Mail,
+  ChevronRight, 
+  TrendingUp, 
+  School, 
+  Phone, 
+  Mail, 
   User
 } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -122,10 +115,7 @@ export default function BlogContentPage() {
   // No longer fetching categories for the Quick Enquiry form as it uses a text field.
   // Fetching categories removed as Quick Enquiry uses text input for course.
 
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(window.location.href);
-    toast.success("Link copied to clipboard!");
-  };
+
 
   const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -202,72 +192,8 @@ export default function BlogContentPage() {
 
   return (
     <Box sx={{ bgcolor: "#fafafa", minHeight: "100vh", pb: 10 }}>
-      {/* Article Header Background Area */}
-      <Box sx={{ 
-        width: '100%', 
-        height: '40vh', 
-        maxHeight: '400px',
-        position: 'relative',
-        bgcolor: '#0f172a',
-        overflow: 'hidden'
-      }}>
-        {blog.image && (
-          <>
-            <Box 
-              component="img" 
-              src={getImgUrl(blog.image)} 
-              sx={{ 
-                width: '100%', 
-                height: '100%', 
-                objectFit: 'cover',
-                opacity: 0.4 
-              }} 
-            />
-            <Box sx={{
-              position: 'absolute',
-              top: 0, left: 0, right: 0, bottom: 0,
-              background: 'linear-gradient(to top, #fafafa 0%, transparent 100%)'
-            }} />
-          </>
-        )}
-      </Box>
-
-      <Container maxWidth="lg" sx={{ mt: { xs: -15, md: -25 }, position: 'relative', zIndex: 10 }}>
+      <Container maxWidth="lg" sx={{ mt: 8, position: 'relative', zIndex: 10 }}>
         
-        {/* Title Block */}
-        <Box 
-          data-aos="fade-up"
-          sx={{ 
-            bgcolor: '#fff', 
-            borderRadius: '24px', 
-            p: { xs: 3, md: 5 }, 
-            mb: { xs: 4, md: 6 },
-            boxShadow: '0 20px 40px rgba(0,0,0,0.06)'
-          }}
-        >
-          <Typography 
-            variant="h1" 
-            sx={{ 
-              fontSize: { xs: '2rem', md: '3rem' }, 
-              fontWeight: 800, 
-              color: '#0f172a',
-              fontFamily: '"Bricolage Grotesque", sans-serif',
-              lineHeight: 1.2,
-              mb: 3
-            }}
-          >
-            {blog.title}
-          </Typography>
-          <Stack direction="row" spacing={3} alignItems="center" sx={{ color: '#64748b' }}>
-            <Stack direction="row" spacing={1} alignItems="center">
-              <Calendar size={18} />
-              <Typography fontWeight={500}>{getFormattedDate(blog.createdAt)}</Typography>
-            </Stack>
-            <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#cbd5e1' }} />
-            <Typography fontWeight={500} sx={{ color: '#10b981' }}>{blog.readTime || '5 min read'}</Typography>
-          </Stack>
-        </Box>
-
         <Box
           sx={{
             display: "grid",
@@ -275,46 +201,9 @@ export default function BlogContentPage() {
             gap: { xs: 6, lg: 8 },
             alignItems: "start"
           }}
-        > 
-          {/* LEFT CONTENT (ARTICLE) */}
+        >           {/* LEFT CONTENT (ARTICLE) */}
           <Box component="article" data-aos="fade-up" data-aos-delay="100">
-            {/* Social Share Bar */}
-            <Stack 
-              direction="row" 
-              spacing={2} 
-              alignItems="center" 
-              sx={{ 
-                mb: 4, 
-                p: 1.5, 
-                bgcolor: '#fff', 
-                borderRadius: '16px',
-                border: '1px solid #e2e8f0',
-                width: 'fit-content',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.02)'
-              }}
-            >
-              <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 1, ml: 1 }}>
-                Share
-              </Typography>
-              <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
-              <Stack direction="row" spacing={0.5}>
-                <Tooltip title="Share on Twitter" arrow>
-                  <IconButton size="small" sx={{ color: '#1DA1F2', '&:hover': { bgcolor: alpha('#1DA1F2', 0.1) } }}>
-                    <Twitter size={18} />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Share on LinkedIn" arrow>
-                  <IconButton size="small" sx={{ color: '#0A66C2', '&:hover': { bgcolor: alpha('#0A66C2', 0.1) } }}>
-                    <Linkedin size={18} />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Copy Link" arrow>
-                  <IconButton onClick={handleCopyLink} size="small" sx={{ color: '#64748b', '&:hover': { bgcolor: alpha('#64748b', 0.1) } }}>
-                    <LinkIcon size={18} />
-                  </IconButton>
-                </Tooltip>
-              </Stack>
-            </Stack>
+
 
             {/* Blog Content */}
             <Box
@@ -324,6 +213,8 @@ export default function BlogContentPage() {
                 lineHeight: 1.8, 
                 color: "#334155",
                 fontSize: { xs: "1.05rem", md: "1.125rem" },
+                overflowWrap: "break-word",
+                wordBreak: "break-word",
                 "& h2": { 
                   fontSize: { xs: "1.75rem", md: "2.25rem" }, 
                   fontWeight: 800, 

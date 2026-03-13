@@ -36,9 +36,9 @@ export default function FloatingEnquiry() {
         <Box
           sx={{
             position: "fixed",
-            bottom: { xs: 80, sm: 90 },
-            right: { xs: 10, sm: 20 },
-            width: { xs: "calc(100% - 20px)", sm: "400px" },
+            bottom: { xs: 90, sm: 100 },
+            right: { xs: 15, sm: 20 },
+            width: { xs: "calc(100% - 30px)", sm: "400px" },
             height: { xs: "60vh", sm: "600px" },
             maxHeight: "calc(100vh - 120px)",
             bgcolor: "white",
@@ -90,29 +90,11 @@ export default function FloatingEnquiry() {
       <Box
         sx={{
           position: "fixed",
-          bottom: 60,
-          right: 20,
+          bottom: { xs: 80, sm: 90, md: 60 },
+          right: { xs: 20, sm: 20 },
           zIndex: 1300 }}
       >
         <Stack spacing={2}>
-          {/* WhatsApp */}
-          <Fab
-            sx={{ 
-              overflow: 'hidden',
-              padding: 0,
-              width: 56,
-              height: 56
-            }}
-            href="https://wa.me/917708150152"
-            target="_blank"
-          >
-            <img 
-              src="/photos/whatsapp-icon.png" 
-              alt="WhatsApp" 
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-            />
-          </Fab>
-
           {/* Chatbot Button (3D Icon) */}
           <Box sx={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             {/* Notification Bubble */}
@@ -128,7 +110,7 @@ export default function FloatingEnquiry() {
                   px: 2,
                   borderRadius: "16px",
                   boxShadow: "0 8px 25px rgba(61, 184, 67, 0.4)",
-                  width: "200px",
+                  width: { xs: "180px", sm: "200px" },
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
@@ -148,7 +130,7 @@ export default function FloatingEnquiry() {
                     content: '""',
                     position: "absolute",
                     bottom: -8,
-                    right: 30,
+                    right: { xs: 25, sm: 30 },
                     width: 0,
                     height: 0,
                     borderLeft: "10px solid transparent",
@@ -175,8 +157,8 @@ export default function FloatingEnquiry() {
               sx={{ 
                 overflow: 'hidden',
                 padding: 0,
-                width: 70,
-                height: 70,
+                width: { xs: 60, sm: 70 },
+                height: { xs: 60, sm: 70 },
                 bgcolor: "transparent",
                 boxShadow: "none",
                 transition: "all 0.3s ease",
@@ -193,6 +175,24 @@ export default function FloatingEnquiry() {
               />
             </Fab>
           </Box>
+
+          {/* WhatsApp */}
+          <Fab
+            sx={{ 
+              overflow: 'hidden',
+              padding: 0,
+              width: { xs: 50, sm: 56 },
+              height: { xs: 50, sm: 56 }
+            }}
+            href="https://wa.me/917708150152"
+            target="_blank"
+          >
+            <img 
+              src="/photos/whatsapp-icon.png" 
+              alt="WhatsApp" 
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+            />
+          </Fab>
         </Stack>
       </Box>
     </>

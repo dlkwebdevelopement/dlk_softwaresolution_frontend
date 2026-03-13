@@ -422,28 +422,42 @@ const Ads = () => {
           }}
         >
           {cats.map((cat) => (
-            <Chip
+            <Box
               key={cat.id}
-              label={`${cat.categoryName} ${cat.courseCount !== undefined ? `(${cat.courseCount})` : ''}`}
               onClick={() => setActiveCategory(cat.id)}
               sx={{
-                px: 2,
-                py: 2.5,
-                borderRadius: '12px',
-                fontWeight: 600,
-                fontSize: '0.95rem',
+                px: 1,
+                py: 1,
+                mr: 2,
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
-                bgcolor: activeCategory === cat.id ? 'var(--green)' : 'white',
-                color: activeCategory === cat.id ? 'white' : 'text.primary',
-                border: `1px solid ${activeCategory === cat.id ? 'transparent' : 'var(--green-mid)'}`,
-                boxShadow: activeCategory === cat.id ? '0 4px 15px rgba(61, 184, 67, 0.3)' : 'none',
+                position: 'relative',
+                whiteSpace: 'nowrap',
+                color: activeCategory === cat.id ? 'var(--green)' : '#757575',
+                fontWeight: 800,
+                fontSize: '1.15rem',
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: -2,
+                  left: 0,
+                  width: activeCategory === cat.id ? '100%' : '0%',
+                  height: '3px',
+                  bgcolor: 'var(--green)',
+                  transition: 'width 0.3s ease',
+                },
                 '&:hover': {
-                  bgcolor: activeCategory === cat.id ? 'var(--green-dark)' : 'var(--green-light)',
-                  transform: 'translateY(-2px)',
+                  color: 'var(--green)',
+                  '&::after': {
+                    width: '100%',
+                  }
                 }
               }}
-            />
+            >
+              <Typography sx={{ fontWeight: 'inherit', fontSize: 'inherit' }}>
+                {cat.categoryName} {cat.courseCount !== undefined ? `(${cat.courseCount})` : ''}
+              </Typography>
+            </Box>
           ))}
         </Box>
 

@@ -135,9 +135,14 @@ const FloatingElement = styled(Box)({
 
 const MarqueeContainer = styled(Box)(({ theme }) => ({
   width: '100%',
-  overflow: 'hidden',
+  overflowX: 'auto',
+  [theme.breakpoints.up('md')]: {
+    overflowX: 'hidden',
+  },
   position: 'relative',
   padding: theme.spacing(4, 0),
+  scrollbarWidth: 'none',
+  '&::-webkit-scrollbar': { display: 'none' },
   '&::before, &::after': {
     content: '""',
     position: 'absolute',
@@ -183,6 +188,9 @@ const MarqueeTrack = styled(Box, {
   width: 'max-content',
   animation: `${scrollLeft} ${($blogsCount || 1) * 12}s linear infinite`,
   '&:hover': {
+    animationPlayState: 'paused',
+  },
+  '&:active': {
     animationPlayState: 'paused',
   },
 }));

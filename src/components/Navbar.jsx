@@ -436,7 +436,7 @@ const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [courseOpen, setCourseOpen] = useState(false);
   const [fortuneOpen, setFortuneOpen] = useState(false);
-  const [mobileCatOpen, setMobileCatOpen] = useState({});
+  const [mobileCatOpen, setMobileCatOpen] = useState(null);
   const [roadMap, setRoadMapOpen] = useState(false);
   const [workShop, setWorkShopOpen] = useState(false);
   const [cats, setCats] = useState([]);
@@ -456,10 +456,7 @@ const Navbar = () => {
   }, []);
 
   const toggleMobileCat = (id) => {
-    setMobileCatOpen((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
+    setMobileCatOpen((prev) => (prev === id ? null : id));
   };
 
   const handleNavigation = (path) => {
@@ -674,6 +671,22 @@ const Navbar = () => {
           }
         }}
       >
+        <IconButton
+          onClick={() => setOpen(false)}
+          sx={{
+            position: "absolute",
+            top: 20,
+            right: 20,
+            color: colors.primary,
+            bgcolor: alpha(colors.primary, 0.05),
+            "&:hover": {
+              bgcolor: alpha(colors.primary, 0.1),
+            },
+            zIndex: 1500,
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
         <Container maxWidth="sm">
           <Stack spacing={1} alignItems="center" sx={{ width: "100%" }}>
             {/* All Courses Section */}
@@ -720,14 +733,14 @@ const Navbar = () => {
                             fontSize: "0.95rem"
                           }}
                         />
-                        {mobileCatOpen[cat.id] ? (
+                        {mobileCatOpen === cat.id ? (
                           <ExpandLessIcon sx={{ color: colors.primary, fontSize: 20 }} />
                         ) : (
                           <ExpandMoreIcon sx={{ color: colors.primary, fontSize: 20 }} />
                         )}
                       </MobileMenuItem>
 
-                      <Collapse in={mobileCatOpen[cat.id]} timeout="auto" unmountOnExit>
+                      <Collapse in={mobileCatOpen === cat.id} timeout="auto" unmountOnExit>
                         <List component="div" disablePadding sx={{ pl: 4 }}>
                           {cat.subcategories?.length > 0 ? (
                             cat.subcategories.map((sub) => (

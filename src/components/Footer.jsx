@@ -17,7 +17,7 @@ import {
 import { styled, keyframes } from "@mui/material/styles";
 import SendIcon from "@mui/icons-material/Send";
 import FacebookIcon from "@mui/icons-material/Facebook";
-import TwitterIcon from "@mui/icons-material/Twitter";
+import YouTubeIcon from "@mui/icons-material/YouTube";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
@@ -496,15 +496,15 @@ const Footer = () => {
 
               <Stack direction="row" spacing="12px" sx={{ mb: 3 }}>
                 {[
-                  { icon: FacebookIcon, color: '#1877f2' },
-                  { icon: TwitterIcon, color: '#1da1f2' },
-                  { icon: InstagramIcon, color: '#e4405f' },
-                  { icon: LinkedInIcon, color: '#0a66c2' },
+                  { icon: FacebookIcon, color: '#1877f2', link: "https://www.facebook.com/profile.php?id=61569333069634" },
+                  { icon: InstagramIcon, color: '#e4405f', link: "https://www.instagram.com/dlk_softwaresolutions/" },
+                  { icon: LinkedInIcon, color: '#0a66c2', link: "https://www.linkedin.com/company/107134148/admin/dashboard/" },
+                  { icon: YouTubeIcon, color: '#ff0000', link: "#" },
                 ].map((Social, index) => (
                   <SocialIconButton
                     key={index}
                     component="a"
-                    href="#"
+                    href={Social.link}
                     target="_blank"
                     sx={{
                       '&:hover': {
