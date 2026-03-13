@@ -194,7 +194,7 @@ const Category = () => {
                     <Box
                       component="img"
                       src={getImgUrl(cat?.image) || "https://via.placeholder.com/100x100?text=No+Img"}
-                      alt={cat?.category || "Category"}
+                      alt={cat?.categoryName || "Category"}
                       sx={{
                         width: "100%",
                         height: "100%",
@@ -222,7 +222,7 @@ const Category = () => {
                       mx: 'auto',
                     }}
                   >
-                    {cat?.category || "N/A"}
+                    {cat?.categoryName || "N/A"}
                   </Typography>
                 </CategoryCard>
               ))}

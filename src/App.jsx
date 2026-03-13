@@ -2,6 +2,7 @@ import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 import AppRoute from "./routes/AppRoute";
 import { BrowserRouter } from "react-router-dom";
 import FloatingEnquiry from "./components/FloatingEnquiry";
+import { Toaster } from "react-hot-toast";
 
 const theme = createTheme({
   palette: {
@@ -104,6 +105,45 @@ const App = () => {
     <BrowserRouter>
       <ThemeProvider theme={theme}>
         <CssBaseline />
+        <Toaster 
+          position="top-center"
+          reverseOrder={false}
+          gutter={8}
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: '#ffffff',
+              color: '#1a2b1b',
+              borderRadius: '16px',
+              padding: '16px 24px',
+              fontSize: '15px',
+              fontWeight: 600,
+              fontFamily: '"Plus Jakarta Sans", sans-serif',
+              boxShadow: '0 10px 30px -5px rgba(61, 184, 43, 0.15), 0 8px 10px -6px rgba(61, 184, 43, 0.1)',
+              border: '1px solid rgba(61, 184, 67, 0.1)',
+            },
+            success: {
+              iconTheme: {
+                primary: '#3DB843',
+                secondary: '#fff',
+              },
+              style: {
+                border: '1px solid rgba(61, 184, 67, 0.2)',
+                boxShadow: '0 10px 40px -10px rgba(61, 184, 67, 0.4)',
+              },
+            },
+            error: {
+              iconTheme: {
+                primary: '#ef4444',
+                secondary: '#fff',
+              },
+              style: {
+                border: '1px solid rgba(239, 68, 68, 0.2)',
+                boxShadow: '0 10px 40px -10px rgba(239, 68, 68, 0.3)',
+              },
+            },
+          }}
+        />
         <AppRoute />
 
         {/* Only this */}

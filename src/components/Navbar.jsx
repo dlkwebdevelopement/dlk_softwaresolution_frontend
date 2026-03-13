@@ -26,6 +26,7 @@ import {
 } from "@mui/material";
 import { styled, keyframes } from "@mui/material/styles";
 import CloseIcon from "@mui/icons-material/Close";
+import toast from "react-hot-toast";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useNavigate } from "react-router-dom";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
@@ -208,11 +209,11 @@ const CategoryItem = styled(Box)(({ active }) => ({
   cursor: "pointer",
   transition: "all 0.3s ease",
   backgroundColor: active ? alpha(colors.primary, 0.1) : "transparent",
-  color: active ? colors.primary : '#111c12',
+  color: 'black',
   border: active ? `1px solid ${alpha(colors.primary, 0.1)}` : '1px solid transparent',
   '&:hover': {
     backgroundColor: alpha(colors.primary, 0.05),
-    color: colors.primary,
+    color: 'black',
     transform: "translateX(5px)",
   },
 }));
@@ -293,6 +294,7 @@ const MobileMenuItem = styled(ListItemButton)({
 });
 
 const MegaMenu = ({ open, onClose, handleCardClick }) => {
+  const navigate = useNavigate();
   const [cats, setCats] = useState([]);
   const [activeCat, setActiveCat] = useState(null);
 
@@ -401,7 +403,10 @@ const MegaMenu = ({ open, onClose, handleCardClick }) => {
                       <SubCategoryChip
                         key={sub.id}
                         label={sub.subcategory}
-                        onClick={() => navigate(`/course/${sub.slug}`)}
+                        onClick={() => {
+                          navigate(`/course/${sub.slug}`);
+                          onClose();
+                        }}
                         icon={<ChevronRightIcon />}
                       />
                   ))}
@@ -471,7 +476,7 @@ const Navbar = () => {
         navigate(`/course/${courses[0].slug}`);
         setOpen(false);
       } else {
-        alert("Course not found for this category");
+        toast.error("Course not found for this category");
       }
     } catch (err) {
       console.error(err);
@@ -711,7 +716,7 @@ const Navbar = () => {
                           primary={cat.categoryName}
                           primaryTypographyProps={{
                             fontWeight: 600,
-                            color: colors.text.primary,
+                            color: "black",
                             fontSize: "0.95rem"
                           }}
                         />

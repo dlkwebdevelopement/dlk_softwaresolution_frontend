@@ -7,117 +7,184 @@ import {
   Checkbox,
   FormControlLabel,
   Box,
-  Paper,
   Stack,
   Alert,
   Snackbar,
   CircularProgress,
   Fade,
-  Zoom,
+  IconButton,
+  Grid
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
+import { styled, keyframes } from "@mui/material/styles";
 import SendIcon from "@mui/icons-material/Send";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
-import PersonIcon from "@mui/icons-material/Person";
-import { GetRequest, PostRequest } from "../../api/config";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import FacebookIcon from "@mui/icons-material/Facebook";
+import InstagramIcon from "@mui/icons-material/Instagram";
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import TwitterIcon from "@mui/icons-material/Twitter";
+import { PostRequest } from "../../api/config";
 import { ADMIN_POST_CONTACT } from "../../api/endpoints";
 
-// Illustration URL
-const illustrationUrl =
-  "https://img.freepik.com/free-vector/flat-design-illustration-customer-support_23-2148889374.jpg?w=1060";
+// Animations
+const fadeIn = keyframes`
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+`;
 
-const StyledPaper = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(4),
-  borderRadius: theme.spacing(2),
-  boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-  transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
+const shimmer = keyframes`
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+`;
+
+// Styled Components
+const PageWrapper = styled(Box)(({ theme }) => ({
+  minHeight: "100vh",
+  background: "linear-gradient(180deg, #f8fdf8 0%, #ffffff 100%)",
+  paddingTop: theme.spacing(8),
+  paddingBottom: theme.spacing(8),
+  position: "relative",
+  overflow: "hidden",
+}));
+
+const UnifiedCard = styled(Box)(({ theme }) => ({
+  background: "rgba(255, 255, 255, 0.9)",
+  backdropFilter: "blur(20px)",
+  borderRadius: "40px",
+  border: "1px solid rgba(61, 184, 67, 0.12)",
+  boxShadow: "0 40px 100px -20px rgba(0,0,0,0.08)",
+  display: "flex",
+  flexDirection: "row",
+  minHeight: "650px",
+  overflow: "hidden",
+  [theme.breakpoints.down("md")]: {
+    flexDirection: "column",
+    borderRadius: "32px",
+  },
+}));
+
+const Sidebar = styled(Box)(({ theme }) => ({
+  flex: "0 0 40%",
+  background: "#c2eac4", // Light Green
+  padding: theme.spacing(6, 4),
+  color: "#121b13",
+  position: "relative",
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "space-between",
+  backgroundImage: `radial-gradient(circle at 0% 0%, rgba(61, 184, 67, 0.1) 0%, transparent 50%), 
+                    radial-gradient(circle at 100% 100%, rgba(61, 184, 67, 0.05) 0%, transparent 50%)`,
+  [theme.breakpoints.down("md")]: {
+    flex: "none",
+    padding: theme.spacing(6, 4),
+  },
+}));
+
+const FormSection = styled(Box)(({ theme }) => ({
+  flex: 1,
+  padding: theme.spacing(6, 8),
+  background: "#ffffff",
+  [theme.breakpoints.down("md")]: {
+    padding: theme.spacing(6, 4),
+  },
+}));
+
+const InfoItem = styled(Box)(({ theme }) => ({
+  display: "flex",
+  alignItems: "flex-start",
+  gap: theme.spacing(3),
+  marginBottom: theme.spacing(4),
+  transition: "transform 0.3s ease",
   "&:hover": {
-    transform: "translateY(-5px)",
-    boxShadow: "0 8px 30px rgba(0,0,0,0.15)",
+    transform: "translateX(8px)",
   },
 }));
 
-const AnimatedIllustration = styled(Box)(() => ({
-  animation: "float 3s ease-in-out infinite",
-  "@keyframes float": {
-    "0%": {
-      transform: "translateY(0px)",
+const IconBox = styled(Box)(({ theme }) => ({
+  width: "56px",
+  height: "56px",
+  borderRadius: "18px",
+  background: "rgba(61, 184, 67, 0.12)",
+  border: "1px solid rgba(61, 184, 67, 0.2)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  color: "#3DB843",
+  flexShrink: 0,
+  boxShadow: "0 8px 16px rgba(61, 184, 67, 0.1)",
+}));
+
+const LuxuryTextField = styled(TextField)(({ theme }) => ({
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "18px",
+    backgroundColor: "#fcfdfc",
+    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+    border: "1px solid rgba(0,0,0,0.03)",
+    "& fieldset": {
+      borderColor: "transparent",
     },
-    "50%": {
-      transform: "translateY(-15px)",
+    "&:hover": {
+      backgroundColor: "#f7fbf7",
+      "& fieldset": {
+        borderColor: "rgba(61, 184, 67, 0.2)",
+      },
     },
-    "100%": {
-      transform: "translateY(0px)",
+    "&.Mui-focused": {
+      backgroundColor: "#ffffff",
+      boxShadow: "0 10px 40px -10px rgba(61, 184, 67, 0.15)",
+      "& fieldset": {
+        borderColor: "#3DB843",
+        borderWidth: "1.5px",
+      },
+    },
+  },
+  "& .MuiInputLabel-root": {
+    fontSize: "0.95rem",
+    color: "#6b8f6d",
+    "&.Mui-focused": {
+      color: "#3DB843",
+      fontWeight: 700,
     },
   },
 }));
 
-const FloatingElement = styled(Box)(() => ({
-  position: "absolute",
-  backgroundColor: "rgba(131, 165, 97, 0.1)", // Light green alpha
-  borderRadius: "50%",
-  animation: "pulse 2s ease-in-out infinite",
-  "@keyframes pulse": {
-    "0%": {
-      transform: "scale(1)",
-      opacity: 0.5,
-    },
-    "50%": {
-      transform: "scale(1.1)",
-      opacity: 0.8,
-    },
-    "100%": {
-      transform: "scale(1)",
-      opacity: 0.5,
-    },
+const PremiumButton = styled(Button)(({ theme }) => ({
+  background: "#3DB843", // Vibrant Light Green
+  color: "#ffffff",
+  borderRadius: "20px",
+  padding: "18px 40px",
+  fontSize: "15px",
+  fontWeight: 800,
+  letterSpacing: "1px",
+  textTransform: "uppercase",
+  boxShadow: "0 15px 35px -10px rgba(61, 184, 67, 0.15)", // Lighter shadow
+  transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+  "&:hover": {
+    transform: "translateY(-5px) scale(1.01)",
+    background: "#d0edd0", // Slightly darker on hover
+    boxShadow: "0 20px 45px -12px rgba(61, 184, 67, 0.25)", // Lighter shadow on hover
+  },
+  "&:disabled": {
+    background: "#e0eee0",
+    color: "#a0b0a0",
   },
 }));
 
-const IllustrationBox = ({ children }) => (
-  <Box
-    sx={{
-      width: "100%",
-      borderRadius: "16px",
-      overflow: "hidden",
-      boxShadow: "0 8px 30px rgba(0,0,0,0.15)",
-      background: "linear-gradient(135deg,  #90ea66 0%, #2e5737 100%)",
-      p: { xs: 3, md: 6 },
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      position: "relative",
-      mb: { xs: 2, md: 0 } }}
-  >
-    <FloatingElement
-      sx={{
-        width: 150,
-        height: 150,
-        top: -30,
-        left: -30 }}
-    />
-    <FloatingElement
-      sx={{
-        width: 100,
-        height: 100,
-        bottom: -20,
-        right: -20,
-        animationDelay: "1s" }}
-    />
-    <AnimatedIllustration>{children}</AnimatedIllustration>
-    <Typography
-      variant="caption"
-      sx={{
-        mt: 2,
-        color: "#fff",
-        fontWeight: 500,
-        textShadow: "1px 1px 2px rgba(0,0,0,0.2)" }}
-    >
-      We're here to help! Contact us anytime.
-    </Typography>
-  </Box>
-);
+const SocialButton = styled(IconButton)(({ theme }) => ({
+  background: "rgba(255, 255, 255, 0.4)",
+  border: "1px solid rgba(0, 0, 0, 0.05)",
+  color: "#121b13",
+  marginRight: theme.spacing(1.5),
+  transition: "all 0.3s ease",
+  "&:hover": {
+    background: "#3DB843",
+    borderColor: "#3DB843",
+    transform: "translateY(-4px)",
+    boxShadow: "0 8px 20px rgba(61, 184, 67, 0.3)",
+  },
+}));
 
 export default function ContactForm() {
   const [formData, setFormData] = useState({
@@ -132,388 +199,254 @@ export default function ContactForm() {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
 
   const validateForm = () => {
     const newErrors = {};
-
-    if (!formData.firstName.trim()) {
-      newErrors.firstName = "First name is required";
-    }
-
-    if (!formData.lastName.trim()) {
-      newErrors.lastName = "Last name is required";
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Email is invalid";
-    }
-
-    if (formData.phone && !/^[0-9+\-\s()]{10,}$/.test(formData.phone)) {
-      newErrors.phone = "Please enter a valid phone number";
-    }
-
-    if (!formData.message.trim()) {
-      newErrors.message = "Message is required";
-    }
-
-    if (!formData.acceptTerms) {
-      newErrors.acceptTerms = "You must accept the terms";
-    }
-
+    if (!formData.firstName.trim()) newErrors.firstName = "First name is essential";
+    if (!formData.lastName.trim()) newErrors.lastName = "Last name is essential";
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email.trim() || !emailRegex.test(formData.email)) newErrors.email = "Valid professional email requested";
+    if (formData.phone.trim() && formData.phone.length !== 10) newErrors.phone = "Phone number must be exactly 10 digits";
+    if (!formData.message.trim()) newErrors.message = "Please share your message";
+    if (!formData.acceptTerms) newErrors.acceptTerms = "Terms must be accepted";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleChange = (e) => {
     const { name, value, checked, type } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-    // Clear error for this field when user starts typing
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
+    
+    if (name === "phone") {
+      const nums = value.replace(/[^0-9]/g, "");
+      if (nums.length <= 10) {
+        setFormData(prev => ({ ...prev, [name]: nums }));
+      }
+      return;
     }
+
+    setFormData(prev => ({ ...prev, [name]: type === "checkbox" ? checked : value }));
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: "" }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      setSnackbar({
-        open: true,
-        message: "Please fix the errors in the form",
-        severity: "error",
-      });
-      return;
-    }
-
+    if (!validateForm()) return;
     setIsSubmitting(true);
-
     try {
       const response = await PostRequest(ADMIN_POST_CONTACT, formData);
-
       if (response?.success) {
         setSubmitSuccess(true);
-
-        setSnackbar({
-          open: true,
-          message: response.message || "Message sent successfully!",
-          severity: "success",
-        });
-
-        // Reset form
-        setFormData({
-          firstName: "",
-          lastName: "",
-          email: "",
-          phone: "",
-          message: "",
-          acceptTerms: true,
-        });
-
-        setTimeout(() => setSubmitSuccess(false), 5000);
+        setFormData({ firstName: "", lastName: "", email: "", phone: "", message: "", acceptTerms: true });
+        setTimeout(() => setSubmitSuccess(false), 8000);
       } else {
-        setSnackbar({
-          open: true,
-          message: response?.message || "Something went wrong",
-          severity: "error",
-        });
+        setSnackbar({ open: true, message: response?.message || "Transmission failed", severity: "error" });
       }
     } catch (error) {
-      console.error(error);
-
-      setSnackbar({
-        open: true,
-        message: "Server error. Please try again.",
-        severity: "error",
-      });
+      setSnackbar({ open: true, message: "Connection lost with server", severity: "error" });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleCloseSnackbar = () => {
-    setSnackbar((prev) => ({ ...prev, open: false }));
-  };
-
   return (
-    <Container maxWidth="lg" sx={{ py: 8 }}>
-      <Zoom in={true} timeout={1000}>
-        <Typography
-          variant="h3"
-          align="center"
-          gutterBottom
-          fontWeight="bold"
-          sx={{ mb: 1,  color: "#1a4718" }}
-        >
-          Contact <span style={{ color: "#83a561" }}>Us</span>
-        </Typography>
-      </Zoom>
+    <PageWrapper>
+      <Container maxWidth="lg" sx={{ animation: `${fadeIn} 1s ease-out` }}>
+        
+        {/* Unified Luxury Card */}
+        <UnifiedCard>
+          
+          {/* Information Sidebar */}
+          <Sidebar>
+            <Box>
+              <Typography variant="h3" sx={{ fontWeight: 900, mb: 1.5, letterSpacing: "-1.5px", fontSize: { xs: "2rem", md: "2.8rem" }, color: "#121b13" }}>
+                Connect With <span style={{ color: "#3DB843" }}>Us.</span>
+              </Typography>
+              <Typography variant="body1" sx={{ color: "rgba(18,27,19,0.7)", fontSize: "1.05rem", fontWeight: 500, mb: 4, maxWidth: "340px", lineHeight: 1.6 }}>
+                Our team of digital architects is ready to bring your vision to absolute reality.
+              </Typography>
 
-      {/* Success Alert */}
-      <Fade in={submitSuccess}>
-        <Alert
-          icon={<CheckCircleIcon fontSize="inherit" />}
-          severity="success"
-          sx={{
-            mb: 1,
-            maxWidth: "600px",
-            mx: "auto",
-            animation: "slideDown 0.5s ease-out",
-            "@keyframes slideDown": {
-              "0%": {
-                transform: "translateY(-20px)",
-                opacity: 0,
-              },
-              "100%": {
-                transform: "translateY(0)",
-                opacity: 1,
-              },
-            } }}
-        >
-          Thank you for contacting us! We'll respond within 24 hours.
-        </Alert>
-      </Fade>
+              <Box>
+                <InfoItem>
+                  <IconBox><LocationOnIcon /></IconBox>
+                  <Box>
+                    <Typography variant="subtitle2" sx={{ color: "#3DB843", fontWeight: 900, textTransform: "uppercase", fontSize: "11px", letterSpacing: "2px", mb: 0.5 }}>Headquarters</Typography>
+                    <Typography variant="body1" sx={{ fontWeight: 600, fontSize: "0.95rem" }}>Rahath Plaza, Vadapalani,<br/>Chennai - 600026</Typography>
+                  </Box>
+                </InfoItem>
 
-      {/* Flex container */}
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: { xs: "column", md: "row" },
-          alignItems: "center",
-          gap: { xs: 6, md: 4 } }}
-      >
-        {/* Illustration */}
-        <Box sx={{ flex: { xs: "0 0 100%", md: "0 0 40%" } }}>
-          <IllustrationBox>
-            <Box
-              component="img"
-              src={illustrationUrl}
-              alt="Customer service illustration"
-              sx={{
-                width: "100%",
-                objectFit: "contain",
-                maxHeight: { xs: "auto", md: "400px" },
-                filter: "drop-shadow(0 10px 20px rgba(0,0,0,0.2))" }}
-            />
-          </IllustrationBox>
-        </Box>
+                <InfoItem>
+                  <IconBox><PhoneIcon /></IconBox>
+                  <Box>
+                    <Typography variant="subtitle2" sx={{ color: "#3DB843", fontWeight: 900, textTransform: "uppercase", fontSize: "11px", letterSpacing: "2px", mb: 0.5 }}>Direct Line</Typography>
+                    <Typography variant="body1" sx={{ fontWeight: 600, fontSize: "0.95rem" }}>+91 77081 50152</Typography>
+                  </Box>
+                </InfoItem>
 
-        {/* Form */}
-        <Box sx={{ flex: { xs: "0 0 100%", md: "0 0 55%" } }}>
-          <StyledPaper elevation={3}>
+                <InfoItem>
+                  <IconBox><EmailIcon /></IconBox>
+                  <Box>
+                    <Typography variant="subtitle2" sx={{ color: "#3DB843", fontWeight: 900, textTransform: "uppercase", fontSize: "11px", letterSpacing: "2px", mb: 0.5 }}>Partnerships</Typography>
+                    <Typography variant="body1" sx={{ fontWeight: 600, fontSize: "0.95rem" }}>dlksoftwaresolutions@gmail.com</Typography>
+                  </Box>
+                </InfoItem>
+              </Box>
+            </Box>
+
+            <Box>
+              <Typography variant="overline" sx={{ color: "rgba(18,27,19,0.4)", fontWeight: 800, letterSpacing: "3px", mb: 2, display: "block" }}>Stay Social</Typography>
+              <Stack direction="row">
+                {[FacebookIcon, InstagramIcon, LinkedInIcon, TwitterIcon].map((Icon, i) => (
+                  <SocialButton key={i} size="small"><Icon fontSize="small" /></SocialButton>
+                ))}
+              </Stack>
+            </Box>
+          </Sidebar>
+
+          {/* Interaction FormSection */}
+          <FormSection>
+            <Box sx={{ mb: 4 }}>
+              <Typography variant="h4" sx={{ fontWeight: 900, color: "#111c12", mb: 1.5, letterSpacing: "-1px" }}>
+                Send a Message
+              </Typography>
+              <Typography variant="body2" sx={{ color: "#6b8f6d", fontWeight: 600 }}>Fill out the form below and we'll reach back within 2 hours.</Typography>
+            </Box>
+
             <form onSubmit={handleSubmit}>
-              <Stack spacing={3}>
-                {/* First Name & Last Name */}
-                <Box
-                  sx={{
-                    display: "flex",
-                    gap: 2,
-                    flexDirection: { xs: "column", sm: "row" } }}
-                >
-                  <TextField
-                    fullWidth
-                    label="First Name"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleChange}
-                    variant="outlined"
-                    error={!!errors.firstName}
-                    helperText={errors.firstName}
-                    InputProps={{
-                      startAdornment: (
-                        <PersonIcon sx={{ mr: 1, color: "action.active" }} />
-                      ) }}
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        "&:hover fieldset": {
-                          borderColor: "#48723e",
-                        },
-                      } }}
-                  />
-                  <TextField
-                    fullWidth
-                    label="Last Name"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleChange}
-                    variant="outlined"
-                    error={!!errors.lastName}
-                    helperText={errors.lastName}
-                    InputProps={{
-                      startAdornment: (
-                        <PersonIcon sx={{ mr: 1, color: "action.active" }} />
-                      ) }}
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        "&:hover fieldset": {
-                          borderColor: "#48723e",
-                        },
-                      } }}
-                  />
-                </Box>
+              <Stack spacing={2.5}>
+                <Grid container spacing={3}>
+                  <Grid item xs={12} sm={6}>
+                    <LuxuryTextField
+                      fullWidth
+                      label="First Name"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleChange}
+                      error={!!errors.firstName}
+                      helperText={errors.firstName}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <LuxuryTextField
+                      fullWidth
+                      label="Last Name"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleChange}
+                      error={!!errors.lastName}
+                      helperText={errors.lastName}
+                    />
+                  </Grid>
+                </Grid>
 
-                {/* Email & Phone Number */}
-                <Box
-                  sx={{
-                    display: "flex",
-                    gap: 2,
-                    flexDirection: { xs: "column", sm: "row" } }}
-                >
-                  <TextField
-                    required
-                    fullWidth
-                    label="Email"
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    variant="outlined"
-                    error={!!errors.email}
-                    helperText={errors.email}
-                    InputProps={{
-                      startAdornment: (
-                        <EmailIcon sx={{ mr: 1, color: "action.active" }} />
-                      ) }}
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        "&:hover fieldset": {
-                          borderColor: "#48723e",
-                        },
-                      } }}
-                  />
-                  <TextField
-                    fullWidth
-                    label="Phone Number"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    variant="outlined"
-                    error={!!errors.phone}
-                    helperText={errors.phone}
-                    InputProps={{
-                      startAdornment: (
-                        <PhoneIcon sx={{ mr: 1, color: "action.active" }} />
-                      ) }}
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        "&:hover fieldset": {
-                          borderColor: "#48723e",
-                        },
-                      } }}
-                  />
-                </Box>
-
-                {/* Message */}
-                <TextField
+                <LuxuryTextField
                   fullWidth
-                  label="Message"
-                  name="message"
-                  value={formData.message}
+                  label="Professional Email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
                   onChange={handleChange}
+                  error={!!errors.email}
+                  helperText={errors.email}
+                />
+
+                <LuxuryTextField
+                  fullWidth
+                  label="Contact Number"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  error={!!errors.phone}
+                  helperText={errors.phone}
+                />
+
+                <LuxuryTextField
+                  fullWidth
+                  label="Brief your requirement..."
+                  name="message"
                   multiline
                   rows={4}
-                  variant="outlined"
+                  value={formData.message}
+                  onChange={handleChange}
                   error={!!errors.message}
                   helperText={errors.message}
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      "&:hover fieldset": {
-                        borderColor: "#48723e",
-                      },
-                    } }}
                 />
 
-                {/* Terms Checkbox */}
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      name="acceptTerms"
-                      checked={formData.acceptTerms}
-                      onChange={handleChange}
-                      color="primary"
-                      sx={{
-                        color: "#48723e",
-                        
-                        "&.Mui-checked": {
-                          color: "#48723e",
-                        } }}
-                    />
-                  }
-                  label="I accept the Terms and Conditions"
-                />
-                {errors.acceptTerms && (
-                  <Typography color="error" variant="caption" sx={{ mt: -1 }}>
-                    {errors.acceptTerms}
-                  </Typography>
-                )}
-
-                {/* Submit Button */}
-                <Box sx={{ display: "flex", justifyContent: "center" }}>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    disabled={isSubmitting}
-                    sx={{
-                      color: "white",
-                      borderRadius: "10px",
-                      textTransform: "none",
-                      fontWeight: "600",
-                      background: "#48723e",
-                      minWidth: "200px",
-                      transition: "all 0.3s ease",
-                      "&:hover": {
-                        background: "#000000ff",
-                        color: "white",
-                        transform: "translateY(-2px)",
-                        boxShadow: "0 5px 15px rgba(0,0,0,0.3)",
-                      },
-                      "&:disabled": {
-                        background: "#cccccc",
-                      } }}
-                    size="large"
-                    endIcon={
-                      isSubmitting ? (
-                        <CircularProgress size={20} color="inherit" />
-                      ) : (
-                        <SendIcon />
-                      )
+                <Box>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        name="acceptTerms"
+                        checked={formData.acceptTerms}
+                        onChange={handleChange}
+                        sx={{ color: "#3DB843", '&.Mui-checked': { color: "#3DB843" } }}
+                      />
                     }
-                  >
-                    {isSubmitting ? "Sending..." : "Send Message"}
-                  </Button>
+                    label={<Typography variant="body2" sx={{ color: "#6b8f6d", fontWeight: 600 }}>I agree to the privacy and cookie policy.</Typography>}
+                  />
+                  {errors.acceptTerms && (
+                    <Typography color="error" sx={{ fontSize: "11px", mt: 0.5, fontWeight: 700, uppercase: true }}>{errors.acceptTerms}</Typography>
+                  )}
                 </Box>
+
+                <PremiumButton
+                  type="submit"
+                  variant="contained"
+                  fullWidth
+                  disabled={isSubmitting}
+                  endIcon={isSubmitting ? <CircularProgress size={18} color="inherit" /> : <SendIcon sx={{ fontSize: "18px" }} />}
+                >
+                  {isSubmitting ? "Initiating Protocol..." : "Submit Inquiry"}
+                </PremiumButton>
+
+                {/* Fade-in Success Alert */}
+                <Fade in={submitSuccess}>
+                  <Alert 
+                    icon={<CheckCircleIcon fontSize="inherit" />} 
+                    severity="success"
+                    sx={{ 
+                      borderRadius: "20px", 
+                      background: "#e8f7e9", 
+                      color: "#1a4718",
+                      fontWeight: 700,
+                      border: "1px solid rgba(61, 184, 67, 0.2)",
+                      fontSize: "0.85rem"
+                    }}
+                  >
+                    Successfully sent! check your inbox for our automated confirmation.
+                  </Alert>
+                </Fade>
               </Stack>
             </form>
-          </StyledPaper>
-        </Box>
-      </Box>
+          </FormSection>
 
-      {/* Snackbar for notifications */}
+        </UnifiedCard>
+
+        {/* Floating Decorative Elements */}
+        <Box sx={{ 
+          position: "absolute", 
+          zIndex: -1, 
+          bottom: "-50px", 
+          left: "5%", 
+          width: "200px", 
+          height: "200px", 
+          border: "40px solid #f2fbf2", 
+          borderRadius: "60px",
+          transform: "rotate(25deg)"
+        }} />
+
+      </Container>
+      
       <Snackbar
         open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
+        autoHideDuration={5000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity={snackbar.severity}
-          sx={{
-            width: "100%",
-            boxShadow: 3 }}
-        >
+        <Alert severity={snackbar.severity} variant="filled" sx={{ borderRadius: "14px", fontWeight: 700 }}>
           {snackbar.message}
         </Alert>
       </Snackbar>
-    </Container>
+    </PageWrapper>
   );
 }

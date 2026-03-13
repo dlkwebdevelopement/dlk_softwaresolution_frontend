@@ -54,6 +54,7 @@ import {
   ADMIN_POST_REGISTRATIONS,
 } from "../../api/endpoints";
 import { BASE_URL, getImgUrl } from "../../api/api";
+import toast from "react-hot-toast";
 
 // Animations
 const floatAnimation = keyframes`
@@ -210,6 +211,9 @@ const Ads = () => {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [favorites, setFavorites] = useState([]);
   const [hoveredCard, setHoveredCard] = useState(null);
+  const [activeCategory, setActiveCategory] = useState(null);
+  const [courses, setCourses] = useState([]);
+  const [loadingCourses, setLoadingCourses] = useState(false);
   const [isHoveringSlider, setIsHoveringSlider] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -236,6 +240,9 @@ const Ads = () => {
       try {
         const data = await GetRequest(ADMIN_GET_CATEGORIES);
         setCats(data);
+        if (data?.length > 0) {
+          setActiveCategory(data[0].id);
+        }
       } catch (err) {
         console.error("Failed to fetch Categories", err);
       }
@@ -243,6 +250,23 @@ const Ads = () => {
 
     fetchCats();
   }, []);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      if (!activeCategory) return;
+      setLoadingCourses(true);
+      try {
+        const res = await GetRequest(`/admin/course/category/${activeCategory}`);
+        setCourses(res?.data || []);
+      } catch (err) {
+        console.error("Failed to fetch Courses", err);
+      } finally {
+        setLoadingCourses(false);
+      }
+    };
+
+    fetchCourses();
+  }, [activeCategory]);
 
   const handleOpen = (course) => {
     setSelectedCourse(course);
@@ -255,28 +279,49 @@ const Ads = () => {
     setSelectedCourse(null);
   };
 
+  const validateEmail = (email) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  };
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    
+    // Phone validation: only numbers and max 10 digits
+    if (name === "phone") {
+      const numbersOnly = value.replace(/[^0-9]/g, "");
+      if (numbersOnly.length <= 10) {
+        setFormData({ ...formData, [name]: numbersOnly });
+      }
+      return;
+    }
+    
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async () => {
+    // Validation Checks
+    if (!formData.fullName.trim()) return toast.error("Full name is required");
+    if (!formData.email.trim() || !validateEmail(formData.email)) return toast.error("Please enter a valid email address");
+    if (!formData.phone.trim() || formData.phone.length !== 10) return toast.error("Phone number must be exactly 10 digits");
+    if (!formData.courseId) return toast.error("Please select a course");
+
     try {
       const data = await PostRequest(ADMIN_POST_REGISTRATIONS, formData);
 
       if (data?.message === "Registration successful") {
-        alert(
-          `✅ Registration successful for ${cats.find((c) => c.id === formData.courseId)?.category
-          }!`,
+        toast.success(
+          `Registration successful for ${cats.find((c) => c.id === formData.courseId)?.category}!`,
         );
       } else {
-        alert(data.message || "Registration failed");
+        toast.error(data.message || "Registration failed");
       }
 
       handleClose();
       setFormData({ fullName: "", email: "", phone: "", courseId: "" });
     } catch (err) {
       console.error(err);
-      alert("Server error");
+      toast.error("Server error");
     }
   };
 
@@ -289,18 +334,9 @@ const Ads = () => {
     );
   };
 
-  const handleCardClick = async (categoryId) => {
-    try {
-      const res = await GetRequest(`/admin/course/category/${categoryId}`);
-      const courses = res?.data || [];
-
-      if (courses.length > 0) {
-        navigate(`/course/${courses[0].slug}`);
-      } else {
-        alert("Course not found for this category");
-      }
-    } catch (err) {
-      console.error(err);
+  const handleCourseClick = (slug) => {
+    if (slug) {
+      navigate(`/course/${slug}`);
     }
   };
 
@@ -373,17 +409,44 @@ const Ads = () => {
           </Typography>     
         </Box>
 
-        {/* SLIDER CONTROLS */}
-        <Box
-          sx={{
-            display: { xs: "none", md: "flex" },
-            justifyContent: "flex-end",
+        {/* CATEGORY TABS (Scrollable on Mobile) */}
+        <Box 
+          sx={{ 
+            display: "flex", 
             gap: 1.5,
-            mb: 2,
+            mb: 2, 
+            overflowX: "auto",
+            "&::-webkit-scrollbar": { height: 4 },
+            "&::-webkit-scrollbar-track": { background: 'transparent' },
+            "&::-webkit-scrollbar-thumb": { background: 'rgba(61, 184, 67, 0.3)', borderRadius: 4 },
           }}
         >
-
+          {cats.map((cat) => (
+            <Chip
+              key={cat.id}
+              label={`${cat.categoryName} ${cat.courseCount !== undefined ? `(${cat.courseCount})` : ''}`}
+              onClick={() => setActiveCategory(cat.id)}
+              sx={{
+                px: 2,
+                py: 2.5,
+                borderRadius: '12px',
+                fontWeight: 600,
+                fontSize: '0.95rem',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                bgcolor: activeCategory === cat.id ? 'var(--green)' : 'white',
+                color: activeCategory === cat.id ? 'white' : 'text.primary',
+                border: `1px solid ${activeCategory === cat.id ? 'transparent' : 'var(--green-mid)'}`,
+                boxShadow: activeCategory === cat.id ? '0 4px 15px rgba(61, 184, 67, 0.3)' : 'none',
+                '&:hover': {
+                  bgcolor: activeCategory === cat.id ? 'var(--green-dark)' : 'var(--green-light)',
+                  transform: 'translateY(-2px)',
+                }
+              }}
+            />
+          ))}
         </Box>
+
 
         {/* COURSE CARDS - Horizontal Scroll */}
         <Box
@@ -419,11 +482,11 @@ const Ads = () => {
             }
           }}
         >
-          {cats.map((item, index) => (
+          {courses.map((course, index) => (
             <Grow
               in={true}
               timeout={500 + index * 100}
-              key={item.id}
+              key={course.id}
               style={{ transformOrigin: '0 0 0' }}
             >
               <Box
@@ -454,28 +517,27 @@ const Ads = () => {
                     width: '100%'
                   }}
                 >
-                  {/* IMAGE SECTION */}
-                  <Box
-                    sx={{
-                      position: "relative",
-                      height: 140,
-                      overflow: "hidden",
-                      cursor: 'pointer',
-                    }}
-                    onClick={() => handleCardClick(item.id)}
-                  >
-                    <Box
-                      component="img"
-                       src={getImgUrl(item?.image) || "https://via.placeholder.com/300x140?text=No+Image"}
-                      alt={item?.category || "Category"}
+                  {/* IMAGE SECTION */}                    <Box
                       sx={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                        transition: "transform 0.5s ease",
-                        transform: hoveredCard === index ? "scale(1.15)" : "scale(1)",
+                        position: "relative",
+                        height: 140,
+                        overflow: "hidden",
+                        cursor: 'pointer',
                       }}
-                    />
+                      onClick={() => handleCourseClick(course.slug)}
+                    >
+                      <Box
+                        component="img"
+                        src={getImgUrl(course?.thumbnail) || "https://via.placeholder.com/300x140?text=No+Image"}
+                        alt={course?.title || "Course"}
+                        sx={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          transition: "transform 0.5s ease",
+                          transform: hoveredCard === index ? "scale(1.15)" : "scale(1)",
+                        }}
+                      />
 
                     {/* Gradient Overlay */}
                     <Box
@@ -527,7 +589,7 @@ const Ads = () => {
 
                     {/* Favorite Button */}
                     <IconButton
-                      onClick={(e) => toggleFavorite(item.id, e)}
+                      onClick={(e) => toggleFavorite(course.id, e)}
                       sx={{
                         position: "absolute",
                         top: 16,
@@ -546,7 +608,7 @@ const Ads = () => {
                     >
                       <FavoriteTwoTone
                         sx={{
-                          color: favorites.includes(item.id)
+                          color: favorites.includes(course.id)
                             ? "#ff4d4d"
                             : "red",
                           fontSize: 20,
@@ -567,7 +629,7 @@ const Ads = () => {
                   >
                     {/* Title & Rating */}
                     <Box
-                      onClick={() => handleCardClick(item.id)}
+                      onClick={() => handleCourseClick(course.slug)}
                       sx={{
                         display: "flex",
                         flexDirection: "column",
@@ -576,44 +638,72 @@ const Ads = () => {
                         mb: 1,
                         cursor: 'pointer',
                       }}
-                    >
-                      <Typography
-                        variant="h6"
-                        sx={{
-                          fontWeight: 700,
-                          fontSize: "1.2rem",
-                          color: 'black',
-                          lineHeight: 1.3,
-                        }}
-                      >
-                        {item?.category || "N/A"}
-                      </Typography>
-
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                        <Rating value={4.8} precision={0.1} readOnly size="small" sx={{ color: 'var(--green)' }} />
-                        <Typography variant="body2" fontWeight={600} sx={{ color: 'black' }}>
-                          (4.8)
+                    >                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: 700,
+                            fontSize: "1.1rem",
+                            color: 'black',
+                            lineHeight: 1.3,
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          {course?.title || "N/A"}
                         </Typography>
+
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                          <Rating value={Number(course.rating) || 0} precision={0.1} readOnly size="small" sx={{ color: 'var(--green)' }} />
+                          <Typography variant="body2" fontWeight={600} sx={{ color: 'black' }}>
+                            ({course.total_ratings || 0})
+                          </Typography>
+                        </Box>
                       </Box>
-                    </Box>
 
                     {/* Description */}
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: 'black',
-                        mb: 1,
-                        fontSize: "0.9rem",
-                        height: 60,
-                        overflow: "hidden",
-                        display: "-webkit-box",
-                        WebkitLineClamp: 3,
-                        WebkitBoxOrient: "vertical",
-                      }}
-                    >
-                      {item.description ||
-                        "Learn from industry experts and master the skills you need to succeed in your career."}
-                    </Typography>
+                                            <Typography
+                        variant="body2"
+                        sx={{
+                          color: 'text.secondary',
+                          mb: 1,
+                          fontSize: "0.85rem",
+                          height: 40,
+                          overflow: "hidden",
+                          display: "-webkit-box",
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: "vertical",
+                        }}
+                      >
+                        {course.short_description || "Learn from industry experts."}
+                      </Typography>
+
+                      {/* Info Pills */}
+                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 1.5 }}>
+                         <Chip
+                            icon={<AccessTime sx={{ fontSize: '14px !important' }}/>}
+                            label={`${course.duration_months || 0} Months`}
+                            size="small"
+                            sx={{
+                              bgcolor: 'rgba(61, 184, 67, 0.1)',
+                              color: 'var(--green-dark)',
+                              fontSize: '0.75rem',
+                              fontWeight: 600,
+                            }}
+                          />
+                          <Chip
+                            icon={<School sx={{ fontSize: '14px !important' }}/>}
+                            label={course.level || "Regular"}
+                            size="small"
+                            sx={{
+                              bgcolor: 'rgba(61, 184, 67, 0.1)',
+                              color: 'var(--green-dark)',
+                              fontSize: '0.75rem',
+                              fontWeight: 600,
+                            }}
+                          />
+                      </Box>
 
                     {/* Instructor */}
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -643,22 +733,24 @@ const Ads = () => {
                         pt: 1.5,
                         borderTop: '1px solid var(--green-light)',
                       }}
-                    >
-                      <Box>
-                        <Typography variant="caption" sx={{ color: 'black' }}>
-                          Starting from
-                        </Typography>
-                        <Typography variant="h6" sx={{ color: 'var(--green)', fontWeight: 700 }}>
-                          Free
-                        </Typography>
-                      </Box>
+                    >                        <Box>
+                          <Typography variant="h6" sx={{ color: 'var(--green)', fontWeight: 800 }}>
+                            {course.price ? `₹${course.price}` : "Free"}
+                          </Typography>
+                          {course.original_price && (
+                             <Typography variant="caption" sx={{ color: 'text.secondary', textDecoration: 'line-through' }}>
+                               ₹{course.original_price}
+                             </Typography>
+                          )}
+                        </Box>
 
-                      <AnimatedButton
-                        onClick={() => handleOpen(item)}
-                        size="small"
-                      >
-                        Enroll Now
-                      </AnimatedButton>
+                        <AnimatedButton
+                          onClick={() => handleOpen(course)}
+                          size="small"
+                        >
+                          Enroll Now
+                        </AnimatedButton>
+
                     </Box>
                   </Box>
                 </GlassCard>
@@ -668,7 +760,7 @@ const Ads = () => {
         </Box>
 
         {/* Scroll Indicator */}
-        {cats.length > 0 && (
+        {courses.length > 0 && (
           <Fade in={true}>
             <Box
               sx={{
@@ -695,12 +787,11 @@ const Ads = () => {
         transitionDuration={500}
         PaperProps={{
           sx: {
-            borderRadius: 4,
+            borderRadius: 6,
             overflow: "hidden",
-            background: 'rgba(255, 255, 255, 0.1)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
+            bgcolor: '#ffffff',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            border: '1px solid var(--green-light)',
           }
         }}
       >
@@ -708,30 +799,30 @@ const Ads = () => {
           <>
             <DialogTitle
               sx={{
-                background: 'linear-gradient(135deg, #1a2e0f, #2d4a1e)',
+                background: 'linear-gradient(135deg, var(--green-dark), #0a1a05)',
                 color: 'white',
-                py: 4,
+                py: 3,
                 position: "relative",
               }}
             >
               <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                 <Avatar
-                  src={getImgUrl(selectedCourse?.image) || "https://via.placeholder.com/70x70?text=No+Img"}
+                  src={getImgUrl(selectedCourse?.thumbnail) || "https://via.placeholder.com/70x70?text=No+Img"}
                   sx={{
-                    width: 70,
-                    height: 70,
-                    border: `3px solid ${colors.secondary}`,
-                    boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+                    width: 60,
+                    height: 60,
+                    border: `2px solid ${colors.secondary}`,
+                    boxShadow: '0 8px 20px rgba(0,0,0,0.2)',
                   }}
                 />
                 <Box>
-                  <Typography variant="h5" fontWeight={800}>
-                    {selectedCourse?.category || "Course"}
+                  <Typography variant="h6" sx={{ fontWeight: 800, fontSize: '1.25rem', lineHeight: 1.2 }}>
+                    {selectedCourse?.title || "Enrollment Form"}
                   </Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                    <Rating value={4.8} size="small" readOnly sx={{ color: colors.secondary }} />
-                    <Typography variant="caption" sx={{ opacity: 0.8 }}>
-                      (120+ reviews)
+                    <Rating value={Number(selectedCourse?.rating) || 0} size="small" readOnly sx={{ color: colors.secondary }} />
+                    <Typography variant="caption" sx={{ opacity: 0.9, fontWeight: 500 }}>
+                      Join {selectedCourse?.total_ratings || 0}+ Students
                     </Typography>
                   </Box>
                 </Box>
@@ -755,33 +846,36 @@ const Ads = () => {
               </IconButton>
             </DialogTitle>
 
-            <DialogContent sx={{ py: 4 }}>
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+            <DialogContent sx={{ py: 3, pt: '24px !important' }}>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
                 <TextField
                   label="Full Name"
                   name="fullName"
+                  placeholder="Enter your full name"
                   value={formData.fullName}
                   onChange={handleChange}
                   fullWidth
                   variant="outlined"
                   InputProps={{
                     sx: {
-                      borderRadius: 2,
-                      bgcolor: 'rgba(255,255,255,0.05)',
-                      color: 'white',
+                      borderRadius: 3,
+                      bgcolor: '#f8fafc',
+                      color: 'black',
+                      fontWeight: 500,
                       '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: 'rgba(255,255,255,0.2)',
+                        borderColor: '#e2e8f0',
                       },
                       '&:hover .MuiOutlinedInput-notchedOutline': {
-                        borderColor: colors.secondary,
+                        borderColor: 'var(--green)',
                       },
                       '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                        borderColor: colors.secondary,
+                        borderColor: 'var(--green)',
+                        borderWidth: 2,
                       },
                     }
                   }}
                   InputLabelProps={{
-                    sx: { color: 'rgba(255,255,255,0.7)' }
+                    sx: { color: '#64748b', fontWeight: 600 }
                   }}
                 />
 
@@ -789,44 +883,54 @@ const Ads = () => {
                   label="Email Address"
                   name="email"
                   type="email"
+                  placeholder="example@gmail.com"
                   value={formData.email}
                   onChange={handleChange}
                   fullWidth
                   variant="outlined"
                   InputProps={{
                     sx: {
-                      borderRadius: 2,
-                      bgcolor: 'rgba(255,255,255,0.05)',
-                      color: 'white',
+                      borderRadius: 3,
+                      bgcolor: '#f8fafc',
+                      color: 'black',
+                      fontWeight: 500,
                       '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: 'rgba(255,255,255,0.2)',
+                        borderColor: '#e2e8f0',
+                      },
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'var(--green)',
                       },
                     }
                   }}
                   InputLabelProps={{
-                    sx: { color: 'rgba(255,255,255,0.7)' }
+                    sx: { color: '#64748b', fontWeight: 600 }
                   }}
                 />
 
                 <TextField
                   label="Phone Number"
                   name="phone"
+                  placeholder="+91 XXXXX XXXXX"
                   value={formData.phone}
                   onChange={handleChange}
                   fullWidth
                   variant="outlined"
                   InputProps={{
                     sx: {
-                      borderRadius: 2,
-                      bgcolor: 'rgba(255,255,255,0.05)',
-                      color: 'white',
+                      borderRadius: 3,
+                      bgcolor: '#f8fafc',
+                      color: 'black',
+                      fontWeight: 500,
                       '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: 'rgba(255,255,255,0.2)',
+                        borderColor: '#e2e8f0',
+                      },
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'var(--green)',
                       },
                     }
                   }}
                   InputLabelProps={{
-                    sx: { color: 'rgba(255,255,255,0.7)' }
+                    sx: { color: '#64748b', fontWeight: 600 }
                   }}
                 />
 
@@ -840,26 +944,36 @@ const Ads = () => {
                   variant="outlined"
                   InputProps={{
                     sx: {
-                      borderRadius: 2,
-                      bgcolor: 'rgba(255,255,255,0.05)',
-                      color: 'white',
+                      borderRadius: 3,
+                      bgcolor: '#f8fafc',
+                      color: 'black',
+                      fontWeight: 600,
                       '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: 'rgba(255,255,255,0.2)',
+                        borderColor: '#e2e8f0',
+                      },
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'var(--green)',
                       },
                     }
                   }}
                   InputLabelProps={{
-                    sx: { color: 'rgba(255,255,255,0.7)' }
-                  }}
-                  SelectProps={{
-                    sx: { color: 'white' }
+                    sx: { color: '#64748b', fontWeight: 600 }
                   }}
                 >
-                  {cats.map((course) => (
-                    <MenuItem key={course.id} value={course.id}>
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <School sx={{ fontSize: 20, color: colors.primary }} />
-                        {course.category}
+                  {courses.map((course) => (
+                    <MenuItem 
+                      key={course.id} 
+                      value={course.id}
+                      sx={{ 
+                        color: 'black',
+                        fontWeight: 500,
+                        py: 1.5,
+                        '&:hover': { bgcolor: 'var(--green-light)' }
+                      }}
+                    >
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                        <School sx={{ fontSize: 20, color: 'var(--green)' }} />
+                        {course.title}
                       </Box>
                     </MenuItem>
                   ))}
@@ -867,28 +981,29 @@ const Ads = () => {
 
                 {/* Course Benefits */}
                 <Paper
+                  elevation={0}
                   sx={{
-                    p: 3,
-                    bgcolor: 'rgba(191, 219, 129, 0.05)',
-                    borderRadius: 3,
-                    border: `1px solid rgba(191, 219, 129, 0.2)`,
+                    p: 2.5,
+                    bgcolor: '#f8fafc',
+                    borderRadius: 4,
+                    border: `1px dashed #cbd5e1`,
                   }}
                 >
-                  <Typography variant="subtitle2" sx={{ color: colors.secondary, fontWeight: 600 }}>
-                    🎓 What You'll Get:
+                  <Typography variant="subtitle2" sx={{ color: 'var(--green-dark)', fontWeight: 800, mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+                    🚀 Exclusive Course Benefits:
                   </Typography>
-                  <Box sx={{ display: "grid", gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+                  <Box sx={{ display: "grid", gridTemplateColumns: '1fr 1fr', gap: 1.5 }}>
                     {[
-                      'Certificate',
-                      'Live Sessions',
-                      'Projects',
-                      'Mentorship',
-                      'Job Support',
+                      'Official Certificate',
+                      'Live Expert Sessions',
+                      'Hands-on Projects',
+                      '1-on-1 Mentorship',
+                      'Placement Support',
                       'Lifetime Access'
                     ].map((benefit, i) => (
-                      <Box key={i} sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                        <CheckCircle sx={{ fontSize: 16, color: colors.secondary }} />
-                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                      <Box key={i} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <CheckCircle sx={{ fontSize: 16, color: 'var(--green)' }} />
+                        <Typography variant="caption" sx={{ color: '#475569', fontWeight: 600 }}>
                           {benefit}
                         </Typography>
                       </Box>
@@ -898,19 +1013,20 @@ const Ads = () => {
               </Box>
             </DialogContent>
 
-            <DialogActions sx={{ p: 4, pt: 0, gap: 2 }}>
+            <DialogActions sx={{ p: 3, pt: 0, gap: 1.5 }}>
               <Button
                 onClick={handleClose}
-                variant="outlined"
+                variant="text"
                 sx={{
                   borderRadius: 3,
                   px: 4,
-                  py: 1.5,
-                  borderColor: 'rgba(255,255,255,0.2)',
-                  color: 'rgba(255,255,255,0.8)',
+                  py: 1.2,
+                  color: '#64748b',
+                  fontWeight: 700,
+                  textTransform: 'none',
                   '&:hover': {
-                    borderColor: colors.secondary,
-                    bgcolor: 'rgba(255,255,255,0.05)',
+                    bgcolor: '#f1f5f9',
+                    color: 'black',
                   },
                 }}
               >
@@ -927,10 +1043,11 @@ const Ads = () => {
                   px: 4,
                   py: 1.5,
                   fontWeight: 700,
-                  '&:hover': {
-                    transform: 'translateY(-2px)',
-                    boxShadow: '0 15px 30px rgba(191, 219, 129, 0.3)',
-                  },
+                    '&:hover': {
+                      bgcolor: 'var(--green-dark)',
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 12px 25px rgba(61, 184, 67, 0.25)',
+                    },
                 }}
                 startIcon={<CheckCircle />}
               >

@@ -61,8 +61,21 @@ export default function EnquiryFormAlone() {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
 
+  const validateEmail = (email) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  };
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === "mobile") {
+      const nums = value.replace(/[^0-9]/g, "");
+      if (nums.length <= 10) {
+        setFormData({ ...formData, [name]: nums });
+      }
+      return;
+    }
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async () => {
@@ -72,7 +85,22 @@ export default function EnquiryFormAlone() {
 
     const { name, email, mobile, course, location, timeslot } = formData;
 
-    if (!name || !email || !mobile || !course || !location || !timeslot) {
+    if (!name.trim()) {
+      setError("Name is required");
+      setLoading(false);
+      return;
+    }
+    if (!email.trim() || !validateEmail(email)) {
+      setError("Please enter a valid email address");
+      setLoading(false);
+      return;
+    }
+    if (!mobile.trim() || mobile.length !== 10) {
+      setError("Mobile number must be exactly 10 digits");
+      setLoading(false);
+      return;
+    }
+    if (!course || !location || !timeslot) {
       setError("Please fill all fields");
       setLoading(false);
       return;
@@ -153,7 +181,9 @@ export default function EnquiryFormAlone() {
           />
           <StyledTextField
             fullWidth
-            placeholder="Preferred Call Time *"
+            type="time"
+            label="Preferred Call Time"
+            InputLabelProps={{ shrink: true }}
             name="timeslot"
             value={formData.timeslot}
             onChange={handleChange}

@@ -67,6 +67,11 @@ const GlassCard = styled(({ $hovered, ...other }) => <Paper {...other} />)(({ th
   borderRadius: '24px',
   overflow: 'hidden',
   position: 'relative',
+  display: 'flex',
+  flexDirection: 'column',
+  height: '100%',
+  minHeight: '430px',
+  width: '100%',
   transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
   transform: $hovered ? 'translateY(-10px)' : 'translateY(0)',
   boxShadow: $hovered
@@ -347,10 +352,10 @@ export default function LiveClass() {
               <Box
                 key={i}
                 sx={{
-                  minWidth: {
-                    xs: "280px",
-                    sm: "320px",
-                    md: "350px",
+                  width: {
+                    xs: "250px",
+                    sm: "280px",
+                    md: "300px",
                   },
                   flexShrink: 0,
                   scrollSnapAlign: "start",
@@ -367,7 +372,7 @@ export default function LiveClass() {
                   <Box sx={{ position: "relative", overflow: "hidden" }}>
                     <CardMedia
                       component="img"
-                      height="180"
+                      height="150"
                       src={getImgUrl(cls.courseId?.image) || "https://via.placeholder.com/400x180?text=No+Image"}
                       alt={cls.title || "Live Class"}
                       sx={{
@@ -401,9 +406,18 @@ export default function LiveClass() {
                         alignItems: "center",
                       }}
                     >
-                      <GlassChip
-                        label={cls.title}
+                      <Chip
+                        label={cls.courseId?.categoryName || "Category"}
                         size="small"
+                        sx={{
+                          bgcolor: '#c2eac4',
+                          color: '#2e9133',
+                          fontWeight: 800,
+                          fontSize: '0.7rem',
+                          borderRadius: '8px',
+                          border: 'none',
+                          px: 0.5
+                        }}
                       />
 
                       <GlassChip
@@ -432,33 +446,43 @@ export default function LiveClass() {
                   </Box>
 
                   {/* CARD CONTENT */}
-                  <CardContent sx={{ p: 3 }}>
+                  <CardContent 
+                    sx={{ 
+                      p: 2, 
+                      flex: 1, 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      justifyContent: 'space-between' 
+                    }}
+                  >
                     {/* TITLE */}
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontWeight: 700,
-                        mb: 2,
-                        fontSize: "1.2rem",
-                        color: 'black',
-                        lineHeight: 1.4,
-                      }}
-                    >
-                      {cls.courseId?.category || "Uncategorized"}
-                    </Typography>
-
-                    {/* INSTRUCTOR INFO */}
-                    <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                      <GlassAvatar sx={{ width: 32, height: 32, mr: 1.5, bgcolor: 'var(--green-light)', border: 'none' }}>
-                        <SchoolIcon sx={{ fontSize: 16, color: 'var(--green-dark)' }} />
-                      </GlassAvatar>
-                      <Typography variant="body2" sx={{ color: 'black', fontWeight: 800 }}>
-                        Expert Instructor
+                    <Box>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          fontWeight: 800,
+                          mb: 1.5,
+                          fontSize: "1.05rem",
+                          color: 'black',
+                          lineHeight: 1.4,
+                        }}
+                      >
+                        {cls.title || "Live Class"}
                       </Typography>
+
+                      {/* INSTRUCTOR INFO */}
+                      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                        <GlassAvatar sx={{ width: 32, height: 32, mr: 1.5, bgcolor: 'var(--green-light)', border: 'none' }}>
+                          <SchoolIcon sx={{ fontSize: 16, color: 'var(--green-dark)' }} />
+                        </GlassAvatar>
+                        <Typography variant="body2" sx={{ color: 'black', fontWeight: 800 }}>
+                          Expert Instructor
+                        </Typography>
+                      </Box>
                     </Box>
 
                     {/* COURSE DETAILS */}
-                    <Box sx={{ display: "grid", gap: 1.5, mb: 3 }}>
+                    <Box sx={{ display: "grid", gap: 1, mb: 2 }}>
                       {/* DATE */}
                       <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
                         <StyledIcon sx={{ width: 28, height: 28, bgcolor: 'var(--green-light)' }}>
