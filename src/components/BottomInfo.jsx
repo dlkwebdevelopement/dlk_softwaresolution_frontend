@@ -230,8 +230,24 @@ const BottomInfo = () => {
             }}
           >
             {/* Phone Numbers */}
-            <Stack direction="row" spacing={1} alignItems="center" sx={{ flexShrink: 0 }}>
-              <IconWrapper>
+            <Stack 
+              direction="row" 
+              spacing={1} 
+              alignItems="center" 
+              sx={{ 
+                flexShrink: 0,
+                cursor: 'pointer',
+                '&:hover': {
+                  '& .MuiTypography-root': { color: colors.primary },
+                  '& .IconWrapper-root': { 
+                    background: colors.primary,
+                    '& svg': { color: colors.light }
+                  }
+                }
+              }}
+              onClick={() => window.location.href = 'tel:+917708150152'}
+            >
+              <IconWrapper className="IconWrapper-root">
                 <PhoneIcon />
               </IconWrapper>
               <AnimatedText
@@ -240,6 +256,7 @@ const BottomInfo = () => {
                   fontWeight: 800,
                   whiteSpace: 'nowrap',
                   color: colors.dark,
+                  transition: 'color 0.3s ease',
                 }}
               >
                 {isMobile
@@ -271,8 +288,12 @@ const BottomInfo = () => {
               onClick={() => {
                 const subject = encodeURIComponent("Enquiry from Website");
                 const body = encodeURIComponent("Hello DLK Software Solutions,\n\nI am interested in your training programs and would like to get more details.\n\nRegards,");
-                const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=dlksoftwaresolutions@gmail.com&su=${subject}&body=${body}`;
-                window.open(gmailUrl, "_blank");
+                if (isMobile) {
+                  window.location.href = `mailto:dlksoftwaresolutions@gmail.com?subject=${subject}&body=${body}`;
+                } else {
+                  const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=dlksoftwaresolutions@gmail.com&su=${subject}&body=${body}`;
+                  window.open(gmailUrl, "_blank");
+                }
               }}
             >
               <IconWrapper className="IconWrapper-root">
