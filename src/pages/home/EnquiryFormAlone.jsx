@@ -228,7 +228,7 @@ export default function EnquiryFormAlone() {
         <Box sx={{ display: 'flex', justifyContent: 'center', my: 1 }}>
           <ReCAPTCHA
             ref={recaptchaRef}
-            sitekey="6LfR8o8sAAAAACcDXBSb3nHObtFxsIlLxov_uO0D"
+            sitekey="6Lc_DJAsAAAAADKYIf74PvRX5a5dUCy8GTxlxP5D"
             onChange={handleCaptchaChange}
           />
         </Box>
