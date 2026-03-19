@@ -205,18 +205,18 @@ export default function BlogContentPage() {
           <Box component="article" data-aos="fade-up" data-aos-delay="100">
 
 
-            {/* Blog Content */}
             <Box
               className="blog-content"
               dangerouslySetInnerHTML={{ __html: blog.description }}
               sx={{ 
+                textAlign: "justify",
                 lineHeight: 1.8, 
                 color: "#334155",
-                fontSize: { xs: "1.05rem", md: "1.125rem" },
+                fontSize: { xs: "0.95rem", md: "1.05rem" },
                 overflowWrap: "break-word",
                 wordBreak: "break-word",
                 "& h2": { 
-                  fontSize: { xs: "1.75rem", md: "2.25rem" }, 
+                  fontSize: { xs: "1.5rem", md: "2rem" }, 
                   fontWeight: 800, 
                   mb: 3, 
                   mt: 6, 
@@ -224,7 +224,7 @@ export default function BlogContentPage() {
                   fontFamily: '"Bricolage Grotesque", sans-serif',
                 },
                 "& h3": { 
-                  fontSize: { xs: "1.4rem", md: "1.75rem" }, 
+                  fontSize: { xs: "1.25rem", md: "1.5rem" }, 
                   fontWeight: 700, 
                   mb: 2, 
                   mt: 4, 
@@ -259,7 +259,7 @@ export default function BlogContentPage() {
                   py: 4,
                   borderRadius: "0 16px 16px 0",
                   mb: 5,
-                  fontSize: "1.25rem",
+                  fontSize: "1.1rem",
                   color: "#0f172a",
                   fontWeight: 500,
                   lineHeight: 1.6

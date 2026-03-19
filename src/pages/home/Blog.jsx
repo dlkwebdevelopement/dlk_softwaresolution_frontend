@@ -22,6 +22,7 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import { useTheme, useMediaQuery } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { GetRequest } from "../../api/config";
@@ -436,6 +437,11 @@ const Blog = () => {
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, color: colors.textPrimary }}>
                         <AccessTimeIcon sx={{ fontSize: 16, color: colors.secondary }} />
                         <Typography variant="caption" sx={{ fontWeight: 600 }}>3 min read</Typography>
+                      </Box>
+                      <Box sx={{ width: 4, height: 4, borderRadius: '50%', bgcolor: 'divider' }} />
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, color: colors.textPrimary }}>
+                        <VisibilityIcon sx={{ fontSize: 16, color: colors.primary }} />
+                        <Typography variant="caption" sx={{ fontWeight: 600 }}>{blog.views || 0} views</Typography>
                       </Box>
                     </Box>
 

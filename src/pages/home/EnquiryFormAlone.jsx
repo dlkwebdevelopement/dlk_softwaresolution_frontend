@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Box, Typography, TextField, Button, alpha } from "@mui/material";
 import { styled, keyframes } from "@mui/material/styles";
 import { PostRequest } from "../../api/config";
 import { ADMIN_POST_ENQUIRIES } from "../../api/endpoints";
 import SendIcon from '@mui/icons-material/Send';
+import ReCAPTCHA from "react-google-recaptcha";
 
 // Animations
 const fadeIn = keyframes`
@@ -60,6 +61,8 @@ export default function EnquiryFormAlone() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+  const [captchaToken, setCaptchaToken] = useState(null);
+  const recaptchaRef = useRef(null);
 
   const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -76,6 +79,10 @@ export default function EnquiryFormAlone() {
       return;
     }
     setFormData({ ...formData, [name]: value });
+  };
+
+  const handleCaptchaChange = (value) => {
+    setCaptchaToken(value);
   };
 
   const handleSubmit = async () => {
@@ -105,9 +112,14 @@ export default function EnquiryFormAlone() {
       setLoading(false);
       return;
     }
+    if (!captchaToken) {
+      setError("Please verify that you are not a robot");
+      setLoading(false);
+      return;
+    }
 
     try {
-      await PostRequest(ADMIN_POST_ENQUIRIES, formData);
+      await PostRequest(ADMIN_POST_ENQUIRIES, { ...formData, captchaToken });
       setSuccess("Enquiry submitted successfully!");
       setFormData({
         name: "",
@@ -117,6 +129,10 @@ export default function EnquiryFormAlone() {
         location: "",
         timeslot: "",
       });
+      setCaptchaToken(null);
+      if (recaptchaRef.current) {
+        recaptchaRef.current.reset();
+      }
     } catch (err) {
       setError("Failed to submit enquiry: " + err.message);
     } finally {
@@ -208,6 +224,14 @@ export default function EnquiryFormAlone() {
             {success}
           </Typography>
         )}
+
+        <Box sx={{ display: 'flex', justifyContent: 'center', my: 1 }}>
+          <ReCAPTCHA
+            ref={recaptchaRef}
+            sitekey="6LfR8o8sAAAAACcDXBSb3nHObtFxsIlLxov_uO0D"
+            onChange={handleCaptchaChange}
+          />
+        </Box>
 
         <Button
           onClick={handleSubmit}

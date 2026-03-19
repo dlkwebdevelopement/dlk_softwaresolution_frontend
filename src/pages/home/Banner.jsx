@@ -352,6 +352,14 @@ export default function Banner() {
     fetch();
   }, []);
 
+  // Auto-open Enquiry Popup after 5 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setEnquiryOpen(true);
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, []);
+
   useEffect(() => {
     let timer;
     if (!isHovering && list.length > 1) {

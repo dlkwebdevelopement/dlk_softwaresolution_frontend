@@ -9,6 +9,9 @@ import {
 } from "@mui/material";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import CloseIcon from "@mui/icons-material/Close";
+import FacebookIcon from '@mui/icons-material/Facebook';
+import InstagramIcon from '@mui/icons-material/Instagram';
+import YouTubeIcon from '@mui/icons-material/YouTube';
 
 export default function FloatingEnquiry() {
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -175,25 +178,129 @@ export default function FloatingEnquiry() {
               />
             </Fab>
           </Box>
-
-          {/* WhatsApp */}
-          <Fab
-            sx={{ 
-              overflow: 'hidden',
-              padding: 0,
-              width: { xs: 50, sm: 56 },
-              height: { xs: 50, sm: 56 }
-            }}
-            href="https://wa.me/917708150152"
-            target="_blank"
-          >
-            <img 
-              src="/photos/whatsapp-icon.png" 
-              alt="WhatsApp" 
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-            />
-          </Fab>
         </Stack>
+      </Box>
+
+      {/* Left-side Social Buttons (Centered, Flush Left) */}
+      <Box
+        sx={{
+          position: "fixed",
+          top: "50%",
+          transform: "translateY(-50%)",
+          left: 0,
+          zIndex: 1300,
+          display: "flex",
+          flexDirection: "column",
+          boxShadow: "2px 0 10px rgba(0,0,0,0.2)"
+        }}
+      >
+        {/* Facebook */}
+        <Box
+          component="a"
+          href="https://www.facebook.com/profile.php?id=61569333069634"
+          target="_blank"
+          sx={{
+            width: 48,
+            height: 48,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            overflow: "hidden",
+            bgcolor: "#3b5998",
+            color: "white",
+            textDecoration: "none",
+            transition: "width 0.3s ease",
+            "&:hover": { width: 140, bgcolor: "#334f88" }
+          }}
+        >
+          <Box sx={{ minWidth: 48, height: 48, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <FacebookIcon />
+          </Box>
+          <Typography sx={{ fontWeight: 600, fontSize: "0.9rem", whiteSpace: "nowrap" }}>
+            Facebook
+          </Typography>
+        </Box>
+
+        {/* Instagram */}
+        <Box
+          component="a"
+          href="https://instagram.com"
+          target="_blank"
+          sx={{
+            width: 48,
+            height: 48,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            overflow: "hidden",
+            bgcolor: "#7b4632", 
+            color: "white",
+            textDecoration: "none",
+            transition: "width 0.3s ease",
+            "&:hover": { width: 140, bgcolor: "#6a3b2a" }
+          }}
+        >
+          <Box sx={{ minWidth: 48, height: 48, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <InstagramIcon />
+          </Box>
+          <Typography sx={{ fontWeight: 600, fontSize: "0.9rem", whiteSpace: "nowrap" }}>
+            Instagram
+          </Typography>
+        </Box>
+
+        {/* YouTube */}
+        <Box
+          component="a"
+          href="https://youtube.com"
+          target="_blank"
+          sx={{
+            width: 48,
+            height: 48,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            overflow: "hidden",
+            bgcolor: "#cd201f",
+            color: "white",
+            textDecoration: "none",
+            transition: "width 0.3s ease",
+            "&:hover": { width: 140, bgcolor: "#b31b1b" }
+          }}
+        >
+          <Box sx={{ minWidth: 48, height: 48, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <YouTubeIcon />
+          </Box>
+          <Typography sx={{ fontWeight: 600, fontSize: "0.9rem", whiteSpace: "nowrap" }}>
+            YouTube
+          </Typography>
+        </Box>
+      </Box>
+
+      {/* Left-side WhatsApp Button (Bottom) */}
+      <Box
+        sx={{
+          position: "fixed",
+          bottom: { xs: 80, sm: 90, md: 60 },
+          left: { xs: 15, sm: 20 },
+          zIndex: 1300
+        }}
+      >
+        <Fab
+          sx={{ 
+            overflow: 'hidden',
+            padding: 0,
+            width: { xs: 50, sm: 56 },
+            height: { xs: 50, sm: 56 }
+          }}
+          href="https://wa.me/917708150152"
+          target="_blank"
+        >
+          <img 
+            src="/photos/whatsapp-icon.png" 
+            alt="WhatsApp" 
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+          />
+        </Fab>
       </Box>
     </>
   );
