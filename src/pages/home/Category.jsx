@@ -148,8 +148,8 @@ const Category = () => {
           <SectionTitle
             variant="h4"
             sx={{
-              fontWeight: 900,
-              fontSize: { xs: '2.5rem', sm: '3rem', md: '3.5rem' },
+              fontWeight: 600,
+              fontSize: 'clamp(1.7rem, 3.2vw, 2.5rem)',
               color: 'var(--green-dark)',
               mb: 1
             }}
@@ -218,8 +218,8 @@ const Category = () => {
                   <Typography
                     sx={{
                       mt: "12px",
-                      fontSize: { xs: "12px", sm: "14px", lg: "16px" },
-                      fontWeight: 700,
+                      fontSize: { xs: "11px", sm: "13px", lg: "14px" },
+                      fontWeight: 500,
                       color: "black",
                       lineHeight: 1.3,
                       textAlign: 'center',

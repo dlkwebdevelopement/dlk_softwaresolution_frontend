@@ -31,7 +31,7 @@ export default function Companies() {
       }}
     >
       {/* TITLE */}
-      <Typography variant="h4" align="center" sx={{ fontWeight: 700, mb: 4, color: "var(--green-deep)" }}>
+      <Typography variant="h4" align="center" sx={{ fontWeight: 600, mb: 4, color: "var(--green-deep)", fontSize: 'clamp(1.7rem, 3.2vw, 2.5rem)' }}>
         Our Hiring <span style={{ color: "var(--green-mid)" }}> Partners</span>
       </Typography>
 

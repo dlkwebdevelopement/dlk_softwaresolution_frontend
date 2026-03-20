@@ -285,9 +285,9 @@ export default function LiveClass() {
           <Typography
             variant="h3"
             sx={{
-              fontWeight: 800,
+              fontWeight: 600,
               mb: 2,
-              fontSize: { xs: '2.5rem', sm: '3rem', md: '3.5rem' },
+              fontSize: 'clamp(1.7rem, 3.2vw, 2.5rem)',
               color: 'var(--green-dark)', // Base color for Classes
             }}
           >
@@ -295,14 +295,13 @@ export default function LiveClass() {
           </Typography>
 
           <Typography
-            variant="h6"
+            variant="body1"
             sx={{
               color: '#6b8f76',
               maxWidth: 700,
               mx: "auto",
-              fontWeight: 500,
-              fontSize: { xs: '1rem', sm: '1.1rem' },
-              opacity: 1,
+              fontWeight: 400,
+              fontSize: '1rem',
             }}
           >
             Join our interactive live sessions with expert instructors and transform your learning experience
@@ -460,7 +459,7 @@ export default function LiveClass() {
                       <Typography
                         variant="h6"
                         sx={{
-                          fontWeight: 800,
+                          fontWeight: 600,
                           mb: 1.5,
                           fontSize: "1.05rem",
                           color: 'black',
@@ -475,7 +474,7 @@ export default function LiveClass() {
                         <GlassAvatar sx={{ width: 32, height: 32, mr: 1.5, bgcolor: 'var(--green-light)', border: 'none' }}>
                           <SchoolIcon sx={{ fontSize: 16, color: 'var(--green-dark)' }} />
                         </GlassAvatar>
-                        <Typography variant="body2" sx={{ color: 'black', fontWeight: 800 }}>
+                        <Typography variant="body2" sx={{ color: 'black', fontWeight: 600 }}>
                           Expert Instructor
                         </Typography>
                       </Box>
@@ -489,7 +488,7 @@ export default function LiveClass() {
                           <CalendarTodayIcon sx={{ fontSize: 14 }} />
                         </StyledIcon>
                         <Typography variant="body2" sx={{ color: 'black' }}>
-                          <span style={{ fontWeight: 700, color: 'black' }}>
+                          <span style={{ fontWeight: 600, color: 'black' }}>
                             Starts:{' '}
                           </span>
                           {dayjs(cls.startDate).format("DD MMM YYYY")}
@@ -502,7 +501,7 @@ export default function LiveClass() {
                           <AccessTimeIcon sx={{ fontSize: 14 }} />
                         </StyledIcon>
                         <Typography variant="body2" sx={{ color: 'black' }}>
-                          <span style={{ fontWeight: 700, color: 'black' }}>
+                          <span style={{ fontWeight: 600, color: 'black' }}>
                             Time:{' '}
                           </span>
                           {formatTime12(cls.startTime)} – {formatTime12(cls.endTime)}
@@ -515,7 +514,7 @@ export default function LiveClass() {
                           <PeopleIcon sx={{ fontSize: 14 }} />
                         </StyledIcon>
                         <Typography variant="body2" sx={{ color: 'black' }}>
-                          <span style={{ fontWeight: 700, color: 'black' }}>
+                          <span style={{ fontWeight: 600, color: 'black' }}>
                             Duration:{' '}
                           </span>
                           {cls.durationDays} {cls.durationDays === 1 ? "day" : "days"}
@@ -624,9 +623,9 @@ export default function LiveClass() {
               <Typography
                 component="h3"
                 sx={{
-                  fontFamily: "'Bricolage Grotesque', sans-serif",
-                  fontSize: { xs: '2rem', md: '2.6rem' },
-                  fontWeight: 800,
+                  fontFamily: "'Poppins', sans-serif",
+                  fontSize: { xs: '2.4rem', md: '3.2rem' },
+                  fontWeight: 600,
                   color: 'var(--green, #3DB843)',
                   letterSpacing: '-0.04em',
                   lineHeight: 1.2

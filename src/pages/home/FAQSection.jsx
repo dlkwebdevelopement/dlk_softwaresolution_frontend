@@ -284,9 +284,9 @@ export default function FAQSection() {
             <Typography
               variant="h2"
               sx={{
-                fontWeight: 900,
+                fontWeight: 600,
                 mb: 2,
-                fontSize: { xs: '2.25rem', md: '3.75rem' },
+                fontSize: 'clamp(1.7rem, 3.2vw, 2.5rem)',
                 color: 'var(--green-dark)',
                 letterSpacing: '-0.02em',
                 lineHeight: 1.1

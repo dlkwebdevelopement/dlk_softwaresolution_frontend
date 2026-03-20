@@ -386,8 +386,8 @@ const Ads = () => {
           <Typography
             variant="h2"
             sx={{
-              fontWeight: 900,
-              fontSize: { xs: '2.5rem', sm: '3rem', md: '3.5rem' },
+              fontWeight: 600,
+              fontSize: 'clamp(1.7rem, 3.2vw, 2.5rem)',
               color: 'black',
             }}
           >
@@ -395,14 +395,14 @@ const Ads = () => {
           </Typography>
 
           <Typography
-            variant="h6"
+            variant="body1"
             sx={{
               color: '#6b8f76',
               fontWeight: 400,
               maxWidth: 700,
               mx: "auto",
               mb: 4,
-              fontSize: { xs: '1rem', sm: '1.1rem' },
+              fontSize: '1rem',
             }}
           >
             Unlock your potential with our expert-led courses and transform your career
@@ -434,8 +434,8 @@ const Ads = () => {
                 position: 'relative',
                 whiteSpace: 'nowrap',
                 color: activeCategory === cat.id ? 'var(--green)' : '#757575',
-                fontWeight: 800,
-                fontSize: '1.15rem',
+                fontWeight: 600,
+                fontSize: '1rem',
                 '&::after': {
                   content: '""',
                   position: 'absolute',

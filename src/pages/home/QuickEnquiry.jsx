@@ -197,7 +197,7 @@ export default function QuickEnquiry() {
                   </Box>
                 </FloatingBadge>
                 <Typography variant="h4" sx={{
-                  fontWeight: 900,
+                  fontWeight: 600,
                   mb: 2,
                   color: "var(--dark)",
                   fontSize: { xs: '2rem', md: '2.8rem' },
@@ -210,7 +210,7 @@ export default function QuickEnquiry() {
                     WebkitTextFillColor: 'transparent',
                   }}>Software Training</span> Academy
                 </Typography>
-                <Typography sx={{ color: "#4b5563", lineHeight: 1.8, fontSize: '1.1rem', mb: 3 }}>
+                <Typography sx={{ color: "#4b5563", lineHeight: 1.8, fontSize: '1rem', fontWeight: 400, mb: 3 }}>
                   DLK is <strong>the Best Software Training Institute in Chennai</strong>, led by IT experts with 20+ years of experience and a track record of 100% placement guidance.
                 </Typography>
               </Box>
@@ -235,7 +235,7 @@ export default function QuickEnquiry() {
                   }}>
                     <EmojiEventsIcon fontSize="small" />
                   </Box>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'var(--dark)' }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'var(--dark)' }}>
                     100% Placement
                   </Typography>
                   <Typography variant="caption" sx={{ color: 'text.secondary', lineHeight: 1.4 }}>
@@ -256,7 +256,7 @@ export default function QuickEnquiry() {
                   }}>
                     <GroupIcon fontSize="small" />
                   </Box>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'var(--dark)' }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'var(--dark)' }}>
                     Expert Trainers
                   </Typography>
                   <Typography variant="caption" sx={{ color: 'text.secondary', lineHeight: 1.4 }}>
@@ -277,7 +277,7 @@ export default function QuickEnquiry() {
                   }}>
                     <SpeedIcon fontSize="small" />
                   </Box>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'var(--dark)' }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'var(--dark)' }}>
                     70+ Technologies
                   </Typography>
                   <Typography variant="caption" sx={{ color: 'text.secondary', lineHeight: 1.4 }}>
@@ -298,7 +298,7 @@ export default function QuickEnquiry() {
                   }}>
                     <VerifiedIcon fontSize="small" />
                   </Box>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'var(--dark)' }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'var(--dark)' }}>
                     Global Certification
                   </Typography>
                   <Typography variant="caption" sx={{ color: 'text.secondary', lineHeight: 1.4 }}>
@@ -333,7 +333,7 @@ export default function QuickEnquiry() {
                   <VerifiedIcon />
                 </Box>
                 <Box>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'var(--dark)', lineHeight: 1.2 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'var(--dark)', lineHeight: 1.2 }}>
                     ISO 9001:2015 Certified
                   </Typography>
                   <Typography variant="caption" sx={{ color: 'text.secondary' }}>

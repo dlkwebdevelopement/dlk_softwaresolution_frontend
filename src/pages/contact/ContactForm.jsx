@@ -145,7 +145,7 @@ const LuxuryTextField = styled(TextField)(({ theme }) => ({
     color: "#6b8f6d",
     "&.Mui-focused": {
       color: "#3DB843",
-      fontWeight: 700,
+      fontWeight: 600,
     },
   },
 }));
@@ -156,7 +156,7 @@ const PremiumButton = styled(Button)(({ theme }) => ({
   borderRadius: "20px",
   padding: "18px 40px",
   fontSize: "15px",
-  fontWeight: 800,
+  fontWeight: 600,
   letterSpacing: "1px",
   textTransform: "uppercase",
   boxShadow: "0 15px 35px -10px rgba(61, 184, 67, 0.15)", // Lighter shadow
@@ -259,10 +259,10 @@ export default function ContactForm() {
           {/* Information Sidebar */}
           <Sidebar>
             <Box>
-              <Typography variant="h3" sx={{ fontWeight: 900, mb: 1.5, letterSpacing: "-1.5px", fontSize: { xs: "2rem", md: "2.8rem" }, color: "#121b13" }}>
+              <Typography variant="h3" sx={{ fontWeight: 600, mb: 1.5, letterSpacing: "-1.5px", fontSize: { xs: "2rem", md: "2.8rem" }, color: "#121b13" }}>
                 Connect With <span style={{ color: "#3DB843" }}>Us.</span>
               </Typography>
-              <Typography variant="body1" sx={{ color: "rgba(18,27,19,0.7)", fontSize: "1.05rem", fontWeight: 500, mb: 4, maxWidth: "340px", lineHeight: 1.6 }}>
+              <Typography variant="body1" sx={{ color: "rgba(18,27,19,0.7)", fontSize: "16px", fontWeight: 400, mb: 4, maxWidth: "340px", lineHeight: 1.6 }}>
                 Our team of digital architects is ready to bring your vision to absolute reality.
               </Typography>
 
@@ -270,7 +270,7 @@ export default function ContactForm() {
                 <InfoItem>
                   <IconBox><LocationOnIcon /></IconBox>
                   <Box>
-                    <Typography variant="subtitle2" sx={{ color: "#3DB843", fontWeight: 900, textTransform: "uppercase", fontSize: "11px", letterSpacing: "2px", mb: 0.5 }}>Headquarters</Typography>
+                    <Typography variant="subtitle2" sx={{ color: "#3DB843", fontWeight: 600, textTransform: "uppercase", fontSize: "11px", letterSpacing: "2px", mb: 0.5 }}>Headquarters</Typography>
                     <Typography variant="body1" sx={{ fontWeight: 600, fontSize: "0.95rem" }}>Rahath Plaza, Vadapalani,<br/>Chennai - 600026</Typography>
                   </Box>
                 </InfoItem>
@@ -278,7 +278,7 @@ export default function ContactForm() {
                 <InfoItem>
                   <IconBox><PhoneIcon /></IconBox>
                   <Box>
-                    <Typography variant="subtitle2" sx={{ color: "#3DB843", fontWeight: 900, textTransform: "uppercase", fontSize: "11px", letterSpacing: "2px", mb: 0.5 }}>Direct Line</Typography>
+                    <Typography variant="subtitle2" sx={{ color: "#3DB843", fontWeight: 600, textTransform: "uppercase", fontSize: "11px", letterSpacing: "2px", mb: 0.5 }}>Direct Line</Typography>
                     <Typography variant="body1" sx={{ fontWeight: 600, fontSize: "0.95rem" }}>+91 77081 50152</Typography>
                   </Box>
                 </InfoItem>
@@ -286,7 +286,7 @@ export default function ContactForm() {
                 <InfoItem>
                   <IconBox><EmailIcon /></IconBox>
                   <Box>
-                    <Typography variant="subtitle2" sx={{ color: "#3DB843", fontWeight: 900, textTransform: "uppercase", fontSize: "11px", letterSpacing: "2px", mb: 0.5 }}>Partnerships</Typography>
+                    <Typography variant="subtitle2" sx={{ color: "#3DB843", fontWeight: 600, textTransform: "uppercase", fontSize: "11px", letterSpacing: "2px", mb: 0.5 }}>Partnerships</Typography>
                     <Typography variant="body1" sx={{ fontWeight: 600, fontSize: "0.95rem" }}>dlksoftwaresolutions@gmail.com</Typography>
                   </Box>
                 </InfoItem>
@@ -294,7 +294,7 @@ export default function ContactForm() {
             </Box>
 
             <Box>
-              <Typography variant="overline" sx={{ color: "rgba(18,27,19,0.4)", fontWeight: 800, letterSpacing: "3px", mb: 2, display: "block" }}>Stay Social</Typography>
+              <Typography variant="overline" sx={{ color: "rgba(18,27,19,0.4)", fontWeight: 600, letterSpacing: "3px", mb: 2, display: "block" }}>Stay Social</Typography>
               <Stack direction="row">
                 {[FacebookIcon, InstagramIcon, LinkedInIcon, TwitterIcon].map((Icon, i) => (
                   <SocialButton key={i} size="small"><Icon fontSize="small" /></SocialButton>
@@ -306,7 +306,7 @@ export default function ContactForm() {
           {/* Interaction FormSection */}
           <FormSection>
             <Box sx={{ mb: 4 }}>
-              <Typography variant="h4" sx={{ fontWeight: 900, color: "#111c12", mb: 1.5, letterSpacing: "-1px" }}>
+              <Typography variant="h4" sx={{ fontWeight: 600, color: "#111c12", mb: 1.5, letterSpacing: "-1px" }}>
                 Send a Message
               </Typography>
               <Typography variant="body2" sx={{ color: "#6b8f6d", fontWeight: 600 }}>Fill out the form below and we'll reach back within 2 hours.</Typography>
@@ -385,7 +385,7 @@ export default function ContactForm() {
                     label={<Typography variant="body2" sx={{ color: "#6b8f6d", fontWeight: 600 }}>I agree to the privacy and cookie policy.</Typography>}
                   />
                   {errors.acceptTerms && (
-                    <Typography color="error" sx={{ fontSize: "11px", mt: 0.5, fontWeight: 700, uppercase: true }}>{errors.acceptTerms}</Typography>
+                    <Typography color="error" sx={{ fontSize: "11px", mt: 0.5, fontWeight: 600, uppercase: true }}>{errors.acceptTerms}</Typography>
                   )}
                 </Box>
 
@@ -408,7 +408,7 @@ export default function ContactForm() {
                       borderRadius: "20px", 
                       background: "#e8f7e9", 
                       color: "#1a4718",
-                      fontWeight: 700,
+                      fontWeight: 600,
                       border: "1px solid rgba(61, 184, 67, 0.2)",
                       fontSize: "0.85rem"
                     }}
@@ -443,7 +443,7 @@ export default function ContactForm() {
         onClose={() => setSnackbar({ ...snackbar, open: false })}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
-        <Alert severity={snackbar.severity} variant="filled" sx={{ borderRadius: "14px", fontWeight: 700 }}>
+        <Alert severity={snackbar.severity} variant="filled" sx={{ borderRadius: "14px", fontWeight: 600 }}>
           {snackbar.message}
         </Alert>
       </Snackbar>

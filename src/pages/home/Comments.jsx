@@ -368,9 +368,9 @@ export default function Comments() {
           <Typography
             variant="h3"
             sx={{
-              fontWeight: 900,
+              fontWeight: 600,
               mb: 2,
-              fontSize: { xs: '2.5rem', sm: '3rem', md: '3.5rem' },
+              fontSize: 'clamp(1.7rem, 3.2vw, 2.5rem)',
               color: 'var(--green-dark)',
             }}
           >

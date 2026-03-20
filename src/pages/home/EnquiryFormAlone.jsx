@@ -144,9 +144,9 @@ export default function EnquiryFormAlone() {
     <GlassFormCard>
       <Box sx={{ mb: 3 }}>
         <Typography variant="h4" sx={{
-          fontWeight: 800,
+          fontWeight: 600,
           color: "var(--green-deep)",
-          fontSize: { xs: '1.8rem', md: '2.2rem' },
+          fontSize: { xs: '1.6rem', md: '1.8rem' },
           mb: 1
         }}>
           Quick <span style={{ color: "var(--green)" }}>Enquiry</span>

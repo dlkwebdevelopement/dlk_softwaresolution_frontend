@@ -352,9 +352,9 @@ const Blog = () => {
           <Typography
             variant="h2"
             sx={{
-              fontWeight: 900,
+              fontWeight: 600,
               mb: 2.5,
-              fontSize: { xs: '2.25rem', md: '3.75rem' },
+              fontSize: 'clamp(1.7rem, 3.2vw, 2.5rem)',
               color: 'var(--green-dark)',
               letterSpacing: '-0.02em',
               lineHeight: 1.1
@@ -369,7 +369,7 @@ const Blog = () => {
               color: '#6b8f76',
               maxWidth: "650px",
               mx: "auto",
-              fontSize: "1.15rem",
+              fontSize: "1rem",
               lineHeight: 1.7,
               mb: 2
             }}
@@ -426,29 +426,29 @@ const Blog = () => {
 
                   {/* Content Area */}
                   <Box sx={{ p: 3.5, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, color: colors.textPrimary }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2, flexWrap: 'wrap' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: colors.textPrimary }}>
                         <CalendarMonthIcon sx={{ fontSize: 16, color: colors.primary }} />
-                        <Typography variant="caption" sx={{ fontWeight: 600 }}>
+                        <Typography variant="caption" sx={{ fontWeight: 600, lineHeight: 1 }}>
                           {blog.createdAt ? new Date(blog.createdAt).toLocaleDateString("en-US", { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent'}
                         </Typography>
                       </Box>
-                      <Box sx={{ width: 4, height: 4, borderRadius: '50%', bgcolor: 'divider' }} />
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, color: colors.textPrimary }}>
+                      <Typography variant="caption" sx={{ color: 'divider', fontWeight: 900 }}>·</Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: colors.textPrimary }}>
                         <AccessTimeIcon sx={{ fontSize: 16, color: colors.secondary }} />
-                        <Typography variant="caption" sx={{ fontWeight: 600 }}>3 min read</Typography>
+                        <Typography variant="caption" sx={{ fontWeight: 600, lineHeight: 1 }}>3 min read</Typography>
                       </Box>
-                      <Box sx={{ width: 4, height: 4, borderRadius: '50%', bgcolor: 'divider' }} />
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, color: colors.textPrimary }}>
+                      <Typography variant="caption" sx={{ color: 'divider', fontWeight: 900 }}>·</Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: colors.textPrimary }}>
                         <VisibilityIcon sx={{ fontSize: 16, color: colors.primary }} />
-                        <Typography variant="caption" sx={{ fontWeight: 600 }}>{blog.views || 0} views</Typography>
+                        <Typography variant="caption" sx={{ fontWeight: 600, lineHeight: 1 }}>{blog.views || 0} views</Typography>
                       </Box>
                     </Box>
 
                     <Typography
                       variant="h5"
                       sx={{
-                        fontWeight: 800,
+                        fontWeight: 600,
                         lineHeight: 1.3,
                         color: colors.textPrimary,
                         mb: 2.5,
@@ -456,7 +456,7 @@ const Blog = () => {
                         WebkitLineClamp: 2,
                         WebkitBoxOrient: 'vertical',
                         overflow: 'hidden',
-                        fontSize: '1.25rem',
+                        fontSize: '1.1rem',
                         minHeight: '3.2rem'
                       }}
                     >

@@ -24,20 +24,20 @@ const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif',
-    h1: { fontFamily: '"Bricolage Grotesque", sans-serif', fontWeight: 800 },
-    h2: { fontFamily: '"Bricolage Grotesque", sans-serif', fontWeight: 800 },
-    h3: { fontFamily: '"Bricolage Grotesque", sans-serif', fontWeight: 700 },
-    h4: { fontFamily: '"Bricolage Grotesque", sans-serif', fontWeight: 700 },
-    h5: { fontFamily: '"Bricolage Grotesque", sans-serif', fontWeight: 600 },
-    h6: { fontFamily: '"Bricolage Grotesque", sans-serif', fontWeight: 600 },
-    subtitle1: { fontFamily: '"Plus Jakarta Sans", sans-serif' },
-    subtitle2: { fontFamily: '"Plus Jakarta Sans", sans-serif' },
-    body1: { fontFamily: '"Plus Jakarta Sans", sans-serif' },
-    body2: { fontFamily: '"Plus Jakarta Sans", sans-serif' },
-    button: { fontFamily: '"Bricolage Grotesque", sans-serif', fontWeight: 700, textTransform: 'none' },
-    caption: { fontFamily: '"Plus Jakarta Sans", sans-serif' },
-    overline: { fontFamily: '"Plus Jakarta Sans", sans-serif' },
+    fontFamily: '"Poppins", "Inter", sans-serif',
+    h1: { fontFamily: '"Poppins", sans-serif', fontWeight: 800 },
+    h2: { fontFamily: '"Poppins", sans-serif', fontWeight: 800 },
+    h3: { fontFamily: '"Poppins", sans-serif', fontWeight: 700 },
+    h4: { fontFamily: '"Poppins", sans-serif', fontWeight: 700 },
+    h5: { fontFamily: '"Poppins", sans-serif', fontWeight: 600 },
+    h6: { fontFamily: '"Poppins", sans-serif', fontWeight: 600 },
+    subtitle1: { fontFamily: '"Poppins", sans-serif' },
+    subtitle2: { fontFamily: '"Poppins", sans-serif' },
+    body1: { fontFamily: '"Poppins", sans-serif' },
+    body2: { fontFamily: '"Poppins", sans-serif' },
+    button: { fontFamily: '"Poppins", sans-serif', fontWeight: 700, textTransform: 'none' },
+    caption: { fontFamily: '"Poppins", sans-serif' },
+    overline: { fontFamily: '"Poppins", sans-serif' },
   },
   components: {
     MuiCssBaseline: {
@@ -98,12 +98,12 @@ const theme = createTheme({
           width: 100%;
         }
         body {
-          font-family: "Plus Jakarta Sans", sans-serif !important;
+          font-family: "Poppins", sans-serif !important;
           background-color: #ffffff;
           color: #1a2b1b;
         }
         h1, h2, h3, h4, h5, h6 {
-          font-family: "Bricolage Grotesque", sans-serif !important;
+          font-family: "Poppins", sans-serif !important;
           color: #111c12;
         }
       `,
@@ -129,7 +129,7 @@ const App = () => {
               padding: '16px 24px',
               fontSize: '15px',
               fontWeight: 600,
-              fontFamily: '"Plus Jakarta Sans", sans-serif',
+              fontFamily: '"Poppins", sans-serif',
               boxShadow: '0 10px 30px -5px rgba(61, 184, 43, 0.15), 0 8px 10px -6px rgba(61, 184, 43, 0.1)',
               border: '1px solid rgba(61, 184, 67, 0.1)',
             },

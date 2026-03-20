@@ -113,10 +113,10 @@ export default function BlogBanner() {
         <Typography
           variant="h1"
           sx={{
-            fontWeight: 900,
+            fontWeight: 600,
             lineHeight: 1.1,
             mb: 4,
-            fontSize: { xs: "32px", md: "56px" },
+            fontSize: { xs: "28px", md: "42px" },
             background: "linear-gradient(to bottom, #ffffff, #e2e8f0)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",

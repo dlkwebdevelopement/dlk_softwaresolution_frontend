@@ -129,10 +129,10 @@ const CourseOverviewSection = () => {
           <Typography
             sx={{
               fontSize: "28px",
-              fontWeight: 800,
+              fontWeight: 600,
               color: "#0f172a",
               mb: 2.5,
-              fontFamily: '"Bricolage Grotesque", sans-serif',
+              fontFamily: '"Poppins", sans-serif',
               position: 'relative',
               display: 'inline-block',
               "&::after": {
@@ -198,10 +198,10 @@ const CourseOverviewSection = () => {
           <Typography
             sx={{
               fontSize: "28px",
-              fontWeight: 800,
+              fontWeight: 600,
               color: "#0f172a",
               mb: 2.5,
-              fontFamily: '"Bricolage Grotesque", sans-serif',
+              fontFamily: '"Poppins", sans-serif',
               position: 'relative',
               display: 'inline-block',
               "&::after": {
@@ -276,10 +276,10 @@ const CourseOverviewSection = () => {
           <Typography
             sx={{
               fontSize: "28px",
-              fontWeight: 800,
+              fontWeight: 600,
               color: "#0f172a",
               mb: 4,
-              fontFamily: '"Bricolage Grotesque", sans-serif',
+              fontFamily: '"Poppins", sans-serif',
               position: 'relative',
               display: 'inline-block',
               "&::after": {
@@ -338,7 +338,7 @@ const CourseOverviewSection = () => {
                       <Typography 
                         sx={{ 
                           color: isExpanded ? '#fff' : '#64748b', 
-                          fontWeight: 800, 
+                          fontWeight: 600, 
                           fontSize: '14px',
                         }}
                       >
@@ -348,7 +348,7 @@ const CourseOverviewSection = () => {
                     <Box>
                       <Typography
                         sx={{
-                          fontWeight: 700,
+                          fontWeight: 600,
                           fontSize: {xs: "15px", sm: "16px"},
                           color: '#0f172a',
                           mb: 0.2
@@ -412,10 +412,10 @@ const CourseOverviewSection = () => {
           <Typography
             sx={{
               fontSize: "28px",
-              fontWeight: 800,
+              fontWeight: 600,
               mb: 4,
               color: "#0f172a",
-              fontFamily: '"Bricolage Grotesque", sans-serif',
+              fontFamily: '"Poppins", sans-serif',
               position: 'relative',
               display: 'inline-block',
               "&::after": {
@@ -473,10 +473,10 @@ const CourseOverviewSection = () => {
                 <Typography
                   sx={{
                     fontSize: "64px",
-                    fontWeight: 800,
+                    fontWeight: 600,
                     color: "#0f172a",
                     lineHeight: 1,
-                    fontFamily: '"Bricolage Grotesque", sans-serif',
+                    fontFamily: '"Poppins", sans-serif',
                   }}
                 >
                   {course?.rating || 4.8}
@@ -546,7 +546,7 @@ const CourseOverviewSection = () => {
                     </Box>
 
                     <Typography
-                      sx={{ width: 40, fontSize: "14px", color: '#0f172a', fontWeight: 700, textAlign: 'right' }}
+                      sx={{ width: 40, fontSize: "14px", color: '#0f172a', fontWeight: 600, textAlign: 'right' }}
                     >
                       {item.value}%
                     </Typography>
@@ -618,7 +618,7 @@ const CourseOverviewSection = () => {
                     sx={{ width: 40, height: 40 }} 
                   />
                   <Box>
-                    <Typography sx={{ fontWeight: 700, color: '#0f172a', fontSize: '14px' }}>{review.name}</Typography>
+                    <Typography sx={{ fontWeight: 600, color: '#0f172a', fontSize: '14px' }}>{review.name}</Typography>
                     <Typography sx={{ fontSize: "12px", color: "#64748b" }}>
                       {review.role} • {review.date}
                     </Typography>
@@ -638,7 +638,7 @@ const CourseOverviewSection = () => {
   if (!course) {
     return (
       <Box sx={{ p: 10, textAlign: 'center' }}>
-        <Typography variant="h5" sx={{ color: '#064e3b', fontWeight: 700 }}>Preparing your learning journey...</Typography>
+        <Typography variant="h5" sx={{ color: '#064e3b', fontWeight: 600 }}>Preparing your learning journey...</Typography>
       </Box>
     );
   }
@@ -736,11 +736,11 @@ const CourseOverviewSection = () => {
               <CardContent sx={{ p: {xs: 2.5, md: 3} }}>
                 <Typography
                   sx={{
-                    fontWeight: 800,
+                    fontWeight: 600,
                     fontSize: "19.5px",
                     mb: 2,
                     color: "#0f172a",
-                    fontFamily: '"Bricolage Grotesque", sans-serif',
+                    fontFamily: '"Poppins", sans-serif',
                   }}
                 >
                   This course includes:
@@ -794,11 +794,11 @@ const CourseOverviewSection = () => {
             >
               <Typography
                 sx={{
-                  fontWeight: 800,
+                  fontWeight: 600,
                   fontSize: "19.5px",
                   mb: 2.5,
                   color: "#0f172a",
-                  fontFamily: '"Bricolage Grotesque", sans-serif',
+                  fontFamily: '"Poppins", sans-serif',
                 }}
               >
                 Top Related Paths
@@ -848,7 +848,7 @@ const CourseOverviewSection = () => {
                         <Typography
                           className="related-title"
                           sx={{
-                            fontWeight: 700,
+                            fontWeight: 600,
                             fontSize: "15px",
                             color: "#0f172a",
                             transition: 'color 0.2s',
@@ -872,7 +872,7 @@ const CourseOverviewSection = () => {
                   mt: 2, 
                   borderRadius: '12px', 
                   py: 1.5, 
-                  fontWeight: 700,
+                  fontWeight: 600,
                   fontSize: '15px',
                   borderColor: '#cbd5e1',
                   color: '#0f172a',

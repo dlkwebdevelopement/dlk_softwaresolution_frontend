@@ -177,8 +177,8 @@ const NavItem = styled(Box)({
 
 const NavText = styled(Typography)({
   color: colors.dark,
-  fontSize: "0.95rem",
-  fontWeight: 600,
+  fontSize: "0.9rem",
+  fontWeight: 500,
   letterSpacing: "0.2px",
   transition: "color 0.3s ease",
 });
@@ -188,9 +188,9 @@ const MegaMenuContainer = styled(Paper)({
   top: "100%",
   left: "50%",
   transform: "translateX(-50%)",
-  width: "1000px",
+  width: "850px",
   maxWidth: "95vw",
-  height: "500px",
+  height: "450px",
   borderRadius: "24px",
   zIndex: 1400,
   display: "flex",
@@ -205,7 +205,7 @@ const MegaMenuContainer = styled(Paper)({
 const CategoryItem = styled(Box)(({ active }) => ({
   padding: "12px 18px",
   borderRadius: "12px",
-  fontWeight: 600,
+  fontWeight: 500,
   cursor: "pointer",
   transition: "all 0.3s ease",
   backgroundColor: active ? alpha(colors.primary, 0.1) : "transparent",
@@ -224,7 +224,7 @@ const SubCategoryChip = styled(Chip)({
   backgroundColor: alpha(colors.primary, 0.05),
   border: `1px solid ${alpha(colors.primary, 0.1)}`,
   color: colors.text.primary,
-  fontWeight: 600,
+  fontWeight: 500,
   fontSize: "0.85rem",
   transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
   '&:hover': {
@@ -381,7 +381,7 @@ const MegaMenu = ({ open, onClose, handleCardClick }) => {
                   <Typography
                     variant="h5"
                     sx={{
-                      fontWeight: 800,
+                      fontWeight: 600,
                       color: colors.dark,
                       mb: 0.5,
                       fontSize: '1.4rem'
@@ -595,7 +595,7 @@ const Navbar = () => {
                           primary={item.text}
                           primaryTypographyProps={{
                             color: colors.text.primary,
-                            fontWeight: 600,
+                            fontWeight: 500,
                             fontSize: '0.9rem'
                           }}
                         />
@@ -728,7 +728,7 @@ const Navbar = () => {
                         <ListItemText
                           primary={cat.categoryName}
                           primaryTypographyProps={{
-                            fontWeight: 600,
+                            fontWeight: 500,
                             color: "black",
                             fontSize: "0.95rem"
                           }}

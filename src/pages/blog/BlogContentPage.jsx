@@ -180,7 +180,7 @@ export default function BlogContentPage() {
 
   if (!blog) return (
     <Box sx={{ py: 20, textAlign: 'center' }}>
-      <Typography variant="h5" fontWeight={700}>Blog not found</Typography>
+      <Typography variant="h5" fontWeight={600}>Blog not found</Typography>
       <Typography 
         onClick={() => navigate('/blogs')}
         sx={{ mt: 2, color: 'primary.main', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
@@ -217,19 +217,19 @@ export default function BlogContentPage() {
                 wordBreak: "break-word",
                 "& h2": { 
                   fontSize: { xs: "1.5rem", md: "2rem" }, 
-                  fontWeight: 800, 
+                  fontWeight: 600, 
                   mb: 3, 
                   mt: 6, 
                   color: "#0f172a",
-                  fontFamily: '"Bricolage Grotesque", sans-serif',
+                  fontFamily: '"Poppins", sans-serif',
                 },
                 "& h3": { 
                   fontSize: { xs: "1.25rem", md: "1.5rem" }, 
-                  fontWeight: 700, 
+                  fontWeight: 600, 
                   mb: 2, 
                   mt: 4, 
                   color: "#1e293b",
-                  fontFamily: '"Bricolage Grotesque", sans-serif',
+                  fontFamily: '"Poppins", sans-serif',
                 },
                 "& p": { 
                   mb: 3,
@@ -266,7 +266,7 @@ export default function BlogContentPage() {
                 },
                 "& strong": {
                   color: "#0f172a",
-                  fontWeight: 700
+                  fontWeight: 600
                 }
               }}
             />
@@ -320,7 +320,7 @@ export default function BlogContentPage() {
                 overflow: 'hidden'
               }}>
                 <Box sx={{ position: 'absolute', top: -20, right: -20, width: 100, height: 100, bgcolor: 'rgba(16, 185, 129, 0.2)', borderRadius: '50%', filter: 'blur(20px)' }} />
-                <Typography variant="h5" fontWeight={800} sx={{ fontFamily: '"Bricolage Grotesque", sans-serif', mb: 1, position: 'relative', zIndex: 1,color: 'green' }}>
+                <Typography variant="h5" fontWeight={600} sx={{ fontFamily: '"Poppins", sans-serif', mb: 1, position: 'relative', zIndex: 1,color: 'green' }}>
                   Quick Enquiry
                 </Typography>
                 <Typography variant="body2" sx={{ color: '#cbd5e1', position: 'relative', zIndex: 1 }}>
@@ -433,7 +433,7 @@ export default function BlogContentPage() {
                         color: '#fff',
                         py: 1.8,
                         borderRadius: '12px',
-                        fontWeight: 700,
+                        fontWeight: 600,
                         fontSize: '16px',
                         textTransform: 'none',
                         boxShadow: '0 10px 20px rgba(16, 185, 129, 0.2)',
@@ -462,10 +462,10 @@ export default function BlogContentPage() {
           <Container maxWidth="lg">
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 6 }} data-aos="fade-up">
               <Box>
-                <Typography sx={{ color: '#10b981', fontWeight: 800, fontSize: '14px', letterSpacing: 1.5, textTransform: 'uppercase', mb: 1 }}>
+                <Typography sx={{ color: '#10b981', fontWeight: 600, fontSize: '14px', letterSpacing: 1.5, textTransform: 'uppercase', mb: 1 }}>
                   More Reads
                 </Typography>
-                <Typography variant="h3" sx={{ fontWeight: 800, color: '#0f172a', fontFamily: '"Bricolage Grotesque", sans-serif' }}>
+                <Typography variant="h3" sx={{ fontWeight: 600, color: '#0f172a', fontFamily: '"Poppins", sans-serif' }}>
                   Latest Insights
                 </Typography>
               </Box>
@@ -525,7 +525,7 @@ export default function BlogContentPage() {
                       className="title"
                       variant="h6" 
                       sx={{ 
-                        fontWeight: 700, 
+                        fontWeight: 600, 
                         lineHeight: 1.4,
                         mb: 1.5,
                         display: '-webkit-box',

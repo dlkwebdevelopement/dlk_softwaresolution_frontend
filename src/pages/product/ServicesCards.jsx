@@ -144,8 +144,8 @@ const ServiceCard = ({
 
         <Typography
           variant="h6"
-          fontWeight="800"
-          sx={{ fontFamily: '"Bricolage Grotesque", sans-serif', color: '#0f172a', mb: 1, fontSize: '20px' }}
+          fontWeight="600"
+          sx={{ fontFamily: '"Poppins", sans-serif', color: '#0f172a', mb: 1, fontSize: '20px' }}
         >
           {title}
         </Typography>
@@ -178,7 +178,7 @@ const ServiceCard = ({
             textTransform: "none",
             py: 1,
             px: 2.5,
-            fontWeight: 700,
+            fontWeight: 600,
             fontSize: '14px',
             color: color,
             bgcolor: `${color}10`,
@@ -302,7 +302,7 @@ const ServicesCards = () => {
           <Typography
             sx={{
               color: "#10b981",
-              fontWeight: 800,
+              fontWeight: 600,
               fontSize: "14px",
               letterSpacing: 1.5,
               textTransform: "uppercase",
@@ -314,8 +314,8 @@ const ServicesCards = () => {
           <Typography
             sx={{
               fontSize: { xs: "32px", md: "40px" },
-              fontWeight: 800,
-              fontFamily: '"Bricolage Grotesque", sans-serif',
+              fontWeight: 600,
+              fontFamily: '"Poppins", sans-serif',
               color: "#0f172a",
               mb: 2,
             }}
@@ -374,7 +374,7 @@ const ServicesCards = () => {
                 p: {xs: 3, sm: 4}
               }}
             >
-              <Typography variant="h5" fontWeight={800} sx={{ fontFamily: '"Bricolage Grotesque", sans-serif' }}>
+              <Typography variant="h5" fontWeight={600} sx={{ fontFamily: '"Poppins", sans-serif' }}>
                 {selectedService.title}
               </Typography>
               <Typography variant="body2" sx={{ opacity: 0.9, mt: 0.5, maxWidth: '90%' }}>
@@ -459,7 +459,7 @@ const ServicesCards = () => {
                   <Typography variant="subtitle2" color="text.secondary" mb={0.5}>
                     Inquiry Type:
                   </Typography>
-                  <Typography fontWeight="700" color={selectedService.color} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography fontWeight="600" color={selectedService.color} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <CheckCircleIcon fontSize="small" />
                     {selectedService.title} Inquiry
                   </Typography>
@@ -486,7 +486,7 @@ const ServicesCards = () => {
                   px: 4,
                   py: 1.5,
                   borderRadius: '12px',
-                  fontWeight: 700,
+                  fontWeight: 600,
                   boxShadow: `0 4px 12px ${selectedService.color}40`,
                   "&:hover": { 
                     bgcolor: selectedService.color,

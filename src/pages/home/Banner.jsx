@@ -242,17 +242,17 @@ const EyebrowPill = styled('span')({
 });
 
 const MainHeading = styled(Typography)(({ theme }) => ({
-  fontFamily: '"Bricolage Grotesque", sans-serif',
-  fontSize: 'clamp(2rem, 3.8vw, 3.2rem)',
-  fontWeight: 800,
-  lineHeight: 1.1,
-  letterSpacing: '-0.03em',
+  fontFamily: '"Poppins", sans-serif',
+  fontSize: 'clamp(1.5rem, 2.8vw, 2.3rem)',
+  fontWeight: 600,
+  lineHeight: 1.2,
+  letterSpacing: '-0.01em',
   color: '#111c12',
   marginBottom: '16px',
   wordBreak: 'break-word',
   overflowWrap: 'break-word',
   [theme.breakpoints.down('sm')]: {
-    fontSize: '1.8rem',
+    fontSize: '1.4rem',
   }
 }));
 
@@ -281,6 +281,7 @@ const TextAccent = styled('span')({
 const HeroSub = styled(Typography)({
   fontSize: '0.9rem',
   lineHeight: 1.6,
+  fontWeight: 300, // Reduced to light for better contrast
   color: '#6b8f76',
   opacity: 1,
   maxWidth: '480px',
@@ -533,7 +534,7 @@ export default function Banner() {
                     </EyebrowBox>
 
                     <MainHeading variant="h1">
-                      {slide.title}<br />
+                      {slide.title}<br /><br />
                       <UnderlineAccent>{slide.highlight}</UnderlineAccent><br />
                       <TextAccent>{slide.subtitle}</TextAccent>
                     </MainHeading>

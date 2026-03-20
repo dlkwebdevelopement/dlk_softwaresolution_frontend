@@ -145,7 +145,7 @@ const PricingCard = ({
             py: 0.8,
             borderRadius: '20px',
             fontSize: '13px',
-            fontWeight: 800,
+            fontWeight: 600,
             display: 'flex',
             alignItems: 'center',
             gap: 1,
@@ -172,7 +172,7 @@ const PricingCard = ({
           sx={{
             bgcolor: recommended ? 'rgba(16, 185, 129, 0.1)' : '#f1f5f9',
             color: recommended ? highlightColor : '#475569',
-            fontWeight: 700,
+            fontWeight: 600,
             mx: "auto",
             mb: 3
           }}
@@ -180,8 +180,8 @@ const PricingCard = ({
 
         <Typography 
           variant="h5" 
-          fontWeight="800"
-          sx={{ fontFamily: '"Bricolage Grotesque", sans-serif', color: '#0f172a' }}
+          fontWeight="600"
+          sx={{ fontFamily: '"Poppins", sans-serif', color: '#0f172a' }}
         >
           {title}
         </Typography>
@@ -190,7 +190,7 @@ const PricingCard = ({
           {subtitle}
         </Typography>
 
-        <Typography variant="h3" fontWeight="800" sx={{ color: '#0f172a', fontFamily: '"Bricolage Grotesque", sans-serif' }}>
+        <Typography variant="h3" fontWeight="600" sx={{ color: '#0f172a', fontFamily: '"Poppins", sans-serif' }}>
           {price}
           <Typography component="span" variant="body1" sx={{ color: '#94a3b8', fontWeight: 500, ml: 1 }}>
             /course
@@ -231,7 +231,7 @@ const PricingCard = ({
             py: 1.8,
             borderRadius: '16px',
             fontSize: '16px',
-            fontWeight: 700,
+            fontWeight: 600,
             textTransform: 'none',
             bgcolor: buttonVariant === "contained" ? highlightColor : "transparent",
             color: buttonVariant === "contained" ? "#fff" : highlightColor,
@@ -366,7 +366,7 @@ const PricingPlans = () => {
           <Typography
             sx={{
               color: "#10b981",
-              fontWeight: 800,
+              fontWeight: 600,
               fontSize: "14px",
               letterSpacing: 1.5,
               textTransform: "uppercase",
@@ -378,8 +378,8 @@ const PricingPlans = () => {
           <Typography
             sx={{
               fontSize: { xs: "36px", md: "48px" },
-              fontWeight: 800,
-              fontFamily: '"Bricolage Grotesque", sans-serif',
+              fontWeight: 600,
+              fontFamily: '"Poppins", sans-serif',
               color: "#0f172a",
               mb: 3,
             }}
@@ -453,7 +453,7 @@ const PricingPlans = () => {
                   <School />
                 </Avatar>
                 <Box>
-                  <Typography variant="h6" fontWeight={700}>
+                  <Typography variant="h6" fontWeight={600}>
                     {selectedPlan.title}
                   </Typography>
                   <Typography variant="body2" sx={{ opacity: 0.8 }}>
@@ -493,11 +493,11 @@ const PricingPlans = () => {
                     <Typography variant="subtitle2" color="text.secondary">
                       Selected Plan
                     </Typography>
-                    <Typography fontWeight="800" color="#0f172a">
+                    <Typography fontWeight="600" color="#0f172a">
                       {selectedPlan.title}
                     </Typography>
                   </Box>
-                  <Typography variant="h6" fontWeight="800" color={selectedPlan.highlightColor}>
+                  <Typography variant="h6" fontWeight="600" color={selectedPlan.highlightColor}>
                     {selectedPlan.price}
                   </Typography>
                 </Box>
@@ -575,7 +575,7 @@ const PricingPlans = () => {
                   px: 4,
                   py: 1.5,
                   borderRadius: '12px',
-                  fontWeight: 700,
+                  fontWeight: 600,
                   boxShadow: `0 4px 12px ${selectedPlan.highlightColor}40`,
                   "&:hover": {
                     bgcolor: selectedPlan.highlightColor,

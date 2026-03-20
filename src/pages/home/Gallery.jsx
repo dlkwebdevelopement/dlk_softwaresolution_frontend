@@ -384,9 +384,9 @@ const Gallery = () => {
         <Typography
           variant="h2"
           sx={{
-            fontWeight: 800,
+            fontWeight: 600,
             color: 'var(--green-dark, #1a4a1c)',
-            fontSize: { xs: '2.5rem', md: '3.5rem' },
+            fontSize: 'clamp(1.7rem, 3.2vw, 2.5rem)',
             mb: 2
           }}
         >

@@ -108,7 +108,7 @@ const Product = () => {
               sx={{ 
                 background: 'linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%)', 
                 color: '#fff', 
-                fontWeight: 800,
+                fontWeight: 600,
                 fontSize: '13px',
                 border: 'none',
                 px: 1,
@@ -129,11 +129,11 @@ const Product = () => {
           </Box>
           <Typography
             sx={{
-              fontSize: { xs: "40px", md: "56px", lg: "64px" },
-              fontWeight: 800,
+              fontSize: { xs: '28px', md: '38px', lg: '44px' },
+              fontWeight: 600,
               mb: 3,
               lineHeight: 1.1,
-              fontFamily: '"Bricolage Grotesque", sans-serif',
+              fontFamily: '"Poppins", sans-serif',
               textShadow: '0 2px 10px rgba(0,0,0,0.1)'
             }}
           >
@@ -142,7 +142,7 @@ const Product = () => {
 
           <Typography
             sx={{
-              fontSize: { xs: "18px", md: "20px" },
+              fontSize: '16px',
               color: 'rgba(255,255,255,0.9)',
               lineHeight: 1.6,
               mb: 5,
@@ -172,7 +172,7 @@ const Product = () => {
                 <StarIcon sx={{ color: "#facc15", fontSize: 22 }} />
               </Box>
               <Box>
-                <Typography sx={{ fontWeight: 800, fontSize: '16px', lineHeight: 1 }}>{course?.rating || 4.8}</Typography>
+                <Typography sx={{ fontWeight: 600, fontSize: '16px', lineHeight: 1 }}>{course?.rating || 4.8}</Typography>
                 <Typography sx={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', mt: 0.5 }}>{course?.total_ratings || 0} reviews</Typography>
               </Box>
             </Box>
@@ -184,7 +184,7 @@ const Product = () => {
                 <PeopleIcon sx={{ color: "#38bdf8", fontSize: 22 }} />
               </Box>
               <Box>
-                <Typography sx={{ fontWeight: 800, fontSize: '16px', lineHeight: 1 }}>{course?.total_students || 0}+</Typography>
+                <Typography sx={{ fontWeight: 600, fontSize: '16px', lineHeight: 1 }}>{course?.total_students || 0}+</Typography>
                 <Typography sx={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', mt: 0.5 }}>Active Students</Typography>
               </Box>
             </Box>
@@ -196,7 +196,7 @@ const Product = () => {
                 <PlayArrowIcon sx={{ color: "#a78bfa", fontSize: 22 }} />
               </Box>
               <Box>
-                <Typography sx={{ fontWeight: 800, fontSize: '16px', lineHeight: 1 }}>{course?.mode || "Online"}</Typography>
+                <Typography sx={{ fontWeight: 600, fontSize: '16px', lineHeight: 1 }}>{course?.mode || "Online"}</Typography>
                 <Typography sx={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', mt: 0.5 }}>Learning Mode</Typography>
               </Box>
             </Box>
@@ -213,7 +213,7 @@ const Product = () => {
               px: 6,
               py: 2,
               borderRadius: "16px",
-              fontWeight: 800,
+              fontWeight: 600,
               fontSize: '18px',
               textTransform: 'none',
               boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
@@ -286,9 +286,9 @@ const Product = () => {
                 <Typography
                   sx={{
                     fontSize: "42px",
-                    fontWeight: 800,
+                    fontWeight: 600,
                     color: "#0f172a",
-                    fontFamily: '"Bricolage Grotesque", sans-serif',
+                    fontFamily: '"Poppins", sans-serif',
                     lineHeight: 1
                   }}
                 >
@@ -315,7 +315,7 @@ const Product = () => {
                   sx={{
                     bgcolor: "#ef4444",
                     color: "#fff",
-                    fontWeight: 800,
+                    fontWeight: 600,
                     fontSize: '12px',
                     borderRadius: '8px',
                     height: '32px',
@@ -337,7 +337,7 @@ const Product = () => {
                 color: "#fff",
                 py: 2.2,
                 borderRadius: "16px",
-                fontWeight: 800,
+                fontWeight: 600,
                 fontSize: '16px',
                 boxShadow: '0 10px 20px rgba(16, 185, 129, 0.3)',
                 "&:hover": { 
@@ -369,7 +369,7 @@ const Product = () => {
                 color: "#475569",
                 py: 2,
                 borderRadius: "16px",
-                fontWeight: 700,
+                fontWeight: 600,
                 borderWidth: '2px',
                 bgcolor: '#f8fafc',
                 "&:hover": { 
