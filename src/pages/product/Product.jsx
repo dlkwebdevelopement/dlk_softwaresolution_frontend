@@ -142,7 +142,7 @@ const Product = () => {
 
           <Typography
             sx={{
-              fontSize: '16px',
+              fontSize: '15px',
               color: 'rgba(255,255,255,0.9)',
               lineHeight: 1.6,
               mb: 5,

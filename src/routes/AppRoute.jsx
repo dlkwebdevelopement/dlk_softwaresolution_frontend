@@ -18,6 +18,9 @@ import { Box } from "@mui/material";
 import BottomInfo from "../components/BottomInfo";
 import Comments from "../pages/home/Comments";
 import ServicesCards from "../pages/product/ServicesCards";
+import CourseTools from "../pages/product/CourseTools";
+import CareerSupport from "../pages/product/CareerSupport";
+import CourseFAQ from "../pages/product/CourseFAQ";
 import PricingPlans from "../pages/product/PricingPlans";
 import ScrollToTop from "../components/ScrollToTop";
 import OverviewSection from "../pages/product/CourseOverviewSection";
@@ -27,6 +30,8 @@ import BlogContentPage from "../pages/blog/BlogContentPage";
 import NotFound from "../pages/NotFound";
 
 import Help from "../pages/help/Help";
+import Videos from "../pages/videos/Videos";
+import Gallery from "../pages/gallery/Gallery";
 
 const AppRoute = () => {
   return (
@@ -68,6 +73,9 @@ const AppRoute = () => {
               <Product />
               <OverviewSection />
               <ServicesCards />
+              <CourseTools />
+              <CareerSupport />
+              <CourseFAQ />
               {/* <PricingPlans /> */}
               <BottomInfo />
               <Footer />
@@ -96,6 +104,32 @@ const AppRoute = () => {
               <Box sx={{ mt: 15 }}></Box>
               <BlogBanner />
               <BlogContentPage />
+              <BottomInfo />
+              <Footer />
+            </>
+          }
+        />
+        {/* VIDEOS PAGE */}
+        <Route
+          path="/videos"
+          element={
+            <>
+              <Navbar />
+              <Box sx={{ mt: 16 }}></Box>
+              <Videos />
+              <BottomInfo />
+              <Footer />
+            </>
+          }
+        />
+        {/* GALLERY PAGE */}
+        <Route
+          path="/gallery"
+          element={
+            <>
+              <Navbar />
+              <Box sx={{ mt: 10 }}></Box>
+              <Gallery />
               <BottomInfo />
               <Footer />
             </>

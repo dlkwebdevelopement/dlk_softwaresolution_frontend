@@ -40,3 +40,9 @@ export const ADMIN_POST_CONTACT = "/admin/contact";
 
 //testimonials
 export const GET_ALL_TESTIMONIALS = "/admin/testimonial";
+
+// ✅ Videos
+export const GET_ALL_VIDEOS = "/admin/videos";
+
+// 🖼️ Gallery
+export const GET_ALL_GALLERY = "/admin/gallery";

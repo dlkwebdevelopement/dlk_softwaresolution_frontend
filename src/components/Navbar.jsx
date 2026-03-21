@@ -43,6 +43,9 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import StarIcon from "@mui/icons-material/Star";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import LiveHelpIcon from "@mui/icons-material/LiveHelp";
+import PermMediaIcon from "@mui/icons-material/PermMedia";
+import VideoLibraryIcon from "@mui/icons-material/VideoLibrary";
+import PhotoLibraryIcon from "@mui/icons-material/PhotoLibrary";
 import { GetRequest } from "../api/config";
 import { ADMIN_GET_ALL_CATEGORIES_WITH_SUB } from "../api/endpoints";
 
@@ -442,6 +445,8 @@ const Navbar = () => {
   const [cats, setCats] = useState([]);
   const [mobileAllCoursesOpen, setMobileAllCoursesOpen] = useState(false);
   const [mobileFortuneOpen, setMobileFortuneOpen] = useState(false);
+  const [mediaOpen, setMediaOpen] = useState(false);
+  const [mobileMediaOpen, setMobileMediaOpen] = useState(false);
 
   useEffect(() => {
     const fetchCats = async () => {
@@ -518,6 +523,7 @@ const Navbar = () => {
                 onMouseEnter={() => {
                   setCourseOpen(true);
                   setFortuneOpen(false);
+                  setMediaOpen(false);
                 }}
                 onMouseLeave={() => setCourseOpen(false)}
               >
@@ -539,6 +545,7 @@ const Navbar = () => {
                 onMouseEnter={() => {
                   setFortuneOpen(true);
                   setCourseOpen(false);
+                  setMediaOpen(false);
                 }}
                 onMouseLeave={() => setFortuneOpen(false)}
               >
@@ -570,6 +577,79 @@ const Navbar = () => {
                     {[
                       { icon: <SchoolIcon />, text: "Become an Instructor", path: "/become-instructor" },
                       { icon: <WorkIcon />, text: "Career", path: "/career" },
+                    ].map((item, index) => (
+                      <ListItemButton
+                        key={index}
+                        onClick={() => handleNavigation(item.path)}
+                        sx={{
+                          px: 3,
+                          py: 1.8,
+                          '&:hover': {
+                            backgroundColor: alpha(colors.primary, 0.05),
+                            '& .MuiListItemIcon-root': {
+                              color: colors.primary,
+                            },
+                            '& .MuiListItemText-primary': {
+                              color: colors.primary,
+                            }
+                          },
+                        }}
+                      >
+                        <ListItemIcon sx={{ color: colors.text.secondary, minWidth: 36 }}>
+                          {item.icon}
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={item.text}
+                          primaryTypographyProps={{
+                            color: colors.text.primary,
+                            fontWeight: 500,
+                            fontSize: '0.9rem'
+                          }}
+                        />
+                      </ListItemButton>
+                    ))}
+                  </Paper>
+                </Fade>
+              </Box>
+
+              {/* Media Dropdown */}
+              <Box
+                sx={{ position: "relative" }}
+                onMouseEnter={() => {
+                  setMediaOpen(true);
+                  setFortuneOpen(false);
+                  setCourseOpen(false);
+                }}
+                onMouseLeave={() => setMediaOpen(false)}
+              >
+                <NavItem>
+                  <PermMediaIcon className="nav-icon" sx={{ fontSize: 20, mr: 1, color: colors.dark, transition: "all 0.4s ease" }} />
+                  <NavText className="nav-text">Media</NavText>
+                  <ArrowDropDownIcon className="nav-icon" sx={{ color: colors.dark, ml: 0.2, transition: "transform 0.4s ease" }} />
+                </NavItem>
+
+                <Fade in={mediaOpen}>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      position: "absolute",
+                      top: "100%",
+                      left: 0,
+                      minWidth: "220px",
+                      mt: 1,
+                      borderRadius: "20px",
+                      overflow: "hidden",
+                      zIndex: 1400,
+                      background: 'rgba(255, 255, 255, 0.98)',
+                      backdropFilter: 'blur(20px)',
+                      WebkitBackdropFilter: 'blur(20px)',
+                      border: `1px solid ${alpha(colors.primary, 0.1)}`,
+                      boxShadow: '0 15px 45px rgba(0, 0, 0, 0.1)',
+                    }}
+                  >
+                    {[
+                      { icon: <PhotoLibraryIcon />, text: "Gallery", path: "/gallery" },
+                      { icon: <VideoLibraryIcon />, text: "Videos", path: "/videos" },
                     ].map((item, index) => (
                       <ListItemButton
                         key={index}
@@ -839,6 +919,62 @@ const Navbar = () => {
               </Collapse>
             </List>
 
+            {/* Media Mobile Section */}
+            <List sx={{ width: "100%" }}>
+              <MobileMenuItem
+                onClick={() => setMobileMediaOpen(!mobileMediaOpen)}
+                sx={{
+                  backgroundColor: alpha(colors.primary, 0.04),
+                  borderRadius: "16px",
+                  border: `1px solid ${alpha(colors.primary, 0.08)}`,
+                }}
+              >
+                <ListItemIcon sx={{ color: colors.primary, minWidth: 40 }}>
+                  <PermMediaIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Media"
+                  primaryTypographyProps={{
+                    fontWeight: 700,
+                    color: colors.dark,
+                    fontSize: "1.05rem"
+                  }}
+                />
+                {mobileMediaOpen ? (
+                  <ExpandLessIcon sx={{ color: colors.primary }} />
+                ) : (
+                  <ExpandMoreIcon sx={{ color: colors.primary }} />
+                )}
+              </MobileMenuItem>
+
+              <Collapse in={mobileMediaOpen} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding sx={{ pl: 4 }}>
+                  {[
+                    { icon: <PhotoLibraryIcon />, text: "Gallery", path: "/gallery" },
+                    { icon: <VideoLibraryIcon />, text: "Videos", path: "/videos" },
+                  ].map((item, index) => (
+                    <MobileMenuItem
+                      key={index}
+                      sx={{ pl: 2, py: 1.2 }}
+                      onClick={() => handleNavigation(item.path)}
+                    >
+                      <ListItemIcon sx={{ color: alpha(colors.primary, 0.6), minWidth: 40 }}>
+                        {item.icon}
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={item.text}
+                        primaryTypographyProps={{
+                          color: colors.text.primary,
+                          fontSize: "0.95rem",
+                          fontWeight: 500
+                        }}
+                      />
+                    </MobileMenuItem>
+                  ))}
+                </List>
+              </Collapse>
+            </List>
+            
             {/* Workshop Mobile Section */}
             <MobileMenuItem
               onClick={() => handleNavigation("/workshop")}
