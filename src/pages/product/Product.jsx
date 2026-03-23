@@ -1,4 +1,5 @@
-import { Box, Typography, Button, Avatar, Chip, Rating ,Stack} from "@mui/material";
+import { Box, Typography, Button, Avatar, Chip, Rating, Stack, Dialog, DialogTitle, DialogContent, DialogActions, TextField, IconButton } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import SchoolIcon from "@mui/icons-material/School";
 import DownloadIcon from "@mui/icons-material/Download";
 import StarIcon from "@mui/icons-material/Star";
@@ -6,15 +7,46 @@ import PeopleIcon from "@mui/icons-material/People";
 import CircleIcon from "@mui/icons-material/Circle";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import { GetRequest } from "../../api/config";
-import { ADMIN_GET_COURSE_SLUG } from "../../api/endpoints";
+import { GetRequest, PostRequest } from "../../api/config";
+import { ADMIN_GET_COURSE_SLUG, ADMIN_POST_REGISTRATIONS } from "../../api/endpoints";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const Product = () => {
   const { slug } = useParams();
   const [course, setCourse] = useState(null);
   const navigate = useNavigate();
+
+  const [openDownloadDialog, setOpenDownloadDialog] = useState(false);
+  const [email, setEmail] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleDownloadSubmit = async (e) => {
+    e.preventDefault();
+    const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (!email.trim() || !validateEmail(email)) return toast.error("Please enter a valid email");
+
+    try {
+      setSubmitting(true);
+      await PostRequest(ADMIN_POST_REGISTRATIONS, {
+        fullName: "Curriculum Downloader",
+        email,
+        phone: "0000000000",
+        courseId: course?._id || course?.id,
+        inquiryType: `Curriculum Download: ${course?.title || "Course"}`
+      });
+
+      toast.success("Curriculum PDF sent to your email successfully!");
+      setOpenDownloadDialog(false);
+      setEmail("");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to process request. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   useEffect(() => {
     console.log("Current slug:", slug);
@@ -51,7 +83,7 @@ const Product = () => {
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
         }}
       />
-      
+
       {/* Animated Glow Orbs */}
       <Box
         sx={{
@@ -95,36 +127,36 @@ const Product = () => {
         }}
       >
         {/* LEFT SIDE: Hero Content */}
-        <Box 
-          sx={{ 
+        <Box
+          sx={{
             flex: 1,
             animation: 'fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards'
           }}
         >
           <Box sx={{ mb: 3, display: 'flex', gap: 2, alignItems: 'center' }}>
-            <Chip 
-              label="Bestseller" 
-              icon={<StarIcon sx={{ color: '#fbbf24 !important', fontSize: '14px !important' }}/>}
-              sx={{ 
-                background: 'linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%)', 
-                color: '#fff', 
+            <Chip
+              label="Bestseller"
+              icon={<StarIcon sx={{ color: '#fbbf24 !important', fontSize: '14px !important' }} />}
+              sx={{
+                background: 'linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%)',
+                color: '#fff',
                 fontWeight: 600,
                 fontSize: '13px',
                 border: 'none',
                 px: 1,
                 boxShadow: '0 4px 14px rgba(245, 158, 11, 0.4)'
-              }} 
+              }}
             />
-            <Chip 
-              label="New Updated Curriculum" 
-              sx={{ 
-                bgcolor: 'rgba(255,255,255,0.15)', 
-                color: '#fff', 
+            <Chip
+              label="New Updated Curriculum"
+              sx={{
+                bgcolor: 'rgba(255,255,255,0.15)',
+                color: '#fff',
                 backdropFilter: 'blur(10px)',
                 fontWeight: 600,
                 fontSize: '13px',
                 border: '1px solid rgba(255,255,255,0.3)',
-              }} 
+              }}
             />
           </Box>
           <Typography
@@ -154,11 +186,11 @@ const Product = () => {
           </Typography>
 
           {/* Premium Stats Row */}
-          <Box sx={{ 
-            display: "flex", 
-            flexWrap: 'wrap', 
-            alignItems: "center", 
-            gap: { xs: 2, md: 4 }, 
+          <Box sx={{
+            display: "flex",
+            flexWrap: 'wrap',
+            alignItems: "center",
+            gap: { xs: 2, md: 4 },
             mb: 5,
             p: 2,
             bgcolor: 'rgba(255,255,255,0.05)',
@@ -227,7 +259,7 @@ const Product = () => {
           >
             Enroll in Course Now
           </Button>
-          
+
           <Typography sx={{ mt: 3, fontSize: '14px', color: 'rgba(255,255,255,0.7)', display: 'flex', alignItems: 'center', gap: 1 }}>
             <CheckCircleIcon sx={{ fontSize: 16, color: '#34d399' }} /> 30-Day Money-Back Guarantee
           </Typography>
@@ -279,7 +311,7 @@ const Product = () => {
               }}
             />
           </Box>
-          
+
           {course?.price && (
             <Box sx={{ mb: 4, textAlign: 'center' }}>
               <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'baseline', gap: 1.5 }}>
@@ -307,7 +339,7 @@ const Product = () => {
                   </Typography>
                 )}
               </Box>
-              
+
               {course?.discount_percentage && (
                 <Chip
                   label={`${course?.discount_percentage}% OFF - LIMITED TIME`}
@@ -340,7 +372,7 @@ const Product = () => {
                 fontWeight: 600,
                 fontSize: '16px',
                 boxShadow: '0 10px 20px rgba(16, 185, 129, 0.3)',
-                "&:hover": { 
+                "&:hover": {
                   background: "linear-gradient(90deg, #059669 0%, #047857 100%)",
                   transform: 'translateY(-2px)',
                   boxShadow: '0 15px 30px rgba(16, 185, 129, 0.4)'
@@ -354,16 +386,7 @@ const Product = () => {
             <Button
               fullWidth
               variant="outlined"
-              onClick={() => {
-                const pdfUrl = course?.syllabus_pdf_url;
-                if (!pdfUrl) return;
-                const link = document.createElement("a");
-                link.href = pdfUrl;
-                link.setAttribute("download", course?.title?.replace(/\s+/g, '_') + "_Syllabus.pdf");
-                document.body.appendChild(link);
-                link.click();
-                link.remove();
-              }}
+              onClick={() => setOpenDownloadDialog(true)}
               sx={{
                 borderColor: "#cbd5e1",
                 color: "#475569",
@@ -372,7 +395,7 @@ const Product = () => {
                 fontWeight: 600,
                 borderWidth: '2px',
                 bgcolor: '#f8fafc',
-                "&:hover": { 
+                "&:hover": {
                   bgcolor: "#f1f5f9",
                   borderColor: "#94a3b8",
                   borderWidth: '2px',
@@ -386,6 +409,45 @@ const Product = () => {
           </Stack>
         </Box>
       </Box>
+
+      {/* CURRICULUM DOWNLOAD DIALOG */}
+      <Dialog
+        open={openDownloadDialog}
+        onClose={() => setOpenDownloadDialog(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{ sx: { borderRadius: '24px' } }}
+      >
+        <DialogTitle sx={{ bgcolor: '#0f172a', color: '#fff', position: "relative", p: 4 }}>
+          <Typography
+            variant="h5"
+            fontWeight={600}
+            sx={{
+              fontFamily: '"Poppins", sans-serif',
+              color: "#ffffff", // white color
+            }}
+          >
+            Download Curriculum
+          </Typography>
+          <Typography variant="body2" sx={{ opacity: 0.9, mt: 0.5 }}>
+            Enter your email to receive the download link.
+          </Typography>
+          <IconButton onClick={() => setOpenDownloadDialog(false)} sx={{ position: "absolute", right: 16, top: 20, color: "#fff", bgcolor: 'rgba(255,255,255,0.1)', "&:hover": { bgcolor: 'rgba(255,255,255,0.2)' } }}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <form onSubmit={handleDownloadSubmit}>
+          <DialogContent sx={{ p: 4, pt: 5 }}>
+            <TextField label="Your Email Address *" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required fullWidth sx={{ "& .MuiOutlinedInput-root": { borderRadius: '12px' } }} />
+          </DialogContent>
+          <DialogActions sx={{ p: 4, pt: 0, justifyContent: 'flex-end', gap: 1 }}>
+            <Button onClick={() => setOpenDownloadDialog(false)} sx={{ color: '#64748b', fontWeight: 600 }}>Cancel</Button>
+            <Button type="submit" disabled={submitting} variant="contained" sx={{ bgcolor: '#10b981', px: 4, py: 1.5, borderRadius: '12px', fontWeight: 600, boxShadow: '0 4px 12px rgba(16,185,129,0.3)', "&:hover": { bgcolor: '#059669' } }}>
+              {submitting ? "Processing..." : "Download Now"}
+            </Button>
+          </DialogActions>
+        </form>
+      </Dialog>
 
       <style>
         {`
