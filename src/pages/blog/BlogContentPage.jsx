@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import ReCAPTCHA from "react-google-recaptcha";
 import { 
   Box, 
   Typography, 
@@ -52,6 +53,8 @@ export default function BlogContentPage() {
   const [loading, setLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [cats, setCats] = useState([]);
+  const [captchaToken, setCaptchaToken] = useState(null);
+  const recaptchaRef = useRef(null);
 
   // Auto-scroll logic array
   useEffect(() => {
@@ -142,9 +145,10 @@ export default function BlogContentPage() {
     if (!email.trim() || !validateEmail(email)) return toast.error("Valid email is required");
     if (!mobile.trim() || mobile.length !== 10) return toast.error("Mobile number must be 10 digits");
     if (!course.trim() || !location.trim() || !timeslot.trim()) return toast.error("Please fill all fields");
+    if (!captchaToken) return toast.error("Please verify CAPTCHA");
 
     try {
-      const data = await PostRequest(ADMIN_POST_ENQUIRIES, formData);
+      const data = await PostRequest(ADMIN_POST_ENQUIRIES, { ...formData, captchaToken });
       if (data?.message === "Enquiry submitted successfully!") {
         toast.success("Quick Enquiry submitted successfully! We will contact you soon.");
         setFormData({
@@ -155,6 +159,10 @@ export default function BlogContentPage() {
           location: "",
           timeslot: "",
         });
+        setCaptchaToken(null);
+        if (recaptchaRef.current) {
+          recaptchaRef.current.reset();
+        }
       } else {
         toast.error(data.message || "Submission failed");
       }
@@ -422,6 +430,14 @@ export default function BlogContentPage() {
                         }}
                       />
                     </Stack>
+
+                    <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>
+                      <ReCAPTCHA
+                        ref={recaptchaRef}
+                        sitekey="6Lc_DJAsAAAAADKYIf74PvRX5a5dUCy8GTxlxP5D"
+                        onChange={(value) => setCaptchaToken(value)}
+                      />
+                    </Box>
 
                     <Button
                       type="submit"
