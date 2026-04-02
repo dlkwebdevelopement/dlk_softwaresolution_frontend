@@ -32,6 +32,7 @@ import NotFound from "../pages/NotFound";
 import Help from "../pages/help/Help";
 import Videos from "../pages/videos/Videos";
 import Gallery from "../pages/gallery/Gallery";
+import Offers from "../pages/offers/Offers";
 
 const AppRoute = () => {
   return (
@@ -130,6 +131,19 @@ const AppRoute = () => {
               <Navbar />
               <Box sx={{ mt: 10 }}></Box>
               <Gallery />
+              <BottomInfo />
+              <Footer />
+            </>
+          }
+        />
+        {/* OFFERS PAGE */}
+        <Route
+          path="/offers"
+          element={
+            <>
+              <Navbar />
+              <Box sx={{ mt: 10 }}></Box>
+              <Offers />
               <BottomInfo />
               <Footer />
             </>

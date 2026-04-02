@@ -46,6 +46,7 @@ import LiveHelpIcon from "@mui/icons-material/LiveHelp";
 import PermMediaIcon from "@mui/icons-material/PermMedia";
 import VideoLibraryIcon from "@mui/icons-material/VideoLibrary";
 import PhotoLibraryIcon from "@mui/icons-material/PhotoLibrary";
+import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import { GetRequest } from "../api/config";
 import { ADMIN_GET_ALL_CATEGORIES_WITH_SUB } from "../api/endpoints";
 
@@ -650,6 +651,7 @@ const Navbar = () => {
                     {[
                       { icon: <PhotoLibraryIcon />, text: "Gallery", path: "/gallery" },
                       { icon: <VideoLibraryIcon />, text: "Videos", path: "/videos" },
+                      { icon: <LocalOfferIcon />, text: "Offers", path: "/offers" },
                     ].map((item, index) => (
                       <ListItemButton
                         key={index}
@@ -952,6 +954,7 @@ const Navbar = () => {
                   {[
                     { icon: <PhotoLibraryIcon />, text: "Gallery", path: "/gallery" },
                     { icon: <VideoLibraryIcon />, text: "Videos", path: "/videos" },
+                    { icon: <LocalOfferIcon />, text: "Offers", path: "/offers" },
                   ].map((item, index) => (
                     <MobileMenuItem
                       key={index}

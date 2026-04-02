@@ -46,3 +46,5 @@ export const GET_ALL_VIDEOS = "/admin/videos";
 
 // 🖼️ Gallery
 export const GET_ALL_GALLERY = "/admin/gallery";
+// ?? Offers
+export const GET_ALL_OFFERS = '/admin/offers';
