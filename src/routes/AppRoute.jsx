@@ -27,6 +27,7 @@ import OverviewSection from "../pages/product/CourseOverviewSection";
 import Blog from "../pages/home/Blog";
 import BlogBanner from "../pages/blog/BlogBanner";
 import BlogContentPage from "../pages/blog/BlogContentPage";
+import Career from "../pages/career/Career";
 import NotFound from "../pages/NotFound";
 
 import Help from "../pages/help/Help";
@@ -144,6 +145,19 @@ const AppRoute = () => {
               <Navbar />
               <Box sx={{ mt: 10 }}></Box>
               <Offers />
+              <BottomInfo />
+              <Footer />
+            </>
+          }
+        />
+        {/* CAREER PAGE */}
+        <Route
+          path="/career"
+          element={
+            <>
+              <Navbar />
+              <Box sx={{ mt: { xs: 8, md: 10 } }}></Box>
+              <Career />
               <BottomInfo />
               <Footer />
             </>
