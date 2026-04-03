@@ -27,6 +27,10 @@ import OverviewSection from "../pages/product/CourseOverviewSection";
 import Blog from "../pages/home/Blog";
 import BlogBanner from "../pages/blog/BlogBanner";
 import BlogContentPage from "../pages/blog/BlogContentPage";
+import StudentProjects from "../pages/home/StudentProjects";
+import StudentProjectBanner from "../pages/student-projects/StudentProjectBanner";
+import StudentProjectContentPage from "../pages/student-projects/StudentProjectContentPage";
+import StudentProjectList from "../pages/student-projects/StudentProjectList";
 import Career from "../pages/career/Career";
 import NotFound from "../pages/NotFound";
 
@@ -34,6 +38,8 @@ import Help from "../pages/help/Help";
 import Videos from "../pages/videos/Videos";
 import Gallery from "../pages/gallery/Gallery";
 import Offers from "../pages/offers/Offers";
+import Placement from "../pages/placement/Placement";
+import GoogleReviewFloatingButton from "../components/GoogleReviewFloatingButton";
 
 const AppRoute = () => {
   return (
@@ -56,6 +62,7 @@ const AppRoute = () => {
               <LogoCarousel />
               <Comments />
               <Blog />
+              <StudentProjects />
               <BottomInfo />
               <Footer />
             </>
@@ -106,6 +113,32 @@ const AppRoute = () => {
               <Box sx={{ mt: 15 }}></Box>
               <BlogBanner />
               <BlogContentPage />
+              <BottomInfo />
+              <Footer />
+            </>
+          }
+        />
+        {/*Student Project PAGE */}
+        <Route
+          path="/student-projects"
+          element={
+            <>
+              <Navbar />
+              <Box sx={{ mt: 10 }}></Box>
+              <StudentProjectList />
+              <BottomInfo />
+              <Footer />
+            </>
+          }
+        />
+        <Route
+          path="/student-projects/:slug"
+          element={
+            <>
+              <Navbar />
+              <Box sx={{ mt: 15 }}></Box>
+              <StudentProjectBanner />
+              <StudentProjectContentPage />
               <BottomInfo />
               <Footer />
             </>
@@ -163,6 +196,11 @@ const AppRoute = () => {
             </>
           }
         />
+        {/* PLACEMENT PAGE */}
+        <Route
+          path="/placement"
+          element={<Placement />}
+        />
         {/* 404 PAGE */}
         <Route
           path="*"
@@ -176,6 +214,7 @@ const AppRoute = () => {
           }
         />
       </Routes>
+      <GoogleReviewFloatingButton />
     </>
   );
 };

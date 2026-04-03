@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Box,
   AppBar,
@@ -188,25 +188,29 @@ const NavText = styled(Typography)({
 });
 
 const MegaMenuContainer = styled(Paper)({
-  position: "absolute",
-  top: "100%",
-  left: "50%",
+  position: "fixed",
+  top: "80px",
+  left: "50vw",
   transform: "translateX(-50%)",
   width: "850px",
   maxWidth: "95vw",
   height: "450px",
   borderRadius: "24px",
-  zIndex: 1400,
+  zIndex: 9999,
   display: "flex",
   overflow: "hidden",
-  background: 'rgba(255, 255, 255, 0.95)',
+  background: 'rgba(255, 255, 255, 0.98)',
   backdropFilter: 'blur(20px)',
   WebkitBackdropFilter: 'blur(20px)',
   border: `1px solid ${alpha(colors.primary, 0.1)}`,
   boxShadow: '0 30px 60px rgba(0, 0, 0, 0.12)',
+  transition: 'opacity 0.2s ease, transform 0.2s ease',
+  pointerEvents: 'auto',
 });
 
-const CategoryItem = styled(Box)(({ active }) => ({
+const CategoryItem = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'active'
+})(({ active }) => ({
   padding: "12px 18px",
   borderRadius: "12px",
   fontWeight: 500,
@@ -297,7 +301,7 @@ const MobileMenuItem = styled(ListItemButton)({
   },
 });
 
-const MegaMenu = ({ open, onClose, handleCardClick }) => {
+const MegaMenu = ({ open, onClose, onKeepOpen, handleCardClick }) => {
   const navigate = useNavigate();
   const [cats, setCats] = useState([]);
   const [activeCat, setActiveCat] = useState(null);
@@ -317,10 +321,20 @@ const MegaMenu = ({ open, onClose, handleCardClick }) => {
     fetchCats();
   }, []);
 
-  if (!open) return null;
-
+  // Always render — use CSS so mouse events work smoothly
   return (
-    <MegaMenuContainer elevation={0}>
+    <MegaMenuContainer 
+      elevation={0}
+      onMouseEnter={onKeepOpen}
+      onMouseLeave={onClose}
+      sx={{
+        opacity: open ? 1 : 0,
+        pointerEvents: open ? 'auto' : 'none',
+        transform: open
+          ? 'translateX(-50%) translateY(0)'
+          : 'translateX(-50%) translateY(-10px)',
+      }}
+    >
       {/* LEFT COLUMN - Categories */}
         <Box
           sx={{
@@ -347,6 +361,7 @@ const MegaMenu = ({ open, onClose, handleCardClick }) => {
           <Stack spacing={0.5}>
             {cats.map((item, index) => (
               <CategoryItem
+                  key={item.id || index}
                   active={activeCat?.id === item.id}
                   onMouseEnter={() => setActiveCat(item)}
                 >
@@ -448,6 +463,18 @@ const Navbar = () => {
   const [mobileFortuneOpen, setMobileFortuneOpen] = useState(false);
   const [mediaOpen, setMediaOpen] = useState(false);
   const [mobileMediaOpen, setMobileMediaOpen] = useState(false);
+  const courseCloseTimer = useRef(null);
+
+  const openCourseMenu = () => {
+    clearTimeout(courseCloseTimer.current);
+    setCourseOpen(true);
+    setFortuneOpen(false);
+    setMediaOpen(false);
+  };
+
+  const closeCourseMenu = () => {
+    courseCloseTimer.current = setTimeout(() => setCourseOpen(false), 200);
+  };
 
   useEffect(() => {
     const fetchCats = async () => {
@@ -521,12 +548,8 @@ const Navbar = () => {
               {/* All Courses with MegaMenu */}
               <Box
                 sx={{ position: "relative" }}
-                onMouseEnter={() => {
-                  setCourseOpen(true);
-                  setFortuneOpen(false);
-                  setMediaOpen(false);
-                }}
-                onMouseLeave={() => setCourseOpen(false)}
+                onMouseEnter={openCourseMenu}
+                onMouseLeave={closeCourseMenu}
               >
                 <NavItem>
                   <MenuBookIcon className="nav-icon" sx={{ fontSize: 20, mr: 1, color: colors.dark, transition: "all 0.4s ease" }} />
@@ -535,7 +558,8 @@ const Navbar = () => {
                 </NavItem>
                 <MegaMenu
                   open={courseOpen}
-                  onClose={() => setCourseOpen(false)}
+                  onClose={closeCourseMenu}
+                  onKeepOpen={openCourseMenu}
                   handleCardClick={handleCardClick}
                 />
               </Box>
@@ -578,6 +602,8 @@ const Navbar = () => {
                     {[
                       { icon: <SchoolIcon />, text: "Become an Instructor", path: "/become-instructor" },
                       { icon: <WorkIcon />, text: "Career", path: "/career" },
+                      { icon: <EmojiEventsIcon />, text: "Placement", path: "/placement" },
+                      { icon: <RocketLaunchIcon />, text: "Student Projects", path: "/student-projects" },
                     ].map((item, index) => (
                       <ListItemButton
                         key={index}
@@ -898,6 +924,8 @@ const Navbar = () => {
                   {[
                     { icon: <SchoolIcon />, text: "Become an Instructor", path: "/become-instructor" },
                     { icon: <WorkIcon />, text: "Career", path: "/career" },
+                    { icon: <EmojiEventsIcon />, text: "Placement", path: "/placement" },
+                    { icon: <RocketLaunchIcon />, text: "Student Projects", path: "/student-projects" },
                   ].map((item, index) => (
                     <MobileMenuItem
                       key={index}

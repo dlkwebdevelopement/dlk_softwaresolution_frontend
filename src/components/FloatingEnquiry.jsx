@@ -59,20 +59,20 @@ export default function FloatingEnquiry() {
           }}
         >
           {/* Header */}
-          <Box sx={{ 
-            bgcolor: "#3DB843", 
-            color: "white", 
-            p: 1.5, 
-            display: "flex", 
-            justifyContent: "space-between", 
+          <Box sx={{
+            bgcolor: "#3DB843",
+            color: "white",
+            p: 1.5,
+            display: "flex",
+            justifyContent: "space-between",
             alignItems: "center",
             boxShadow: "0 2px 10px rgba(0,0,0,0.1)"
           }}>
             <Stack direction="row" alignItems="center" spacing={1}>
-              <Box 
-                component="img" 
-                src="/photos/chatbot-3d.png" 
-                sx={{ width: 24, height: 24, filter: "brightness(0) invert(1)" }} 
+              <Box
+                component="img"
+                src="/photos/ai_chatbot_icon.png"
+                sx={{ width: 28, height: 28, borderRadius: "50%", objectFit: "cover" }}
               />
               <Box sx={{ fontWeight: 600, fontSize: "1.1rem" }}>DLK Assistant</Box>
             </Stack>
@@ -80,7 +80,7 @@ export default function FloatingEnquiry() {
               <CloseIcon fontSize="small" />
             </IconButton>
           </Box>
-          
+
           <iframe
             src="https://chatbot.dlksoftwaresolutions.co.in/"
             style={{ width: "100%", height: "100%", border: "none" }}
@@ -95,7 +95,8 @@ export default function FloatingEnquiry() {
           position: "fixed",
           bottom: { xs: 80, sm: 90, md: 60 },
           right: { xs: 20, sm: 20 },
-          zIndex: 1300 }}
+          zIndex: 1300
+        }}
       >
         <Stack spacing={2}>
           {/* Chatbot Button (3D Icon) */}
@@ -120,11 +121,11 @@ export default function FloatingEnquiry() {
                   zIndex: 1400,
                   animation: "bgPulse 2s ease-in-out infinite",
                   "@keyframes bgPulse": {
-                    "0%, 100%": { 
+                    "0%, 100%": {
                       boxShadow: "0 8px 15px rgba(61, 184, 67, 0.4)",
                       transform: "scale(1)"
                     },
-                    "50%": { 
+                    "50%": {
                       boxShadow: "0 8px 30px rgba(61, 184, 67, 0.8), 0 0 20px rgba(61, 184, 67, 0.6)",
                       transform: "scale(1.02)"
                     }
@@ -143,11 +144,11 @@ export default function FloatingEnquiry() {
                 }}
               >
                 <Typography sx={{ fontSize: "0.9rem", fontWeight: 600, lineHeight: 1.2 }}>
-                  Need help? Chat with DLK AI
+                  Need help? Chat with Lakshmi AI
                 </Typography>
-                <IconButton 
-                  size="small" 
-                  onClick={() => setShowBanner(false)} 
+                <IconButton
+                  size="small"
+                  onClick={() => setShowBanner(false)}
                   sx={{ color: "white", ml: 1, p: 0.2 }}
                 >
                   <CloseIcon sx={{ fontSize: "14px" }} />
@@ -157,7 +158,7 @@ export default function FloatingEnquiry() {
 
             <Fab
               onClick={toggleChat}
-              sx={{ 
+              sx={{
                 overflow: 'hidden',
                 padding: 0,
                 width: { xs: 60, sm: 70 },
@@ -171,10 +172,10 @@ export default function FloatingEnquiry() {
                 }
               }}
             >
-              <img 
-                src="/photos/chatbot-3d.png" 
-                alt="Chatbot" 
-                style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
+              <img
+                src="/photos/ai_chatbot_icon.png"
+                alt="Chatbot"
+                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
               />
             </Fab>
           </Box>
@@ -188,10 +189,10 @@ export default function FloatingEnquiry() {
           top: "50%",
           transform: "translateY(-50%)",
           left: 0,
-          zIndex: 1300,
+          zIndex: 900,
           display: "flex",
           flexDirection: "column",
-          boxShadow: "2px 0 10px rgba(0,0,0,0.2)"
+          // gap: "4px",
         }}
       >
         {/* Facebook */}
@@ -209,8 +210,13 @@ export default function FloatingEnquiry() {
             bgcolor: "#3b5998",
             color: "white",
             textDecoration: "none",
-            transition: "width 0.3s ease",
-            "&:hover": { width: 140, bgcolor: "#334f88" }
+            transition: "width 0.3s ease, box-shadow 0.3s ease",
+            boxShadow: "2px 2px 8px rgba(0,0,0,0.25)",
+            "&:hover": {
+              width: 140,
+              bgcolor: "#3b5998",
+              boxShadow: "4px 4px 16px rgba(59,89,152,0.5)",
+            }
           }}
         >
           <Box sx={{ minWidth: 48, height: 48, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -233,11 +239,16 @@ export default function FloatingEnquiry() {
             alignItems: "center",
             justifyContent: "flex-start",
             overflow: "hidden",
-            bgcolor: "#7b4632", 
+            bgcolor: "#E1306C",
             color: "white",
             textDecoration: "none",
-            transition: "width 0.3s ease",
-            "&:hover": { width: 140, bgcolor: "#6a3b2a" }
+            transition: "width 0.3s ease, box-shadow 0.3s ease",
+            boxShadow: "2px 2px 8px rgba(0,0,0,0.25)",
+            "&:hover": {
+              width: 140,
+              bgcolor: "#E1306C",
+              boxShadow: "4px 4px 16px rgba(225,48,108,0.5)",
+            }
           }}
         >
           <Box sx={{ minWidth: 48, height: 48, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -263,8 +274,13 @@ export default function FloatingEnquiry() {
             bgcolor: "#cd201f",
             color: "white",
             textDecoration: "none",
-            transition: "width 0.3s ease",
-            "&:hover": { width: 140, bgcolor: "#b31b1b" }
+            transition: "width 0.3s ease, box-shadow 0.3s ease",
+            boxShadow: "2px 2px 8px rgba(0,0,0,0.25)",
+            "&:hover": {
+              width: 140,
+              bgcolor: "#cd201f",
+              boxShadow: "4px 4px 16px rgba(205,32,31,0.5)",
+            }
           }}
         >
           <Box sx={{ minWidth: 48, height: 48, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -286,7 +302,7 @@ export default function FloatingEnquiry() {
         }}
       >
         <Fab
-          sx={{ 
+          sx={{
             overflow: 'hidden',
             padding: 0,
             width: { xs: 50, sm: 56 },
@@ -295,10 +311,10 @@ export default function FloatingEnquiry() {
           href="https://wa.me/917708150152"
           target="_blank"
         >
-          <img 
-            src="/photos/whatsapp-icon.png" 
-            alt="WhatsApp" 
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+          <img
+            src="/photos/whatsapp-icon.png"
+            alt="WhatsApp"
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
         </Fab>
       </Box>

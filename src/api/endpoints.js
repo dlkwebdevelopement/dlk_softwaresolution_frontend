@@ -30,6 +30,10 @@ export const ADMIN_GET_LIVE_CLASSES = "/admin/liveclass";
 export const GET_ALL_BLOGS = "/admin/blogs";
 export const ADMIN_GET_BLOGS_SLUG = (slug) => `/admin/blogs/${slug}`;
 
+// Student Projects
+export const GET_ALL_STUDENT_PROJECTS = "/admin/student-projects";
+export const ADMIN_GET_STUDENT_PROJECTS_SLUG = (slug) => `/admin/student-projects/${slug}`;
+
 
 //course
 export const ADMIN_GET_COURSE_SLUG = (slug) => `/admin/course/${slug}`;
@@ -48,3 +52,6 @@ export const GET_ALL_VIDEOS = "/admin/videos";
 export const GET_ALL_GALLERY = "/admin/gallery";
 // ?? Offers
 export const GET_ALL_OFFERS = '/admin/offers';
+
+// 🎓 Placements
+export const GET_ALL_PLACEMENTS = "/admin/placements";

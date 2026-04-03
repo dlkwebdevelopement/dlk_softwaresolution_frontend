@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Avatar, IconButton, Paper, Rating, Chip, alpha } from "@mui/material";
+import { Box, Typography, Avatar, IconButton, Paper, Rating, Chip, alpha, Button } from "@mui/material";
 import { styled, keyframes } from "@mui/material/styles";
 import { ArrowBackIosNew, ArrowForwardIos, FormatQuote } from "@mui/icons-material";
 import { GetRequest } from "../../api/config";
@@ -109,7 +109,9 @@ const NavigationButton = styled(IconButton)({
   },
 });
 
-const DotIndicator = styled(Box)(({ active }) => ({
+const DotIndicator = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'active'
+})(({ active }) => ({
   width: active ? 30 : 10,
   height: 10,
   borderRadius: 20,
@@ -383,10 +385,39 @@ export default function Comments() {
               fontSize: '1.1rem',
               maxWidth: 600,
               mx: 'auto',
+              mb: 3
             }}
           >
             Real stories from our amazing community of learners
           </Typography>
+
+          {/* Google Rating Badge */}
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 1.5,
+              mb: 4,
+              animation: `${floatAnimation} 4s ease-in-out infinite`
+            }}
+          >
+            <Box
+              component="img"
+              src='https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_"G"_logo.svg'
+              sx={{ width: 24, height: 24 }}
+              alt="Google"
+            />
+            <Box sx={{ textAlign: 'left' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <Typography sx={{ fontWeight: 800, fontSize: '1.2rem', color: colors.textPrimary }}>4.9</Typography>
+                <Rating value={4.9} precision={0.1} readOnly size="small" />
+              </Box>
+              <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: colors.textSecondary, mt: -0.5 }}>
+                Verified Google Reviews
+              </Typography>
+            </Box>
+          </Box>
         </Box>
 
         {/* MARQUEE SECTION */}
