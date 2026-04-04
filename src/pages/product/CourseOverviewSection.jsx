@@ -390,13 +390,54 @@ const CourseOverviewSection = () => {
                 <Collapse in={isExpanded}>
                     <Box sx={{ p: 2.5, pt: 0, px: {xs: 2.5, sm: 6} }}>
                        <Divider sx={{ mb: 2, borderColor: '#f1f5f9' }}/>
-                       <Typography sx={{ fontSize: '14px', color: '#475569', lineHeight: 1.5, mb: 1.5 }}>
-                          This module covers the core concepts related to {module.title.toLowerCase()}. You'll learn the required theory followed by hands-on practical exercises to make sure you have fully understood the topics.
-                       </Typography>
-                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: '#10b981', mt: 1.5 }}>
-                           <PlayCircleFilledIcon sx={{ fontSize: '18px' }} />
-                           <Typography sx={{ fontSize: '13.5px', fontWeight: 600 }}>Includes Video Lectures & Hands-on Lab</Typography>
+                       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.2, mb: 2 }}>
+                          {(module.description || `This module covers the core concepts related to ${module.title.toLowerCase()}. You'll learn the required theory followed by hands-on practical exercises to make sure you have fully understood the topics.`)
+                            .split('\n')
+                            .filter(line => line.trim() !== "")
+                            .map((line, lIdx) => (
+                              <Box key={lIdx} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.2 }}>
+                                <Box sx={{ 
+                                  minWidth: '18px', 
+                                  height: '18px', 
+                                  borderRadius: '50%', 
+                                  bgcolor: '#ecfdf5', 
+                                  display: 'flex', 
+                                  alignItems: 'center', 
+                                  justifyContent: 'center',
+                                  mt: '2px'
+                                }}>
+                                  <CheckCircleIcon sx={{ fontSize: '14px', color: '#10b981' }} />
+                                </Box>
+                                <Typography sx={{ fontSize: '14px', color: '#475569', lineHeight: 1.5, fontWeight: 500 }}>
+                                  {line.trim()}
+                                </Typography>
+                              </Box>
+                          ))}
                        </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: '#10b981', mt: 1.5 }}>
+                            <PlayCircleFilledIcon sx={{ fontSize: '18px', color: '#10b981' }} />
+                            {module.link ? (
+                              <Typography
+                                component="a"
+                                href={module.link.startsWith('http') ? module.link : `https://${module.link}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                sx={{
+                                  fontSize: '13.5px',
+                                  fontWeight: 700,
+                                  color: '#10b981',
+                                  textDecoration: 'none',
+                                  '&:hover': { textDecoration: 'underline' }
+                                }}
+                              >
+                                View Course Resource / Lab
+                              </Typography>
+                            ) : (
+                              <Typography sx={{ fontSize: '13.5px', fontWeight: 600 }}>
+                                Includes Video Lectures & Hands-on Lab
+                              </Typography>
+                            )}
+                        </Box>
                     </Box>
                 </Collapse>
               </Box>
