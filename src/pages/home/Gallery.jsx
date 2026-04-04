@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Box, Typography, Container, useTheme, useMediaQuery, IconButton, Dialog, Fade, LinearProgress } from "@mui/material";
+import { Box, Typography, Container, useTheme, useMediaQuery, IconButton, Fade, LinearProgress } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { BASE_URL, getImgUrl } from "../../api/api";
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
@@ -9,11 +10,6 @@ import ScienceOutlinedIcon from '@mui/icons-material/ScienceOutlined';
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
 import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
 import WorkspacePremiumOutlinedIcon from '@mui/icons-material/WorkspacePremiumOutlined';
-import CloseIcon from '@mui/icons-material/Close';
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import PauseIcon from '@mui/icons-material/Pause';
 import { styled } from "@mui/material/styles";
 import img1 from "../../assets/gallery/industrial_training_gallery_1_1773298102030.png";
 import img2 from "../../assets/gallery/software_development_gallery_2_1773298118042.png";
@@ -132,7 +128,7 @@ const CountBadge = styled(Box)({
 });
 
 const GalleryItem = ({ album, onOpen, height }) => (
-  <ImageContainer height={height}>
+  <ImageContainer height={height} onClick={onOpen}>
     <ImageLayer>
       <GalleryImage
         src={album.images && album.images.length > 0 ? getImgUrl(album.images[album.images.length - 1]) : ""}
@@ -144,7 +140,7 @@ const GalleryItem = ({ album, onOpen, height }) => (
         {album.images.length}+
       </CountBadge>
     )}
-    <HoverOverlay className="hover-overlay" onClick={onOpen}>
+    <HoverOverlay className="hover-overlay">
       <Box sx={{ color: 'white', textAlign: 'center' }}>
         {getCategoryIcon(album.albumName)}
         <Typography variant="h6" sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', color: 'white' }}>
@@ -158,177 +154,14 @@ const GalleryItem = ({ album, onOpen, height }) => (
   </ImageContainer>
 );
 
-const Lightbox = ({ open, images, currentIndex, onClose, onNext, onPrev, isPlaying, onTogglePlay }) => {
-  const [progress, setProgress] = useState(0);
-  const timerRef = useRef(null);
 
-  useEffect(() => {
-    if (open && isPlaying) {
-      setProgress(0);
-      const startTime = Date.now();
-      const duration = 4000;
-
-      timerRef.current = setInterval(() => {
-        const elapsed = Date.now() - startTime;
-        const newProgress = Math.min((elapsed / duration) * 100, 100);
-        setProgress(newProgress);
-
-        if (elapsed >= duration) {
-          clearInterval(timerRef.current);
-        }
-      }, 10);
-    } else {
-      setProgress(0);
-      if (timerRef.current) clearInterval(timerRef.current);
-    }
-
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, [open, isPlaying, currentIndex]);
-
-  return (
-    <Dialog
-      fullScreen
-      open={open}
-      onClose={onClose}
-      TransitionComponent={Fade}
-      TransitionProps={{ timeout: 500 }}
-      PaperProps={{
-        sx: {
-          backgroundColor: 'rgba(0, 0, 0, 0.95)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          overflow: 'hidden'
-        }
-      }}
-    >
-      {/* Progress Bar */}
-      {isPlaying && (
-        <Box sx={{ position: 'absolute', top: 0, left: 0, width: '100%', zIndex: 10 }}>
-          <LinearProgress
-            variant="determinate"
-            value={progress}
-            sx={{
-              height: 4,
-              bgcolor: 'rgba(26, 74, 28, 0.2)',
-              '& .MuiLinearProgress-bar': {
-                bgcolor: '#1a4a1c',
-              }
-            }}
-          />
-        </Box>
-      )}
-
-      {/* Top Controls Container */}
-      <Box sx={{
-        position: 'absolute',
-        top: 20,
-        left: 0,
-        right: 0,
-        px: 4,
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        zIndex: 5
-      }}>
-        {/* Top Left: Counter */}
-        <Typography
-          sx={{
-            color: 'white',
-            fontWeight: 600,
-            letterSpacing: 1.5,
-            bgcolor: 'rgba(255,255,255,0.1)',
-            px: 2,
-            py: 1,
-            borderRadius: '12px',
-            backdropFilter: 'blur(4px)'
-          }}
-        >
-          {currentIndex + 1} / {images.length}
-        </Typography>
-
-        {/* Top Right: Play/Pause & Close */}
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <IconButton
-            onClick={onTogglePlay}
-            sx={{
-              color: 'white',
-              bgcolor: 'rgba(255,255,255,0.1)',
-              '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' }
-            }}
-          >
-            {isPlaying ? <PauseIcon fontSize="large" /> : <PlayArrowIcon fontSize="large" />}
-          </IconButton>
-
-          <IconButton
-            onClick={onClose}
-            sx={{
-              color: 'white',
-              bgcolor: 'rgba(255,255,255,0.1)',
-              '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' }
-            }}
-          >
-            <CloseIcon fontSize="large" />
-          </IconButton>
-        </Box>
-      </Box>
-
-      <IconButton
-        onClick={onPrev}
-        sx={{
-          position: 'absolute',
-          left: { xs: 10, md: 40 },
-          color: 'white',
-          bgcolor: 'rgba(255,255,255,0.1)',
-          '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' },
-          zIndex: 5
-        }}
-      >
-        <ArrowBackIosNewIcon fontSize="large" />
-      </IconButton>
-
-      <Box
-        component="img"
-        src={getImgUrl(images[currentIndex])}
-        sx={{
-          maxHeight: '80vh',
-          maxWidth: '90vw',
-          objectFit: 'contain',
-          boxShadow: '0 0 50px rgba(0,0,0,0.5)',
-          borderRadius: '8px',
-          userSelect: 'none',
-          transition: 'all 0.5s ease-in-out'
-        }}
-      />
-
-      <IconButton
-        onClick={onNext}
-        sx={{
-          position: 'absolute',
-          right: { xs: 10, md: 40 },
-          color: 'white',
-          bgcolor: 'rgba(255,255,255,0.1)',
-          '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' },
-          zIndex: 5
-        }}
-      >
-        <ArrowForwardIosIcon fontSize="large" />
-      </IconButton>
-    </Dialog>
-  );
-};
 
 const Gallery = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
   const isTablet = useMediaQuery(theme.breakpoints.down('lg'));
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [activeAlbum, setActiveAlbum] = useState([]);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [albums, setAlbums] = useState([]);
 
   useEffect(() => {
@@ -344,38 +177,8 @@ const Gallery = () => {
     fetchAlbums();
   }, []);
 
-  useEffect(() => {
-    let interval;
-    if (lightboxOpen && isPlaying) {
-      interval = setInterval(() => {
-        handleNext();
-      }, 4000);
-    }
-    return () => clearInterval(interval);
-  }, [lightboxOpen, isPlaying, activeAlbum.length]);
-
-  const handleOpenLightbox = (albumImages) => {
-    setActiveAlbum(albumImages);
-    setCurrentIndex(0);
-    setIsPlaying(false);
-    setLightboxOpen(true);
-  };
-
-  const handleCloseLightbox = () => {
-    setLightboxOpen(false);
-    setIsPlaying(false);
-  };
-
-  const handleNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % activeAlbum.length);
-  };
-
-  const handlePrev = () => {
-    setCurrentIndex((prev) => (prev - 1 + activeAlbum.length) % activeAlbum.length);
-  };
-
-  const toggleAutoplay = () => {
-    setIsPlaying((prev) => !prev);
+  const handleOpenAlbum = (album) => {
+    navigate("/gallery", { state: { album } });
   };
 
   return (
@@ -411,7 +214,7 @@ const Gallery = () => {
             <GalleryItem 
               key={idx} 
               album={album} 
-              onOpen={() => handleOpenLightbox(album.images)} 
+              onOpen={() => handleOpenAlbum(album)} 
               height={220} // Larger height for better visibility on mobile
             />
           ))
@@ -421,12 +224,12 @@ const Gallery = () => {
             {/* LEFT SECTION */}
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
               {/* Top (Full width of Left) */}
-              {albums[0] && <GalleryItem album={albums[0]} onOpen={() => handleOpenLightbox(albums[0].images)} height={420} />}
+              {albums[0] && <GalleryItem album={albums[0]} onOpen={() => handleOpenAlbum(albums[0])} height={420} />}
 
               {/* Bottom (Split L/R) */}
               <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1 }}>
-                {albums[2] && <GalleryItem album={albums[2]} onOpen={() => handleOpenLightbox(albums[2].images)} />}
-                {albums[4] && <GalleryItem album={albums[4]} onOpen={() => handleOpenLightbox(albums[4].images)} />}
+                {albums[2] && <GalleryItem album={albums[2]} onOpen={() => handleOpenAlbum(albums[2])} />}
+                {albums[4] && <GalleryItem album={albums[4]} onOpen={() => handleOpenAlbum(albums[4])} />}
               </Box>
             </Box>
 
@@ -434,28 +237,17 @@ const Gallery = () => {
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
               {/* Top (Split L/R) */}
               <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1 }}>
-                {albums[3] && <GalleryItem album={albums[3]} onOpen={() => handleOpenLightbox(albums[3].images)} />}
-                {albums[5] && <GalleryItem album={albums[5]} onOpen={() => handleOpenLightbox(albums[5].images)} />}
+                {albums[3] && <GalleryItem album={albums[3]} onOpen={() => handleOpenAlbum(albums[3])} />}
+                {albums[5] && <GalleryItem album={albums[5]} onOpen={() => handleOpenAlbum(albums[5])} />}
               </Box>
 
               {/* Bottom (Full width of Right) */}
-              {albums[1] && <GalleryItem album={albums[1]} onOpen={() => handleOpenLightbox(albums[1].images)} height={420} />}
+              {albums[1] && <GalleryItem album={albums[1]} onOpen={() => handleOpenAlbum(albums[1])} height={420} />}
             </Box>
           </>
         )}
       </Box>
 
-      {/* Lightbox Slider */}
-      <Lightbox
-        open={lightboxOpen}
-        images={activeAlbum}
-        currentIndex={currentIndex}
-        onClose={handleCloseLightbox}
-        onNext={handleNext}
-        onPrev={handlePrev}
-        isPlaying={isPlaying}
-        onTogglePlay={toggleAutoplay}
-      />
     </Container>
   );
 };

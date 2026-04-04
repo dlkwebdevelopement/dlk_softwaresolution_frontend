@@ -27,6 +27,7 @@ import OverviewSection from "../pages/product/CourseOverviewSection";
 import Blog from "../pages/home/Blog";
 import BlogBanner from "../pages/blog/BlogBanner";
 import BlogContentPage from "../pages/blog/BlogContentPage";
+import BlogList from "../pages/blog/BlogList";
 import StudentProjects from "../pages/home/StudentProjects";
 import StudentProjectBanner from "../pages/student-projects/StudentProjectBanner";
 import StudentProjectContentPage from "../pages/student-projects/StudentProjectContentPage";
@@ -40,6 +41,7 @@ import Gallery from "../pages/gallery/Gallery";
 import Offers from "../pages/offers/Offers";
 import Placement from "../pages/placement/Placement";
 import GoogleReviewFloatingButton from "../components/GoogleReviewFloatingButton";
+import WorkshopPage from "../pages/workshop/WorkshopPage";
 
 const AppRoute = () => {
   return (
@@ -55,6 +57,7 @@ const AppRoute = () => {
               <Box sx={{ mt: 10 }}></Box>
               <Banner />
               <LiveClass />
+              <WorkshopPage />
               <QuickEnquiry />
               <Category />
               <Ads />
@@ -105,6 +108,18 @@ const AppRoute = () => {
           }
         />
         {/*Blog PAGE */}
+        <Route
+          path="/blogs"
+          element={
+            <>
+              <Navbar />
+              <Box sx={{ mt: 10 }}></Box>
+              <BlogList />
+              <BottomInfo />
+              <Footer />
+            </>
+          }
+        />
         <Route
           path="/blogs/:slug"
           element={
@@ -200,6 +215,18 @@ const AppRoute = () => {
         <Route
           path="/placement"
           element={<Placement />}
+        />
+        <Route
+          path="/workshop"
+          element={
+            <>
+              <Navbar />
+              <Box sx={{ mt: 10 }}></Box>
+              <WorkshopPage />
+              <BottomInfo />
+              <Footer />
+            </>
+          }
         />
         {/* 404 PAGE */}
         <Route

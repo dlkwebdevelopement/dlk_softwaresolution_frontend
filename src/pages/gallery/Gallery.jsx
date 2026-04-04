@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
+import { useLocation } from "react-router-dom";
 import {
   Box, Typography, Container, Grid, Card, CardMedia, CardContent,
   IconButton, Dialog, Chip, Stack, Fade, CircularProgress,
@@ -185,6 +186,7 @@ function EventCard({ event, onSelect, colors }) {
 
 // ─── Main Gallery Page ─────────────────────────────────────────────────────────
 export default function Gallery() {
+  const location = useLocation();
   const [albums, setAlbums] = useState([]);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -212,6 +214,14 @@ export default function Gallery() {
         ]);
         setAlbums(albumRes || []);
         setEvents((eventRes?.data) || []);
+
+        // Auto-select album if passed from navigation state
+        if (location.state?.album) {
+          const albumFromState = location.state.album;
+          // Try to find the fresh one from the list or just use the passed one
+          const matchingAlbum = (albumRes || []).find(a => a.id === albumFromState.id);
+          setSelectedAlbum(matchingAlbum || albumFromState);
+        }
       } catch (err) {
         console.error("Gallery fetch error:", err);
       } finally {
@@ -219,7 +229,7 @@ export default function Gallery() {
       }
     };
     fetchData();
-  }, []);
+  }, [location.state]);
 
 
   const filteredEvents = selectedAlbum

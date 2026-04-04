@@ -371,11 +371,34 @@ const Blog = () => {
               mx: "auto",
               fontSize: "1rem",
               lineHeight: 1.7,
-              mb: 2
+              mb: 4
             }}
           >
             Stay ahead of the curve with expert perspectives and deep dives into the software solutions shaping tomorrow's digital landscape.
           </Typography>
+
+          <Button
+            variant="outlined"
+            onClick={() => navigate("/blogs")}
+            endIcon={<ArrowForwardIosIcon sx={{ fontSize: '14px !important' }} />}
+            sx={{
+              color: colors.primary,
+              borderColor: alpha(colors.primary, 0.3),
+              borderRadius: '12px',
+              px: 4,
+              py: 1.2,
+              fontWeight: 700,
+              textTransform: 'none',
+              '&:hover': {
+                borderColor: colors.primary,
+                bgcolor: alpha(colors.primary, 0.05),
+                '& .MuiButton-endIcon': { transform: 'translateX(4px)' }
+              },
+              transition: 'all 0.3s ease'
+            }}
+          >
+            View All Articles
+          </Button>
         </Box>
 
         {/* Blog Marquee Section */}

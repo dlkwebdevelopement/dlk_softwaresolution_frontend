@@ -47,6 +47,7 @@ import PermMediaIcon from "@mui/icons-material/PermMedia";
 import VideoLibraryIcon from "@mui/icons-material/VideoLibrary";
 import PhotoLibraryIcon from "@mui/icons-material/PhotoLibrary";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
+import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import { GetRequest } from "../api/config";
 import { ADMIN_GET_ALL_CATEGORIES_WITH_SUB } from "../api/endpoints";
 
@@ -463,6 +464,8 @@ const Navbar = () => {
   const [mobileFortuneOpen, setMobileFortuneOpen] = useState(false);
   const [mediaOpen, setMediaOpen] = useState(false);
   const [mobileMediaOpen, setMobileMediaOpen] = useState(false);
+  const [resourcesOpen, setResourcesOpen] = useState(false);
+  const [mobileResourcesOpen, setMobileResourcesOpen] = useState(false);
   const courseCloseTimer = useRef(null);
 
   const openCourseMenu = () => {
@@ -470,6 +473,7 @@ const Navbar = () => {
     setCourseOpen(true);
     setFortuneOpen(false);
     setMediaOpen(false);
+    setResourcesOpen(false);
   };
 
   const closeCourseMenu = () => {
@@ -571,6 +575,7 @@ const Navbar = () => {
                   setFortuneOpen(true);
                   setCourseOpen(false);
                   setMediaOpen(false);
+                  setResourcesOpen(false);
                 }}
                 onMouseLeave={() => setFortuneOpen(false)}
               >
@@ -646,6 +651,7 @@ const Navbar = () => {
                   setMediaOpen(true);
                   setFortuneOpen(false);
                   setCourseOpen(false);
+                  setResourcesOpen(false);
                 }}
                 onMouseLeave={() => setMediaOpen(false)}
               >
@@ -677,7 +683,6 @@ const Navbar = () => {
                     {[
                       { icon: <PhotoLibraryIcon />, text: "Gallery", path: "/gallery" },
                       { icon: <VideoLibraryIcon />, text: "Videos", path: "/videos" },
-                      { icon: <LocalOfferIcon />, text: "Offers", path: "/offers" },
                     ].map((item, index) => (
                       <ListItemButton
                         key={index}
@@ -718,15 +723,81 @@ const Navbar = () => {
                 <NavText className="nav-text">Workshop</NavText>
               </NavItem>
 
-              <NavItem onClick={() => handleNavigation("/roadmap")}>
-                <MapIcon className="nav-icon" sx={{ fontSize: 20, mr: 1, color: colors.dark, transition: "all 0.4s ease" }} />
-                <NavText className="nav-text">Roadmap</NavText>
-              </NavItem>
+              {/* Resources Dropdown */}
+              <Box
+                sx={{ position: "relative" }}
+                onMouseEnter={() => {
+                  setResourcesOpen(true);
+                  setMediaOpen(false);
+                  setFortuneOpen(false);
+                  setCourseOpen(false);
+                }}
+                onMouseLeave={() => setResourcesOpen(false)}
+              >
+                <NavItem>
+                  <LibraryBooksIcon className="nav-icon" sx={{ fontSize: 20, mr: 1, color: colors.dark, transition: "all 0.4s ease" }} />
+                  <NavText className="nav-text">Resources</NavText>
+                  <ArrowDropDownIcon className="nav-icon" sx={{ color: colors.dark, ml: 0.2, transition: "transform 0.4s ease" }} />
+                </NavItem>
 
-              <NavItem onClick={() => handleNavigation("/help")}>
-                <LiveHelpIcon className="nav-icon" sx={{ fontSize: 20, mr: 1, color: colors.dark, transition: "all 0.4s ease" }} />
-                <NavText className="nav-text">Help</NavText>
-              </NavItem>
+                <Fade in={resourcesOpen}>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      position: "absolute",
+                      top: "100%",
+                      left: 0,
+                      minWidth: "220px",
+                      mt: 1,
+                      borderRadius: "20px",
+                      overflow: "hidden",
+                      zIndex: 1400,
+                      background: 'rgba(255, 255, 255, 0.98)',
+                      backdropFilter: 'blur(20px)',
+                      WebkitBackdropFilter: 'blur(20px)',
+                      border: `1px solid ${alpha(colors.primary, 0.1)}`,
+                      boxShadow: '0 15px 45px rgba(0, 0, 0, 0.1)',
+                    }}
+                  >
+                    {[
+                      { icon: <MapIcon />, text: "Roadmap", path: "/roadmap" },
+                      { icon: <MenuBookIcon />, text: "Blog", path: "/blogs" },
+                      { icon: <LocalOfferIcon />, text: "Offers", path: "/offers" },
+                      { icon: <LiveHelpIcon />, text: "Help", path: "/help" },
+                    ].map((item, index) => (
+                      <ListItemButton
+                        key={index}
+                        onClick={() => handleNavigation(item.path)}
+                        sx={{
+                          px: 3,
+                          py: 1.8,
+                          '&:hover': {
+                            backgroundColor: alpha(colors.primary, 0.05),
+                            '& .MuiListItemIcon-root': {
+                              color: colors.primary,
+                            },
+                            '& .MuiListItemText-primary': {
+                              color: colors.primary,
+                            }
+                          },
+                        }}
+                      >
+                        <ListItemIcon sx={{ color: colors.text.secondary, minWidth: 36 }}>
+                          {item.icon}
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={item.text}
+                          primaryTypographyProps={{
+                            color: colors.text.primary,
+                            fontWeight: 500,
+                            fontSize: '0.9rem'
+                          }}
+                        />
+                      </ListItemButton>
+                    ))}
+                  </Paper>
+                </Fade>
+              </Box>
 
               <CTAGradientButton
                 onClick={() => navigate("/contact")}
@@ -982,7 +1053,6 @@ const Navbar = () => {
                   {[
                     { icon: <PhotoLibraryIcon />, text: "Gallery", path: "/gallery" },
                     { icon: <VideoLibraryIcon />, text: "Videos", path: "/videos" },
-                    { icon: <LocalOfferIcon />, text: "Offers", path: "/offers" },
                   ].map((item, index) => (
                     <MobileMenuItem
                       key={index}
@@ -1028,49 +1098,64 @@ const Navbar = () => {
               />
             </MobileMenuItem>
 
-            {/* Roadmap Mobile Section */}
-            <MobileMenuItem
-              onClick={() => handleNavigation("/roadmap")}
-              sx={{
-                backgroundColor: alpha(colors.primary, 0.04),
-                borderRadius: "16px",
-                border: `1px solid ${alpha(colors.primary, 0.08)}`,
-              }}
-            >
-              <ListItemIcon sx={{ color: colors.primary, minWidth: 40 }}>
-                <MapIcon />
-              </ListItemIcon>
-              <ListItemText
-                primary="Roadmap"
-                primaryTypographyProps={{
-                  fontWeight: 700,
-                  color: colors.dark,
-                  fontSize: "1.05rem"
+            {/* Resources Mobile Section */}
+            <List sx={{ width: "100%" }}>
+              <MobileMenuItem
+                onClick={() => setMobileResourcesOpen(!mobileResourcesOpen)}
+                sx={{
+                  backgroundColor: alpha(colors.primary, 0.04),
+                  borderRadius: "16px",
+                  border: `1px solid ${alpha(colors.primary, 0.08)}`,
+                  mt: 1
                 }}
-              />
-            </MobileMenuItem>
+              >
+                <ListItemIcon sx={{ color: colors.primary, minWidth: 40 }}>
+                  <LibraryBooksIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Resources"
+                  primaryTypographyProps={{
+                    fontWeight: 700,
+                    color: colors.dark,
+                    fontSize: "1.05rem"
+                  }}
+                />
+                {mobileResourcesOpen ? (
+                  <ExpandLessIcon sx={{ color: colors.primary }} />
+                ) : (
+                  <ExpandMoreIcon sx={{ color: colors.primary }} />
+                )}
+              </MobileMenuItem>
 
-            {/* Help Mobile Section */}
-            <MobileMenuItem
-              onClick={() => handleNavigation("/help")}
-              sx={{
-                backgroundColor: alpha(colors.primary, 0.04),
-                borderRadius: "16px",
-                border: `1px solid ${alpha(colors.primary, 0.08)}`,
-              }}
-            >
-              <ListItemIcon sx={{ color: colors.primary, minWidth: 40 }}>
-                <LiveHelpIcon /> {/* Changed to LiveHelpIcon if imported or EmojiEventsIcon as placeholder */}
-              </ListItemIcon>
-              <ListItemText
-                primary="Help"
-                primaryTypographyProps={{
-                  fontWeight: 700,
-                  color: colors.dark,
-                  fontSize: "1.05rem"
-                }}
-              />
-            </MobileMenuItem>
+              <Collapse in={mobileResourcesOpen} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding sx={{ pl: 4 }}>
+                  {[
+                    { icon: <MapIcon />, text: "Roadmap", path: "/roadmap" },
+                    { icon: <MenuBookIcon />, text: "Blog", path: "/blogs" },
+                    { icon: <LocalOfferIcon />, text: "Offers", path: "/offers" },
+                    { icon: <LiveHelpIcon />, text: "Help", path: "/help" },
+                  ].map((item, index) => (
+                    <MobileMenuItem
+                      key={index}
+                      sx={{ pl: 2, py: 1.2 }}
+                      onClick={() => handleNavigation(item.path)}
+                    >
+                      <ListItemIcon sx={{ color: alpha(colors.primary, 0.6), minWidth: 40 }}>
+                        {item.icon}
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={item.text}
+                        primaryTypographyProps={{
+                          color: colors.text.primary,
+                          fontSize: "0.95rem",
+                          fontWeight: 500
+                        }}
+                      />
+                    </MobileMenuItem>
+                  ))}
+                </List>
+              </Collapse>
+            </List>
 
             {/* Book Demo Button - Mobile */}
             <Box sx={{ width: "100%", mt: 3 }}>

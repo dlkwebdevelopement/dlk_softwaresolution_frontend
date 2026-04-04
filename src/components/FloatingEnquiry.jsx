@@ -71,10 +71,10 @@ export default function FloatingEnquiry() {
             <Stack direction="row" alignItems="center" spacing={1}>
               <Box
                 component="img"
-                src="/photos/ai_chatbot_icon.png"
-                sx={{ width: 28, height: 28, borderRadius: "50%", objectFit: "cover" }}
+                src="/photos/lakshmi_bot.png"
+                sx={{ width: 38, height: 38, borderRadius: "50%", objectFit: "cover" }}
               />
-              <Box sx={{ fontWeight: 600, fontSize: "1.1rem" }}>DLK Assistant</Box>
+              <Box sx={{ fontWeight: 600, fontSize: "1.1rem" }}>Lakshmi</Box>
             </Stack>
             <IconButton size="small" onClick={toggleChat} sx={{ color: "white", "&:hover": { bgcolor: "rgba(255,255,255,0.1)" } }}>
               <CloseIcon fontSize="small" />
@@ -106,7 +106,7 @@ export default function FloatingEnquiry() {
               <Box
                 sx={{
                   position: "absolute",
-                  bottom: 80,
+                  bottom: 95,
                   right: 0,
                   bgcolor: "#3DB843",
                   color: "white",
@@ -161,8 +161,8 @@ export default function FloatingEnquiry() {
               sx={{
                 overflow: 'hidden',
                 padding: 0,
-                width: { xs: 60, sm: 70 },
-                height: { xs: 60, sm: 70 },
+                width: { xs: 75, sm: 85 },
+                height: { xs: 75, sm: 85 },
                 bgcolor: "transparent",
                 boxShadow: "none",
                 transition: "all 0.3s ease",
@@ -173,7 +173,7 @@ export default function FloatingEnquiry() {
               }}
             >
               <img
-                src="/photos/ai_chatbot_icon.png"
+                src="/photos/lakshmi_bot.png"
                 alt="Chatbot"
                 style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
               />

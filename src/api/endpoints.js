@@ -54,5 +54,8 @@ export const GET_ALL_GALLERY_EVENTS = "/admin/gallery-events";
 // ?? Offers
 export const GET_ALL_OFFERS = '/admin/offers';
 
+// 📅 Workshops
+export const GET_ALL_WORKSHOPS = "/admin/workshops";
+
 // 🎓 Placements
 export const GET_ALL_PLACEMENTS = "/admin/placements";
