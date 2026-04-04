@@ -259,10 +259,6 @@ const Product = () => {
           >
             Enroll in Course Now
           </Button>
-
-          <Typography sx={{ mt: 3, fontSize: '14px', color: 'rgba(255,255,255,0.7)', display: 'flex', alignItems: 'center', gap: 1 }}>
-            <CheckCircleIcon sx={{ fontSize: 16, color: '#34d399' }} /> 30-Day Money-Back Guarantee
-          </Typography>
         </Box>
 
         {/* RIGHT SIDE: Floating Glass Card */}

@@ -24,7 +24,6 @@ import {
 import { styled, keyframes } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import {
-  FavoriteBorder,
   Phone,
   School,
   AccessTime,
@@ -37,8 +36,6 @@ import {
   CheckCircle,
   CalendarToday,
   MenuBook,
-  FavoriteRounded,
-  FavoriteTwoTone,
   ArrowBackIosNew,
   ArrowForwardIos,
   PlayCircleOutline,
@@ -209,7 +206,6 @@ const Ads = () => {
   const [cats, setCats] = useState([]);
   const [open, setOpen] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
-  const [favorites, setFavorites] = useState([]);
   const [hoveredCard, setHoveredCard] = useState(null);
   const [activeCategory, setActiveCategory] = useState(null);
   const [courses, setCourses] = useState([]);
@@ -325,14 +321,7 @@ const Ads = () => {
     }
   };
 
-  const toggleFavorite = (courseId, e) => {
-    e.stopPropagation();
-    setFavorites((prev) =>
-      prev.includes(courseId)
-        ? prev.filter((id) => id !== courseId)
-        : [...prev, courseId],
-    );
-  };
+
 
   const handleCourseClick = (slug) => {
     if (slug) {
@@ -426,31 +415,22 @@ const Ads = () => {
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
               sx={{
-                px: 1,
+                px: 2,
                 py: 1,
-                mr: 2,
+                mr: 1,
                 cursor: 'pointer',
-                transition: 'all 0.3s ease',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 position: 'relative',
                 whiteSpace: 'nowrap',
-                color: activeCategory === cat.id ? 'var(--green)' : '#757575',
-                fontWeight: 600,
-                fontSize: '1rem',
-                '&::after': {
-                  content: '""',
-                  position: 'absolute',
-                  bottom: -2,
-                  left: 0,
-                  width: activeCategory === cat.id ? '100%' : '0%',
-                  height: '3px',
-                  bgcolor: 'var(--green)',
-                  transition: 'width 0.3s ease',
-                },
+                color: activeCategory === cat.id ? 'var(--green-dark)' : '#64748b',
+                fontWeight: 700,
+                fontSize: '0.9rem',
+                borderRadius: '50px',
+                bgcolor: activeCategory === cat.id ? 'var(--green-light)' : 'transparent',
+                border: activeCategory === cat.id ? '1px solid var(--green-mid)' : '1px solid transparent',
                 '&:hover': {
-                  color: 'var(--green)',
-                  '&::after': {
-                    width: '100%',
-                  }
+                  color: 'var(--green-dark)',
+                  bgcolor: activeCategory === cat.id ? 'var(--green-mid)' : alpha('#3DB843', 0.05),
                 }
               }}
             >
@@ -534,7 +514,7 @@ const Ads = () => {
                   {/* IMAGE SECTION */}                    <Box
                       sx={{
                         position: "relative",
-                        height: 140,
+                        height: 180,
                         overflow: "hidden",
                         cursor: 'pointer',
                       }}
@@ -601,34 +581,7 @@ const Ads = () => {
                       />
                     </Box>
 
-                    {/* Favorite Button */}
-                    <IconButton
-                      onClick={(e) => toggleFavorite(course.id, e)}
-                      sx={{
-                        position: "absolute",
-                        top: 16,
-                        right: 16,
-                        bgcolor: 'rgba(61, 184, 67, 0.1)',
-                        backdropFilter: 'blur(10px)',
-                        WebkitBackdropFilter: 'blur(10px)',
-                        border: '1px solid var(--green-mid)',
-                        '&:hover': {
-                          bgcolor: 'rgba(255, 255, 255, 0.3)',
-                          transform: 'scale(1.1)',
-                        },
-                        transition: 'all 0.2s ease',
-                        zIndex: 2,
-                      }}
-                    >
-                      <FavoriteTwoTone
-                        sx={{
-                          color: favorites.includes(course.id)
-                            ? "#ff4d4d"
-                            : "red",
-                          fontSize: 20,
-                        }}
-                      />
-                    </IconButton>
+
                   </Box>
 
                   {/* CONTENT SECTION */}

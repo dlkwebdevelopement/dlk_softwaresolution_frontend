@@ -50,6 +50,7 @@ export const GET_ALL_VIDEOS = "/admin/videos";
 
 // 🖼️ Gallery
 export const GET_ALL_GALLERY = "/admin/gallery";
+export const GET_ALL_GALLERY_EVENTS = "/admin/gallery-events";
 // ?? Offers
 export const GET_ALL_OFFERS = '/admin/offers';
 
