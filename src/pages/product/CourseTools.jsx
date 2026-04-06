@@ -81,9 +81,7 @@ export default function CourseTools() {
             <Grid
               item
               key={index}
-              xs={6}
-              sm={4}
-              md={2}
+              size={{ xs: 6, sm: 4, md: 2 }}
               sx={{
                 display: "flex",
                 flexDirection: "column",

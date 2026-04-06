@@ -206,8 +206,12 @@ const Product = () => {
                 <StarIcon sx={{ color: "#facc15", fontSize: 22 }} />
               </Box>
               <Box>
-                <Typography sx={{ fontWeight: 600, fontSize: '16px', lineHeight: 1 }}>{course?.rating || 4.8}</Typography>
-                <Typography sx={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', mt: 0.5 }}>{course?.total_ratings || 0} reviews</Typography>
+                <Typography sx={{ fontWeight: 600, fontSize: '18px', lineHeight: 1 }}>
+                  {course?.rating > 0 ? course.rating : "New"}
+                </Typography>
+                <Typography sx={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', mt: 0.5 }}>
+                  {course?.total_ratings || 0} reviews
+                </Typography>
               </Box>
             </Box>
 

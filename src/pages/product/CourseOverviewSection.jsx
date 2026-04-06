@@ -9,7 +9,12 @@ import {
   CardContent,
   Divider,
   Stack,
-  Collapse
+  Collapse,
+  Dialog,
+  TextField,
+  Rating,
+  Avatar,
+  Button
 } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import PlayCircleFilledIcon from "@mui/icons-material/PlayCircleFilled";
@@ -19,25 +24,39 @@ import PhoneIphoneIcon from "@mui/icons-material/PhoneIphone";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Rating, Avatar, Button } from "@mui/material";
 
 import AOS from "aos";
 import "aos/dist/aos.css";
 import { useNavigate, useParams } from "react-router-dom";
-import { GetRequest } from "../../api/config";
+import { GetRequest, PostRequest } from "../../api/config";
 import {
   ADMIN_GET_CATEGORIES,
   ADMIN_GET_COURSE_SLUG,
 } from "../../api/endpoints";
 import { BASE_URL, getImgUrl } from "../../api/api";
 import toast from "react-hot-toast";
+import QuickEnquiryModal from "../../components/QuickEnquiryModal";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+
+dayjs.extend(relativeTime);
 
 const CourseOverviewSection = () => {
   const [value, setValue] = React.useState(0);
   const [expandedModule, setExpandedModule] = useState(0);
+  const [openEnquiry, setOpenEnquiry] = useState(false);
 
   const { slug } = useParams();
   const [course, setCourse] = useState(null);
+
+  // Review Posting State
+  const [openReviewModal, setOpenReviewModal] = useState(false);
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [reviewForm, setReviewForm] = useState({
+    student_name: "",
+    rating: 5,
+    review: ""
+  });
 
   // Icon mapping for dynamic courseIncludes
   const iconMap = {
@@ -105,17 +124,83 @@ const CourseOverviewSection = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchCourse = async () => {
-      try {
-        const res = await GetRequest(ADMIN_GET_COURSE_SLUG(slug));
-        setCourse(res.data);
-      } catch (err) {
-        console.error(err);
-      }
+  const fetchCourse = async () => {
+    try {
+      const res = await GetRequest(ADMIN_GET_COURSE_SLUG(slug));
+      setCourse(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    if (!reviewForm.student_name || !reviewForm.review) return toast.error("Please fill all fields");
+
+    const payload = {
+      ...reviewForm,
+      course_id: course?._id || course?.id
     };
+
+    console.log("Submitting Review Payload:", payload);
+
+    try {
+      setSubmittingReview(true);
+      await PostRequest("/admin/course/review", payload);
+      toast.success("Thank you for your review!");
+      setOpenReviewModal(false);
+      setReviewForm({ student_name: "", rating: 5, review: "" });
+      fetchCourse(); // Refresh data
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to submit review");
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
+
+  useEffect(() => {
     if (slug) fetchCourse();
   }, [slug]);
+
+  // Dynamic Rating Calculations
+  const ratingStats = React.useMemo(() => {
+    const reviews = course?.reviews || [];
+    if (reviews.length === 0) {
+      return {
+        average: Number(course?.rating) || 0,
+        total: Number(course?.total_ratings) || 0,
+        breakdown: [
+          { label: "5 star", value: 0 },
+          { label: "4 star", value: 0 },
+          { label: "3 star", value: 0 },
+          { label: "2 star", value: 0 },
+          { label: "1 star", value: 0 },
+        ]
+      };
+    }
+
+    const counts = [0, 0, 0, 0, 0]; // index 0 = 5 star, 4 = 1 star
+    reviews.forEach(r => {
+      const star = Math.round(r.rating);
+      if (star >= 1 && star <= 5) {
+        counts[5 - star]++;
+      }
+    });
+
+    const total = reviews.length;
+    return {
+      average: (reviews.reduce((acc, r) => acc + r.rating, 0) / total).toFixed(1),
+      total,
+      breakdown: [
+        { label: "5 star", value: Math.round((counts[0] / total) * 100) },
+        { label: "4 star", value: Math.round((counts[1] / total) * 100) },
+        { label: "3 star", value: Math.round((counts[2] / total) * 100) },
+        { label: "2 star", value: Math.round((counts[3] / total) * 100) },
+        { label: "1 star", value: Math.round((counts[4] / total) * 100) },
+      ]
+    };
+  }, [course]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -534,11 +619,11 @@ const CourseOverviewSection = () => {
                     fontFamily: '"Poppins", sans-serif',
                   }}
                 >
-                  {course?.rating || 4.8}
+                  {ratingStats.average}
                 </Typography>
 
                 <Rating 
-                  value={Number(course?.rating) || 4.8} 
+                  value={Number(ratingStats.average)} 
                   precision={0.5} 
                   readOnly 
                   size="large"
@@ -552,19 +637,13 @@ const CourseOverviewSection = () => {
                     fontWeight: 600
                   }}
                 >
-                  Course Rating ({course?.total_ratings || 0})
+                  Course Rating ({ratingStats.total})
                 </Typography>
               </Box>
 
               {/* Rating Bars */}
               <Box sx={{ flex: 1, width: "100%" }}>
-                {[
-                  { label: "5 star", value: 85 },
-                  { label: "4 star", value: 10 },
-                  { label: "3 star", value: 3 },
-                  { label: "2 star", value: 1 },
-                  { label: "1 star", value: 1 },
-                ].map((item, index) => (
+                {ratingStats.breakdown.map((item, index) => (
                   <Box
                     key={index}
                     sx={{
@@ -613,76 +692,68 @@ const CourseOverviewSection = () => {
 
           {/* Individual Reviews Grid */}
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: '1fr 1fr' }, gap: 4 }}>
-            {[
-              {
-                name: "Arun Kumar",
-                img: "https://i.pravatar.cc/100?img=11",
-                role: "Software Developer",
-                content: "Absolutely loved this! The practical sessions helped me land my dream role. Mentoring was world-class and very easy to follow even for beginners.",
-                date: "2 weeks ago",
-                rating: 5
-              },
-              {
-                name: "Priyanka S",
-                img: "https://i.pravatar.cc/100?img=26",
-                role: "Data Analyst",
-                content: "The curriculum is very well-structured. I found the concepts easy to grasp through the real-world projects. Highly recommended for upgrades.",
-                date: "1 month ago",
-                rating: 5
-              },
-              {
-                name: "Rahul Verma",
-                img: "https://i.pravatar.cc/100?img=33",
-                role: "Student",
-                content: "Best investment for my career. The projects you build are portfolio-ready and the instructors actually care about your progress.",
-                date: "2 months ago",
-                rating: 4.5
-              },
-               {
-                name: "Neha Sharma",
-                img: "https://i.pravatar.cc/100?img=47",
-                role: "Freelancer",
-                content: "The depth of topics covered is amazing. They don't just teach the syntax, but also the best industry practices. The support team is also very responsive.",
-                date: "3 months ago",
-                rating: 5
-              }
-            ].map((review, i) => (
-              <Box
-                key={i}
-                sx={{
-                  backgroundColor: "#fff",
-                  borderRadius: "20px",
-                  p: 3,
-                  boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)",
-                  border: '1px solid #e2e8f0',
-                  transition: '0.3s',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  "&:hover": { transform: 'translateY(-4px)', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)', borderColor: '#e2e8f0' }
-                }}
-              >
-                <Rating value={review.rating} precision={0.5} readOnly size="small" sx={{ color: '#f59e0b', mb: 1.5 }} />
-                
-                <Typography sx={{ color: "#334155", mb: 3, lineHeight: 1.6, fontSize: '14.5px', flexGrow: 1, fontStyle: 'italic' }}>
-                  "{review.content}"
-                </Typography>
+            {course?.reviews && course.reviews.length > 0 ? (
+              course.reviews.map((review, i) => (
+                <Box
+                  key={i}
+                  sx={{
+                    backgroundColor: "#fff",
+                    borderRadius: "20px",
+                    p: 3,
+                    boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)",
+                    border: '1px solid #e2e8f0',
+                    transition: '0.3s',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    "&:hover": { transform: 'translateY(-4px)', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)', borderColor: '#e2e8f0' }
+                  }}
+                >
+                  <Rating value={review.rating} precision={0.5} readOnly size="small" sx={{ color: '#f59e0b', mb: 1.5 }} />
+                  
+                  <Typography sx={{ color: "#334155", mb: 3, lineHeight: 1.6, fontSize: '14.5px', flexGrow: 1, fontStyle: 'italic' }}>
+                    "{review.review}"
+                  </Typography>
 
-                <Box sx={{ display: "flex", alignItems: "center", gap: 2, pt: 2, borderTop: '1px solid #f1f5f9' }}>
-                  <Avatar 
-                    src={review.img} 
-                    sx={{ width: 40, height: 40 }} 
-                  />
-                  <Box>
-                    <Typography sx={{ fontWeight: 600, color: '#0f172a', fontSize: '14px' }}>{review.name}</Typography>
-                    <Typography sx={{ fontSize: "12px", color: "#64748b" }}>
-                      {review.role} • {review.date}
-                    </Typography>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 2, pt: 2, borderTop: '1px solid #f1f5f9' }}>
+                    <Avatar 
+                      src={getImgUrl(review.student_avatar)} 
+                      sx={{ width: 40, height: 40 }} 
+                    >
+                      {review.student_name?.charAt(0)}
+                    </Avatar>
+                    <Box>
+                      <Typography sx={{ fontWeight: 600, color: '#0f172a', fontSize: '14px' }}>{review.student_name}</Typography>
+                      <Typography sx={{ fontSize: "12px", color: "#64748b" }}>
+                        Verified Student • {dayjs(review.createdAt).fromNow()}
+                      </Typography>
+                    </Box>
                   </Box>
                 </Box>
+              ))
+            ) : (
+              <Box sx={{ gridColumn: '1 / -1', textAlign: 'center', py: 6, bgcolor: '#fff', borderRadius: '24px', border: '1px dashed #cbd5e1' }}>
+                <Typography sx={{ color: '#64748b', fontSize: '16px', fontWeight: 500 }}>
+                  No reviews yet for this course. Be the first to share your experience!
+                </Typography>
               </Box>
-            ))}
+            )}
           </Box>
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, gap: 2, flexWrap: 'wrap' }}>
+             <Button 
+               variant="contained" 
+               onClick={() => setOpenReviewModal(true)}
+               sx={{ 
+                 borderRadius: '12px', 
+                 bgcolor: '#10b981', 
+                 fontWeight: 600, 
+                 px: 4, 
+                 py: 1.5, 
+                 boxShadow: '0 4px 12px rgba(16,185,129,0.2)',
+                 '&:hover': { bgcolor: '#059669' } 
+               }}
+             >
+               Write a Review
+             </Button>
              <Button variant="outlined" sx={{ borderRadius: '12px', color: '#0f172a', borderColor: '#cbd5e1', fontWeight: 600, px: 4, py: 1.5, '&:hover': { bgcolor: '#f8fafc', borderColor: '#94a3b8' } }}>Show More Reviews</Button>
           </Box>
         </Box>
@@ -949,6 +1020,85 @@ const CourseOverviewSection = () => {
           }
         `}
       </style>
+
+      <QuickEnquiryModal 
+        open={openEnquiry} 
+        onClose={() => setOpenEnquiry(false)}
+        initialCourse={course?.title}
+      />
+
+      <Dialog 
+        open={openReviewModal} 
+        onClose={() => setOpenReviewModal(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{ sx: { borderRadius: '24px' } }}
+      >
+        <Box sx={{ p: 4 }}>
+          <Typography variant="h5" fontWeight={700} sx={{ mb: 1, color: '#0f172a', fontFamily: '"Poppins", sans-serif' }}>
+            Write a Review
+          </Typography>
+          <Typography variant="body2" sx={{ color: '#64748b', mb: 4 }}>
+            Share your experience with other students.
+          </Typography>
+
+          <form onSubmit={handleReviewSubmit}>
+            <Stack spacing={3}>
+              <Box>
+                <Typography variant="subtitle2" sx={{ color: '#475569', mb: 1, fontWeight: 600 }}>Your Rating</Typography>
+                <Rating 
+                  size="large"
+                  value={reviewForm.rating}
+                  onChange={(e, val) => setReviewForm({ ...reviewForm, rating: val })}
+                  sx={{ color: '#f59e0b' }}
+                />
+              </Box>
+
+              <TextField 
+                fullWidth 
+                label="Full Name" 
+                placeholder="Enter your name"
+                required
+                value={reviewForm.student_name}
+                onChange={(e) => setReviewForm({ ...reviewForm, student_name: e.target.value })}
+                sx={{ "& .MuiOutlinedInput-root": { borderRadius: '12px' } }}
+              />
+
+              <TextField 
+                fullWidth 
+                multiline
+                rows={4}
+                label="Your Review" 
+                placeholder="What did you like most about the course?"
+                required
+                value={reviewForm.review}
+                onChange={(e) => setReviewForm({ ...reviewForm, review: e.target.value })}
+                sx={{ "& .MuiOutlinedInput-root": { borderRadius: '12px' } }}
+              />
+
+              <Box sx={{ display: 'flex', gap: 2, pt: 2 }}>
+                <Button 
+                  fullWidth 
+                  variant="outlined" 
+                  onClick={() => setOpenReviewModal(false)}
+                  sx={{ borderRadius: '12px', py: 1.5, fontWeight: 600, color: '#64748b', borderColor: '#cbd5e1' }}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  fullWidth 
+                  type="submit"
+                  disabled={submittingReview}
+                  variant="contained" 
+                  sx={{ borderRadius: '12px', py: 1.5, fontWeight: 600, bgcolor: '#10b981', '&:hover': { bgcolor: '#059669' } }}
+                >
+                  {submittingReview ? "Posting..." : "Post Review"}
+                </Button>
+              </Box>
+            </Stack>
+          </form>
+        </Box>
+      </Dialog>
     </Box>
   );
 };

@@ -134,8 +134,8 @@ export default function CareerSupport() {
             width: "100%",
             // Hide Scrollbar
             "&::-webkit-scrollbar": { display: "none" },
-            "-ms-overflow-style": "none",
-            "scrollbar-width": "none",
+            msOverflowStyle: "none",
+            scrollbarWidth: "none",
           }}
         >
           {servicesList.map((item, index) => (
