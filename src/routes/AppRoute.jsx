@@ -42,6 +42,9 @@ import Offers from "../pages/offers/Offers";
 import Placement from "../pages/placement/Placement";
 import GoogleReviewFloatingButton from "../components/GoogleReviewFloatingButton";
 import WorkshopPage from "../pages/workshop/WorkshopPage";
+import PrivacyPolicy from "../pages/legal/PrivacyPolicy";
+import TermsOfService from "../pages/legal/TermsOfService";
+import CategoryCourseList from "../pages/product/CategoryCourseList";
 
 const AppRoute = () => {
   return (
@@ -223,6 +226,35 @@ const AppRoute = () => {
               <Navbar />
               <Box sx={{ mt: 10 }}></Box>
               <WorkshopPage />
+              <BottomInfo />
+              <Footer />
+            </>
+          }
+        />
+        <Route
+          path="/category/:id"
+          element={<CategoryCourseList />}
+        />
+        {/* LEGAL PAGES */}
+        <Route
+          path="/privacy-policy"
+          element={
+            <>
+              <Navbar />
+              <Box sx={{ mt: 10 }}></Box>
+              <PrivacyPolicy />
+              <BottomInfo />
+              <Footer />
+            </>
+          }
+        />
+        <Route
+          path="/terms-of-service"
+          element={
+            <>
+              <Navbar />
+              <Box sx={{ mt: 10 }}></Box>
+              <TermsOfService />
               <BottomInfo />
               <Footer />
             </>

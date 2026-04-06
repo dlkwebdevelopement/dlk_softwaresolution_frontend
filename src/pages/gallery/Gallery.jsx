@@ -234,9 +234,9 @@ export default function Gallery() {
 
   const filteredEvents = selectedAlbum
     ? events.filter(e =>
-        e.categoryId?._id === selectedAlbum.id ||
-        e.categoryId?.albumName === selectedAlbum.albumName
-      )
+      e.categoryId?._id === selectedAlbum.id ||
+      e.categoryId?.albumName === selectedAlbum.albumName
+    )
     : [];
 
   return (
@@ -269,13 +269,8 @@ export default function Gallery() {
             )}
           </Breadcrumbs>
 
-          <Typography variant="h2" sx={{ fontWeight: 900, fontSize: { xs: "2.4rem", md: "3.8rem" }, mb: 2, lineHeight: 1.1 }}>
+          <Typography variant="h3" sx={{ fontWeight: 600, fontSize: { xs: "2.4rem", md: "3.8rem" }, mb: 2, lineHeight: 1.1 }} color="white">
             {selectedAlbum ? selectedAlbum.albumName : "Memories & Milestones"}
-          </Typography>
-          <Typography variant="subtitle1" sx={{ opacity: 0.9, maxWidth: 640, mx: "auto", mb: 4 }}>
-            {selectedAlbum
-              ? `Explore events in our ${selectedAlbum.albumName} collection.`
-              : "Browse albums of workshops, training and project captures from DLK Software Solutions."}
           </Typography>
 
           {selectedAlbum && (

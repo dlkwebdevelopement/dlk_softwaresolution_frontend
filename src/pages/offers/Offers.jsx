@@ -51,7 +51,7 @@ export default function Offers() {
       {/* HERO */}
       <Box
         sx={{
-          background: `linear-gradient(135deg, ${colors.dark} 0%, ${colors.primary} 100%)`,
+          background: `linear-gradient(135deg, #1a4718 0%, #3DB843 100%)`,
           py: { xs: 8, md: 12 },
           color: "white",
           textAlign: "center",
@@ -59,11 +59,8 @@ export default function Offers() {
         }}
       >
         <Container maxWidth="md">
-          <Typography variant="h3" fontWeight={900}>
+          <Typography variant="h3" fontWeight={900} color="white">
             Special Offers
-          </Typography>
-          <Typography sx={{ opacity: 0.9, mt: 1 }}>
-            Unlock premium savings and career opportunities.
           </Typography>
         </Container>
       </Box>

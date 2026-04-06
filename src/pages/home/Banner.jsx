@@ -568,11 +568,13 @@ export default function Banner() {
                         {slide.button || "Enroll Now — It's Free"} →
                       </Button>
                       <Button
-                        variant="outlined"
-                        onClick={() => {/* Watch how it works */ }}
+                        variant="contained"
+                        component="a"
+                        href="https://www.youtube.com/@StudentsLearningplatform2026"
+                        target="_blank"
                         sx={{
-                          borderColor: '#c2eac4',
-                          color: '#111c12',
+                          background: `linear-gradient(135deg, #1a4718 0%, #3DB843 100%)`,
+                          color: 'white',
                           px: 4,
                           py: 1.5,
                           borderRadius: '100px',
@@ -581,11 +583,12 @@ export default function Banner() {
                           textTransform: 'none',
                           fontFamily: 'inherit',
                           '&:hover': {
-                            borderColor: '#3DB843',
-                            color: '#3DB843',
-                            background: 'transparent',
+                            transform: 'translateY(-2px)',
+                            boxShadow: '0 8px 24px rgba(61,184,67,0.3)',
+                            background: `linear-gradient(135deg, #1a4718 0%, #3DB843 100%)`, // Keep gradient on hover
+                            opacity: 0.9
                           },
-                          transition: 'all 0.2s',
+                          transition: 'all 0.25s',
                         }}
                       >
                         ▶ Watch How It Works

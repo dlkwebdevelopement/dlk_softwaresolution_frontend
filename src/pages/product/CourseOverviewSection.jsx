@@ -39,28 +39,42 @@ const CourseOverviewSection = () => {
   const { slug } = useParams();
   const [course, setCourse] = useState(null);
 
-  const courseIncludes = [
+  // Icon mapping for dynamic courseIncludes
+  const iconMap = {
+    PlayCircleFilled: <PlayCircleFilledIcon sx={{ color: '#10b981' }} />,
+    Download: <DownloadIcon sx={{ color: '#10b981' }} />,
+    AllInclusive: <AllInclusiveIcon sx={{ color: '#10b981' }} />,
+    PhoneIphone: <PhoneIphoneIcon sx={{ color: '#10b981' }} />,
+    WorkspacePremium: <WorkspacePremiumIcon sx={{ color: '#10b981' }} />,
+    CheckCircle: <CheckCircleIcon sx={{ color: '#10b981' }} />,
+  };
+
+  const defaultIncludes = [
     {
-      icon: <PlayCircleFilledIcon sx={{ color: '#10b981' }} />,
+      icon_name: "PlayCircleFilled",
       text: "10 hours on-demand video",
     },
     {
-      icon: <DownloadIcon sx={{ color: '#10b981' }} />,
+      icon_name: "Download",
       text: "20 downloadable resources",
     },
     {
-      icon: <AllInclusiveIcon sx={{ color: '#10b981' }} />,
+      icon_name: "AllInclusive",
       text: "Full lifetime access",
     },
     {
-      icon: <PhoneIphoneIcon sx={{ color: '#10b981' }} />,
+      icon_name: "PhoneIphone",
       text: "Access on mobile and TV",
     },
     {
-      icon: <WorkspacePremiumIcon sx={{ color: '#10b981' }} />,
+      icon_name: "WorkspacePremium",
       text: "Certificate of completion",
     },
   ];
+
+  const currentIncludes = (course?.courseIncludes && course.courseIncludes.length > 0) 
+    ? course.courseIncludes 
+    : defaultIncludes;
 
   const navigate = useNavigate();
   const [cats, setCats] = useState([]);
@@ -788,7 +802,7 @@ const CourseOverviewSection = () => {
                 </Typography>
 
                 <Stack spacing={0}>
-                  {courseIncludes.map((item, index) => (
+                  {currentIncludes.map((item, index) => (
                     <Box key={index}>
                       <Box
                         sx={{
@@ -800,7 +814,7 @@ const CourseOverviewSection = () => {
                         }}
                       >
                         <Box sx={{ p: 0.8, bgcolor: '#ecfdf5', borderRadius: '10px', display: 'flex' }}>
-                          {item.icon}
+                          {iconMap[item.icon_name] || <CheckCircleIcon sx={{ color: '#10b981' }} />}
                         </Box>
                         <Typography
                           sx={{
@@ -813,7 +827,7 @@ const CourseOverviewSection = () => {
                           {item.text}
                         </Typography>
                       </Box>
-                      {index !== courseIncludes.length - 1 && (
+                      {index !== currentIncludes.length - 1 && (
                         <Divider sx={{ borderColor: "#f1f5f9" }} />
                       )}
                     </Box>

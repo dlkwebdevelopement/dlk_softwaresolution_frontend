@@ -49,10 +49,7 @@ const Placement = () => {
         {/* HERO SECTION */}
         <Box
           sx={{
-            background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${alpha(
-              theme.palette.primary.main,
-              0.75
-            )} 100%)`,
+            background: `linear-gradient(135deg, #1a4718 0%, #3DB843 100%)`,
             py: { xs: 5, md: 8 },
             mb: 4,
             color: "white",

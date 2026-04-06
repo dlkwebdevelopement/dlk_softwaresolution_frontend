@@ -372,7 +372,7 @@ export default function LiveClass() {
                     <CardMedia
                       component="img"
                       height="150"
-                      src={getImgUrl(cls.courseId?.image) || "https://via.placeholder.com/400x180?text=No+Image"}
+                      src={cls.image ? `${BASE_URL}/${getImgUrl(cls.image)}` : (cls.courseId?.image ? `${BASE_URL}/${getImgUrl(cls.courseId.image)}` : "https://via.placeholder.com/400x180?text=No+Image")}
                       alt={cls.title || "Live Class"}
                       sx={{
                         transition: "transform 0.5s ease",

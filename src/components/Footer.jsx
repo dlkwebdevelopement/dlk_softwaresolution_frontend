@@ -1,4 +1,8 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { Link as RouterLink } from "react-router-dom";
+import { GetRequest, PostRequest } from "../api/config";
+import { ADMIN_GET_CATEGORIES, ADMIN_POST_CONTACT } from "../api/endpoints";
+import toast from "react-hot-toast";
 import {
   Box,
   Typography,
@@ -242,9 +246,9 @@ const FooterColumn = ({ title, items, delay }) => (
               animation: `${slideInLeft} 0.3s ease-out ${delay + index * 50}ms both`,
             }}
           >
-            <FooterLink href="#">
+            <FooterLink component={RouterLink} to={item.path || "#"}>
               <ArrowForwardIcon sx={{ fontSize: 14, opacity: 0.5 }} />
-              {item}
+              {item.name || item}
             </FooterLink>
           </Box>
         ))}
@@ -289,6 +293,69 @@ const ContactInfo = ({ icon: Icon, text, subtext }) => (
 );
 
 const Footer = () => {
+  const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [topCourses, setTopCourses] = useState([
+    { name: "AI & Machine Learning", path: "#" },
+    { name: "Web Development", path: "#" },
+    { name: "Java Programming", path: "#" },
+    { name: "Python", path: "#" },
+    { name: "AWS Cloud", path: "#" }
+  ]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await GetRequest(ADMIN_GET_CATEGORIES);
+        if (data && data.length > 0) {
+          // Grab the 5 most recent categories (assuming end of array or we just reverse)
+          const recentCategories = [...data].reverse().slice(0, 5).map((cat) => ({
+            name: cat.categoryName,
+            path: `/category/${cat._id || cat.id}`
+          }));
+          setTopCourses(recentCategories);
+        }
+      } catch (err) {
+        console.error("Footer: Failed to fetch categories", err);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  const handleSubscribe = async () => {
+    if (!email) {
+      toast.error("Please enter your email");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const payload = {
+        firstName: "Newsletter",
+        lastName: "Subscriber",
+        email: email,
+        phone: "N/A",
+        message: "Newsletter Subscription Request",
+        acceptTerms: true
+      };
+
+      await PostRequest(ADMIN_POST_CONTACT, payload);
+      toast.success("Subscribed successfully! Thank you for staying updated.");
+      setEmail("");
+    } catch (err) {
+      console.error("Newsletter Subscription Error:", err);
+      toast.error("Failed to subscribe. Please try again later.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <Box
       component="footer"
@@ -397,6 +464,8 @@ const Footer = () => {
                   type="email"
                   placeholder="Enter your email address"
                   variant="outlined"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   sx={{
                     width: { xs: "100%", sm: "300px" },
                   }}
@@ -404,11 +473,13 @@ const Footer = () => {
                 <NewsletterButton
                   variant="contained"
                   endIcon={<SendIcon />}
+                  onClick={handleSubscribe}
+                  disabled={isLoading}
                   sx={{
                     width: { xs: "100%", sm: "auto" },
                   }}
                 >
-                  Subscribe
+                  {isLoading ? "Subscribing..." : "Subscribe"}
                 </NewsletterButton>
               </Box>
             </Box>
@@ -441,7 +512,7 @@ const Footer = () => {
                   WebkitTextFillColor: 'transparent',
                 }}
               >
-                DLK
+                DLK Software Solutions
               </Typography>
               <Typography
                 sx={{
@@ -460,13 +531,35 @@ const Footer = () => {
                 <ContactInfo icon={PhoneIcon} text="+91 77081 50152" subtext="Mon-Sat, 9AM-8PM" />
                 <ContactInfo icon={EmailIcon} text="dlksoftwaresolutions@gmail.com" subtext="Support 24/7" />
               </Box>
-            </Box> 
+            </Box>
           </Grow>
 
           {/* FOOTER COLUMNS */}
-          <FooterColumn title="Explore" items={["Register", "Our News", "Contact Us", "Blog"]} delay={600} />
-          <FooterColumn title="Top Courses" items={["AI & Machine Learning", "Web Development", "Java Programming", "Python", "AWS Cloud"]} delay={800} />
-          <FooterColumn title="Important Links" items={["Help Center", "About Us", "Terms & Services", "Privacy Policy"]} delay={1000} />
+          <FooterColumn
+            title="Explore"
+            items={[
+              { name: "Offers", path: "/offers" },
+              { name: "Careers", path: "/career" },
+              { name: "Contact Us", path: "/contact" },
+              { name: "Blog", path: "/blogs" }
+            ]}
+            delay={600}
+          />
+          <FooterColumn 
+            title="Top Courses" 
+            items={topCourses} 
+            delay={800} 
+          />
+          <FooterColumn
+            title="Important Links"
+            items={[
+              { name: "Help Center", path: "/help" },
+              { name: "Workshops", path: "/workshop" },
+              { name: "Terms & Services", path: "/terms-of-service" },
+              { name: "Privacy Policy", path: "/privacy-policy" }
+            ]}
+            delay={1000}
+          />
 
           {/* SOCIAL & APP */}
           <Grow in={true} timeout={1200}>
@@ -499,7 +592,7 @@ const Footer = () => {
                   { icon: FacebookIcon, color: '#1877f2', link: "https://www.facebook.com/profile.php?id=61569333069634" },
                   { icon: InstagramIcon, color: '#e4405f', link: "https://www.instagram.com/dlk_softwaresolutions/" },
                   { icon: LinkedInIcon, color: '#0a66c2', link: "https://www.linkedin.com/company/107134148/admin/dashboard/" },
-                  { icon: YouTubeIcon, color: '#ff0000', link: "#" },
+                  { icon: YouTubeIcon, color: '#ff0000', link: "https://www.youtube.com/@StudentsLearningplatform2026" },
                 ].map((Social, index) => (
                   <SocialIconButton
                     key={index}
@@ -551,7 +644,8 @@ const Footer = () => {
 
             <Box sx={{ display: 'flex', gap: 3 }}>
               <Link
-                href="#"
+                component={RouterLink}
+                to="/privacy-policy"
                 sx={{
                   color: 'rgba(255, 255, 255, 0.5)',
                   textDecoration: 'none',
@@ -563,7 +657,8 @@ const Footer = () => {
                 Privacy Policy
               </Link>
               <Link
-                href="#"
+                component={RouterLink}
+                to="/terms-of-service"
                 sx={{
                   color: 'rgba(255, 255, 255, 0.5)',
                   textDecoration: 'none',

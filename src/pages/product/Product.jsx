@@ -12,6 +12,7 @@ import { ADMIN_GET_COURSE_SLUG, ADMIN_POST_REGISTRATIONS } from "../../api/endpo
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
+import QuickEnquiryModal from "../../components/QuickEnquiryModal";
 
 const Product = () => {
   const { slug } = useParams();
@@ -21,6 +22,7 @@ const Product = () => {
   const [openDownloadDialog, setOpenDownloadDialog] = useState(false);
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [openEnquiry, setOpenEnquiry] = useState(false);
 
   const handleDownloadSubmit = async (e) => {
     e.preventDefault();
@@ -216,8 +218,8 @@ const Product = () => {
                 <PeopleIcon sx={{ color: "#38bdf8", fontSize: 22 }} />
               </Box>
               <Box>
-                <Typography sx={{ fontWeight: 600, fontSize: '16px', lineHeight: 1 }}>{course?.total_students || 0}+</Typography>
-                <Typography sx={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', mt: 0.5 }}>Active Students</Typography>
+                <Typography sx={{ fontWeight: 600, fontSize: '16px', lineHeight: 1 }}>{course?.enquiryCount || 0}+</Typography>
+                <Typography sx={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', mt: 0.5 }}>Total Enquiries</Typography>
               </Box>
             </Box>
 
@@ -233,32 +235,6 @@ const Product = () => {
               </Box>
             </Box>
           </Box>
-
-          <Button
-            onClick={() => navigate("/contact")}
-            variant="contained"
-            size="large"
-            endIcon={<SchoolIcon />}
-            sx={{
-              bgcolor: "#fff",
-              color: "#064e3b",
-              px: 6,
-              py: 2,
-              borderRadius: "16px",
-              fontWeight: 600,
-              fontSize: '18px',
-              textTransform: 'none',
-              boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
-              "&:hover": {
-                bgcolor: "#f8fafc",
-                transform: 'translateY(-4px)',
-                boxShadow: '0 25px 50px rgba(0,0,0,0.25)',
-              },
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-            }}
-          >
-            Enroll in Course Now
-          </Button>
         </Box>
 
         {/* RIGHT SIDE: Floating Glass Card */}
@@ -357,7 +333,7 @@ const Product = () => {
 
           <Stack spacing={2.5}>
             <Button
-              onClick={() => navigate("/contact")}
+              onClick={() => setOpenEnquiry(true)}
               fullWidth
               variant="contained"
               sx={{
@@ -462,6 +438,12 @@ const Product = () => {
           }
         `}
       </style>
+
+      <QuickEnquiryModal 
+        open={openEnquiry} 
+        onClose={() => setOpenEnquiry(false)}
+        initialCourse={course?.title}
+      />
     </Box>
   );
 };

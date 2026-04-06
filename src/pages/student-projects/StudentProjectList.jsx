@@ -16,11 +16,11 @@ import {
   Skeleton,
   Stack,
 } from "@mui/material";
-import { 
-  ArrowRight, 
-  Calendar, 
-  Clock, 
-  Eye, 
+import {
+  ArrowRight,
+  Calendar,
+  Clock,
+  Eye,
   ChevronRight,
   Code
 } from "lucide-react";
@@ -68,7 +68,7 @@ export default function StudentProjectList() {
       <Navbar />
 
       <Box sx={{ mt: { xs: 8, md: 12 }, minHeight: "80vh", pb: 10, bgcolor: "#f8faf7" }}>
-        
+
         {/* HERO SECTION */}
         <Box
           sx={{
@@ -82,28 +82,17 @@ export default function StudentProjectList() {
           }}
         >
           <Container maxWidth="lg">
-            <Typography 
-              variant="h2" 
-              fontWeight={900} 
-              sx={{ 
+            <Typography
+              variant="h2"
+              fontWeight={900}
+              sx={{
                 fontSize: { xs: "2rem", md: "3.5rem" },
                 mb: 2,
+                color: "white",
                 textShadow: "0 4px 12px rgba(0,0,0,0.1)"
               }}
             >
               Student Success Stories
-            </Typography>
-            <Typography 
-              variant="h6" 
-              sx={{ 
-                opacity: 0.9, 
-                maxWidth: "700px", 
-                mx: "auto", 
-                fontWeight: 500,
-                lineHeight: 1.6
-              }}
-            >
-              Explore the innovative and real-world projects developed by our talented students during their journey at DLK Software Solutions.
             </Typography>
           </Container>
 
@@ -124,8 +113,8 @@ export default function StudentProjectList() {
 
         <Container maxWidth="xl">
           {/* BREADCRUMBS */}
-          <Breadcrumbs 
-            separator={<ChevronRight size={14} />} 
+          <Breadcrumbs
+            separator={<ChevronRight size={14} />}
             sx={{ mb: 4 }}
           >
             <Link color="inherit" href="/" sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
@@ -141,10 +130,10 @@ export default function StudentProjectList() {
               // SKELETON LOADERS
               Array.from(new Array(6)).map((_, index) => (
                 <Grid item xs={12} sm={6} md={4} key={index}>
-                  <Skeleton 
-                    variant="rectangular" 
-                    height={400} 
-                    sx={{ borderRadius: "24px" }} 
+                  <Skeleton
+                    variant="rectangular"
+                    height={400}
+                    sx={{ borderRadius: "24px" }}
                   />
                 </Grid>
               ))
