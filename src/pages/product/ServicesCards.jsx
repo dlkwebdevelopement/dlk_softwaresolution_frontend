@@ -25,7 +25,7 @@ import School from "@mui/icons-material/School";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import { PostRequest, GetRequest } from "../../api/config";
+import { PostRequest, GetRequest } from "../../api/api";
 import {
   ADMIN_POST_REGISTRATIONS,
   ADMIN_GET_CATEGORIES,

@@ -48,7 +48,7 @@ import VideoLibraryIcon from "@mui/icons-material/VideoLibrary";
 import PhotoLibraryIcon from "@mui/icons-material/PhotoLibrary";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
-import { GetRequest } from "../api/config";
+import { GetRequest } from "../api/api";
 import { ADMIN_GET_ALL_CATEGORIES_WITH_SUB } from "../api/endpoints";
 
 // Animations
@@ -324,7 +324,7 @@ const MegaMenu = ({ open, onClose, onKeepOpen, handleCardClick }) => {
 
   // Always render — use CSS so mouse events work smoothly
   return (
-    <MegaMenuContainer 
+    <MegaMenuContainer
       elevation={0}
       onMouseEnter={onKeepOpen}
       onMouseLeave={onClose}
@@ -337,116 +337,116 @@ const MegaMenu = ({ open, onClose, onKeepOpen, handleCardClick }) => {
       }}
     >
       {/* LEFT COLUMN - Categories */}
-        <Box
+      <Box
+        sx={{
+          width: "280px",
+          background: alpha(colors.primary, 0.02),
+          borderRight: `1px solid ${alpha(colors.primary, 0.08)}`,
+          overflowY: "auto",
+          p: 1.5,
+        }}
+      >
+        <Typography
           sx={{
-            width: "280px",
-            background: alpha(colors.primary, 0.02),
-            borderRight: `1px solid ${alpha(colors.primary, 0.08)}`,
-            overflowY: "auto",
-            p: 1.5,
+            color: '#111c12',
+            fontSize: "0.75rem",
+            fontWeight: 700,
+            letterSpacing: "1.2px",
+            mb: 2,
+            px: 1,
+            textTransform: "uppercase",
           }}
         >
-          <Typography
-            sx={{
-              color: '#111c12',
-              fontSize: "0.75rem",
-              fontWeight: 700,
-              letterSpacing: "1.2px",
-              mb: 2,
-              px: 1,
-              textTransform: "uppercase",
-            }}
-          >
-            Course Categories
-          </Typography>
-          <Stack spacing={0.5}>
-            {cats.map((item, index) => (
-              <CategoryItem
-                  key={item.id || index}
-                  active={activeCat?.id === item.id}
-                  onMouseEnter={() => setActiveCat(item)}
-                >
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <MenuBookIcon sx={{ fontSize: 18, color: colors.primary }} />
-                    {item.categoryName}
-                  </Box>
-                </CategoryItem>
-            ))}
-          </Stack>
-        </Box>
+          Course Categories
+        </Typography>
+        <Stack spacing={0.5}>
+          {cats.map((item, index) => (
+            <CategoryItem
+              key={item.id || index}
+              active={activeCat?.id === item.id}
+              onMouseEnter={() => setActiveCat(item)}
+            >
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <MenuBookIcon sx={{ fontSize: 18, color: colors.primary }} />
+                {item.categoryName}
+              </Box>
+            </CategoryItem>
+          ))}
+        </Stack>
+      </Box>
 
-        {/* RIGHT COLUMN - Subcategories */}
-        <Box
-          sx={{
-            flex: 1,
-            p: 4,
-            overflowY: "auto",
-            background: 'white',
-          }}
-        >
-          {activeCat ? (
-            <>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 2.5, mb: 4 }}>
-                <Avatar
+      {/* RIGHT COLUMN - Subcategories */}
+      <Box
+        sx={{
+          flex: 1,
+          p: 4,
+          overflowY: "auto",
+          background: 'white',
+        }}
+      >
+        {activeCat ? (
+          <>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2.5, mb: 4 }}>
+              <Avatar
+                sx={{
+                  bgcolor: alpha(colors.primary, 0.1),
+                  color: colors.primary,
+                  width: 56,
+                  height: 56,
+                }}
+              >
+                <SchoolIcon sx={{ fontSize: 28 }} />
+              </Avatar>
+              <Box>
+                <Typography
+                  variant="h5"
                   sx={{
-                    bgcolor: alpha(colors.primary, 0.1),
-                    color: colors.primary,
-                    width: 56,
-                    height: 56,
+                    fontWeight: 600,
+                    color: colors.dark,
+                    mb: 0.5,
+                    fontSize: '1.4rem'
                   }}
                 >
-                  <SchoolIcon sx={{ fontSize: 28 }} />
-                </Avatar>
-                <Box>
-                  <Typography
-                    variant="h5"
-                    sx={{
-                      fontWeight: 600,
-                      color: colors.dark,
-                      mb: 0.5,
-                      fontSize: '1.4rem'
-                    }}
-                  >
-                    {activeCat.categoryName}
-                  </Typography>
-                  <Typography sx={{ color: colors.text.secondary, fontSize: "0.95rem", fontWeight: 500 }}>
-                    Discover {activeCat?.subcategories?.length || 0} expert-led specializations
-                  </Typography>
-                </Box>
+                  {activeCat.categoryName}
+                </Typography>
+                <Typography sx={{ color: colors.text.secondary, fontSize: "0.95rem", fontWeight: 500 }}>
+                  Discover {activeCat?.subcategories?.length || 0} expert-led specializations
+                </Typography>
               </Box>
-
-              <Divider sx={{ borderColor: alpha(colors.primary, 0.08), mb: 4 }} />
-
-              {activeCat?.subcategories?.length > 0 ? (
-                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5 }}>
-                  {activeCat.subcategories.map((sub, index) => (
-                      <SubCategoryChip
-                        key={sub.id}
-                        label={sub.subcategory}
-                        onClick={() => {
-                          navigate(`/course/${sub.slug}`);
-                          onClose();
-                        }}
-                        icon={<ChevronRightIcon />}
-                      />
-                  ))}
-                </Box>
-              ) : (
-                <Box sx={{ textAlign: "center", py: 6 }}>
-                  <Typography sx={{ color: colors.text.secondary, fontStyle: "italic", fontSize: '1rem' }}>
-                    New courses coming soon for this category
-                  </Typography>
-                </Box>
-              )}
-            </>
-          ) : (
-            <Box sx={{ textAlign: "center", mt: 6 }}>
-              <Typography sx={{ color: colors.text.secondary, fontWeight: 500 }}>
-                Explore our catalog by selecting a category
-              </Typography>
             </Box>
-          )}
-        </Box>
+
+            <Divider sx={{ borderColor: alpha(colors.primary, 0.08), mb: 4 }} />
+
+            {activeCat?.subcategories?.length > 0 ? (
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5 }}>
+                {activeCat.subcategories.map((sub, index) => (
+                  <SubCategoryChip
+                    key={sub.id}
+                    label={sub.subcategory}
+                    onClick={() => {
+                      navigate(`/course/${sub.slug}`);
+                      onClose();
+                    }}
+                    icon={<ChevronRightIcon />}
+                  />
+                ))}
+              </Box>
+            ) : (
+              <Box sx={{ textAlign: "center", py: 6 }}>
+                <Typography sx={{ color: colors.text.secondary, fontStyle: "italic", fontSize: '1rem' }}>
+                  New courses coming soon for this category
+                </Typography>
+              </Box>
+            )}
+          </>
+        ) : (
+          <Box sx={{ textAlign: "center", mt: 6 }}>
+            <Typography sx={{ color: colors.text.secondary, fontWeight: 500 }}>
+              Explore our catalog by selecting a category
+            </Typography>
+          </Box>
+        )}
+      </Box>
     </MegaMenuContainer>
   );
 };
@@ -682,6 +682,7 @@ const Navbar = () => {
                   >
                     {[
                       { icon: <PhotoLibraryIcon />, text: "Gallery", path: "/gallery" },
+                      { icon: <PhotoLibraryIcon />, text: "Office Testimonial", path: "/office-gallery" },
                       { icon: <VideoLibraryIcon />, text: "Videos", path: "/videos" },
                     ].map((item, index) => (
                       <ListItemButton
@@ -1052,6 +1053,7 @@ const Navbar = () => {
                 <List component="div" disablePadding sx={{ pl: 4 }}>
                   {[
                     { icon: <PhotoLibraryIcon />, text: "Gallery", path: "/gallery" },
+                    { icon: <PhotoLibraryIcon />, text: "Office Testimonial", path: "/office-gallery" },
                     { icon: <VideoLibraryIcon />, text: "Videos", path: "/videos" },
                   ].map((item, index) => (
                     <MobileMenuItem
@@ -1075,7 +1077,7 @@ const Navbar = () => {
                 </List>
               </Collapse>
             </List>
-            
+
             {/* Workshop Mobile Section */}
             <MobileMenuItem
               onClick={() => handleNavigation("/workshop")}

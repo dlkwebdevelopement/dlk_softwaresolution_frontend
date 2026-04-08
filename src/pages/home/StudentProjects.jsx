@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Box,
   Card,
@@ -9,21 +9,22 @@ import {
   Button,
   IconButton,
   Container,
-  Paper,
-  Avatar,
-  Rating,
   alpha,
-  Fade,
-  Grow,
-  Zoom,
+  Stack,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import { styled, keyframes } from "@mui/material/styles";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import MenuBookIcon from "@mui/icons-material/MenuBook";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { useTheme, useMediaQuery } from "@mui/material";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import StarIcon from "@mui/icons-material/Star";
+import SchoolIcon from "@mui/icons-material/School";
 import { useNavigate } from "react-router-dom";
 import { GetRequest } from "../../api/config";
 import { GET_ALL_STUDENT_PROJECTS } from "../../api/endpoints";
@@ -32,219 +33,308 @@ import { getImgUrl } from "../../api/api";
 // Animations
 const floatAnimation = keyframes`
   0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+  50% { transform: translateY(-16px); }
   100% { transform: translateY(0px); }
 `;
 
-const pulseGlow = keyframes`
-  0% { box-shadow: 0 0 0 0 rgba(61, 184, 67, 0.4); }
-  70% { box-shadow: 0 0 0 20px rgba(61, 184, 67, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(61, 184, 67, 0); }
-`;
-
 const shimmer = keyframes`
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% { transform: translateX(-100%); opacity: 0.5; }
+  50% { opacity: 0.8; }
+  100% { transform: translateX(100%); opacity: 0.5; }
 `;
 
-const slideInLeft = keyframes`
-  from {
-    opacity: 0;
-    transform: translateX(-50px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+const slideInUp = keyframes`
+  from { opacity: 0; transform: translateY(40px); }
+  to   { opacity: 1; transform: translateY(0); }
 `;
 
-const slideInRight = keyframes`
-  from {
-    opacity: 0;
-    transform: translateX(50px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-`;
-
-const rotateGradient = keyframes`
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+const gradientShift = keyframes`
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 `;
 
-const scrollLeft = keyframes`
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-`;
-
-// Color scheme
+// Color Palette — Brand Green
 const colors = {
-  primary: "#3DB843",
-  secondary: "#D3F36B",
-  dark: "#1a4718",
+  primary: "#4CAF50",
+  primaryDark: "#388E3C",
+  primaryLight: "#81C784",
+  secondary: "#3DB843",
+  accent: "#2e9133",
+  dark: "#1A202C",
   light: "#ffffff",
-  grey: "#f5f5f5",
-  textPrimary: "#111c12",
-  textSecondary: "#2e9133",
-  accent: "#c2eac4",
+  textPrimary: "#2D3748",
+  textSecondary: "#718096",
   background: {
-    main: "#fbfdf3",
+    main: "#f8faf8",
     light: "#ffffff",
-    gradient: "linear-gradient(180deg, #fbfdf3 0%, #ffffff 100%)",
-  }
+    gradient: "linear-gradient(135deg, #f8faf8 0%, #f0f7f0 50%, #e8f5e9 100%)",
+    card: "rgba(255, 255, 255, 0.97)",
+  },
 };
 
-// Styled Components
-const GlassCard = styled(({ $hovered, ...other }) => <Paper {...other} />)(({ theme, $hovered }) => ({
-  background: 'rgba(255, 255, 255, 0.4)',
-  backdropFilter: 'blur(20px)',
-  WebkitBackdropFilter: 'blur(20px)',
-  border: '1px solid rgba(72, 114, 62, 0.1)',
-  borderRadius: '32px',
-  overflow: 'hidden',
-  position: 'relative',
-  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-  transform: $hovered ? 'translateY(-12px)' : 'translateY(0)',
+// ─── Styled Components ────────────────────────────────────────────────────────
+
+const GlassCard = styled(Card, {
+  shouldForwardProp: (prop) => prop !== "$hovered",
+})(({ $hovered }) => ({
+  background: colors.background.card,
+  backdropFilter: "blur(10px)",
+  borderRadius: "20px",
+  overflow: "hidden",
+  position: "relative",
+  transition: "all 0.45s cubic-bezier(0.16, 1, 0.3, 1)",
+  transform: $hovered ? "translateY(-8px) scale(1.01)" : "translateY(0) scale(1)",
+  border: `1px solid ${$hovered ? colors.primary : alpha(colors.primary, 0.2)}`,
   boxShadow: $hovered
-    ? '0 25px 50px -12px rgba(72, 114, 62, 0.2)'
-    : '0 10px 30px -12px rgba(72, 114, 62, 0.1)',
-  height: '100%',
-  display: 'flex',
-  flexDirection: 'column',
-  width: 380, // Matched with Comments.jsx
-  margin: theme.spacing(0, 2),
-  [theme.breakpoints.down('sm')]: {
-    width: 300,
-    margin: theme.spacing(0, 1),
-  }
+    ? `0 24px 48px -12px ${alpha(colors.primary, 0.3)}`
+    : `0 4px 20px -6px ${alpha(colors.dark, 0.08)}`,
+  height: "100%",
+  display: "flex",
+  flexDirection: "column",
+  cursor: "pointer",
+  "&::before": {
+    content: '""',
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: "3px",
+    background: `linear-gradient(90deg, ${colors.primary}, ${colors.primaryDark}, ${colors.primaryLight}, ${colors.primary})`,
+    backgroundSize: "300% 100%",
+    animation: $hovered ? `${gradientShift} 2s linear infinite` : "none",
+    opacity: $hovered ? 1 : 0.35,
+    transition: "opacity 0.3s ease",
+  },
 }));
 
-const GradientText = styled('span')({
-  background: 'linear-gradient(135deg, var(--green), var(--green-mid))',
-  backgroundSize: '200% 200%',
-  WebkitBackgroundClip: 'text',
-  WebkitTextFillColor: 'transparent',
-  animation: `${rotateGradient} 3s ease infinite`,
-});
+const ImageContainer = styled(Box)(() => ({
+  position: "relative",
+  paddingTop: "55%",       // compact image height
+  width: "100%",
+  overflow: "hidden",
+  backgroundColor: "#f1f5f9",
+  "&::after": {
+    content: '""',
+    position: "absolute",
+    inset: 0,
+    background: "linear-gradient(180deg, transparent 40%, rgba(15,23,42,0.35) 100%)",
+    pointerEvents: "none",
+  },
+}));
 
-const FloatingElement = styled(Box)({
-  animation: `${floatAnimation} 3s ease-in-out infinite`,
-});
+const StyledCardMedia = styled(CardMedia)(() => ({
+  position: "absolute",
+  top: 0,
+  left: 0,
+  width: "100%",
+  height: "100%",
+  transition: "transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+  objectFit: "cover",
+  "&:hover": { transform: "scale(1.06)" },
+}));
 
-const ModernButton = styled(Button)(({ theme }) => ({
+const CategoryChip = styled(Chip)(() => ({
+  background: alpha(colors.dark, 0.82),
+  backdropFilter: "blur(6px)",
+  color: colors.light,
+  fontWeight: 600,
+  fontSize: "0.62rem",
+  borderRadius: "8px",
+  border: `1px solid ${alpha(colors.light, 0.15)}`,
+  height: "22px",
+  "& .MuiChip-label": { padding: "0 8px", fontSize: "0.62rem" },
+}));
+
+const BadgeIcon = styled(Box)(() => ({
+  position: "absolute",
+  top: 8,
+  right: 8,
+  zIndex: 2,
+  background: `linear-gradient(135deg, ${colors.primaryDark}, ${colors.accent})`,
+  borderRadius: "20px",
+  padding: "3px 8px",
+  display: "flex",
+  alignItems: "center",
+  gap: 4,
+  boxShadow: `0 4px 12px -3px ${alpha(colors.primary, 0.4)}`,
+  "& span": {
+    color: "#fff",
+    fontSize: "0.62rem",
+    fontWeight: 700,
+    letterSpacing: "0.02em",
+    textTransform: "uppercase",
+  },
+}));
+
+const MetaInfo = styled(Box)(() => ({
+  display: "flex",
+  alignItems: "center",
+  gap: 8,
+  marginBottom: 6,
+  flexWrap: "wrap",
+  "& .meta-item": {
+    display: "flex",
+    alignItems: "center",
+    gap: 3,
+    "& svg": { fontSize: 11, color: colors.primary },
+    "& span": { fontSize: "0.62rem", fontWeight: 500, color: colors.textSecondary },
+  },
+}));
+
+const ProjectTitle = styled(Typography)(() => ({
+  fontWeight: 700,
+  fontSize: "0.78rem",
+  lineHeight: 1.35,
+  color: colors.textPrimary,
+  marginBottom: 5,
+  display: "-webkit-box",
+  WebkitLineClamp: 2,
+  WebkitBoxOrient: "vertical",
+  overflow: "hidden",
+  height: "2.1em",   // 1.35 * 2 + buffer
+  transition: "color 0.2s ease",
+  "&:hover": { color: colors.primary },
+}));
+
+const ProjectDescription = styled(Typography)(() => ({
+  color: colors.textSecondary,
+  fontSize: "0.68rem",
+  lineHeight: 1.5,
+  display: "-webkit-box",
+  WebkitLineClamp: 2,
+  WebkitBoxOrient: "vertical",
+  overflow: "hidden",
+  marginBottom: 10,
+  height: "3.0em",   // FIXED: matches 2 lines of text
+}));
+
+const ActionButton = styled(Button)(() => ({
   color: colors.primary,
   fontWeight: 700,
-  fontSize: '0.9rem',
-  textTransform: 'none',
-  padding: '6px 16px',
-  borderRadius: '12px',
-  background: alpha(colors.primary, 0.05),
-  border: `1px solid ${alpha(colors.primary, 0.1)}`,
-  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-  '&:hover': {
+  fontSize: "0.65rem",
+  textTransform: "none",
+  padding: "5px 14px",
+  borderRadius: "50px",
+  background: alpha(colors.primary, 0.07),
+  border: `1px solid ${alpha(colors.primary, 0.12)}`,
+  minWidth: "auto",
+  transition: "all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+  "&:hover": {
     background: colors.primary,
-    color: colors.light,
-    transform: 'translateX(4px)',
-    boxShadow: `0 10px 20px ${alpha(colors.primary, 0.2)}`,
-    '& .MuiButton-endIcon': {
-      transform: 'translateX(4px)',
-    }
+    color: "#fff",
+    transform: "scale(1.04) translateY(-1px)",
+    boxShadow: `0 6px 14px -4px ${alpha(colors.primary, 0.3)}`,
+    "& .arrow-icon": { transform: "translateX(3px)" },
   },
-  '& .MuiButton-endIcon': {
-    transition: 'transform 0.3s ease',
-    marginLeft: '4px',
-  }
+  "& .arrow-icon": { transition: "transform 0.3s ease", fontSize: 12, marginLeft: 4 },
 }));
 
-const MarqueeContainer = styled(Box)(({ theme }) => ({
-  width: '100%',
-  overflowX: 'auto',
-  [theme.breakpoints.up('md')]: {
-    overflowX: 'hidden',
+const NavigationButton = styled(IconButton)(({ theme }) => ({
+  background: colors.light,
+  boxShadow: `0 4px 12px -4px ${alpha(colors.dark, 0.1)}`,
+  border: `1px solid ${alpha(colors.primary, 0.1)}`,
+  color: colors.primary,
+  width: 44,
+  height: 44,
+  transition: "all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+  "&:hover": {
+    background: colors.primary,
+    color: "#fff",
+    transform: "scale(1.08) translateY(-3px)",
+    borderColor: "transparent",
+    boxShadow: `0 10px 20px -6px ${alpha(colors.primary, 0.4)}`,
   },
+  "&.Mui-disabled": { opacity: 0.35, background: colors.background.main },
+  [theme.breakpoints.down("sm")]: { width: 38, height: 38 },
+}));
+
+const DotIndicator = styled(Box)(({ $active }) => ({
+  width: $active ? 32 : 8,
+  height: 5,
+  borderRadius: 3,
+  background: $active
+    ? `linear-gradient(90deg, ${colors.primary}, ${colors.accent})`
+    : alpha(colors.primary, 0.15),
+  transition: "all 0.45s cubic-bezier(0.19, 1, 0.22, 1)",
+  cursor: "pointer",
+  "&:hover": { background: colors.primary, opacity: 0.75 },
+}));
+
+const ScrollContainer = styled(Box)({
   position: 'relative',
-  padding: theme.spacing(4, 0),
-  scrollbarWidth: 'none',
-  '&::-webkit-scrollbar': { display: 'none' },
-  '&::before, &::after': {
-    content: '""',
-    position: 'absolute',
-    top: 0,
-    width: '150px',
-    height: '100%',
-    zIndex: 2,
-    pointerEvents: 'none',
-  },
-  '&::before': {
-    left: 0,
-    background: 'linear-gradient(90deg, #f8faf7 0%, transparent 100%)',
-  },
-  '&::after': {
-    right: 0,
-    background: 'linear-gradient(-90deg, #f8faf7 0%, transparent 100%)',
-  },
-  [theme.breakpoints.down('sm')]: {
-    '&::before, &::after': {
-      width: '60px',
-    },
-  },
-}));
-
-const CategoryChip = styled(Chip)({
-  background: alpha("#83a561", 0.2),
-  color: "#48723e",
-  fontWeight: 600,
-  fontSize: '0.85rem',
-  borderRadius: '30px',
-  border: `1px solid ${alpha("#48723e", 0.2)}`,
-  backdropFilter: 'blur(10px)',
-  WebkitBackdropFilter: 'blur(10px)',
-  '& .MuiChip-label': {
-    padding: '6px 12px',
+  width: '100%',
+  overflow: 'visible',
+  '&:hover .scroll-button': {
+    opacity: 1,
+    transform: 'translateY(-50%) scale(1)',
   },
 });
 
-const MarqueeTrack = styled(Box, {
-  shouldForwardProp: (prop) => prop !== '$projectsCount'
-})(({ $projectsCount }) => ({
+const ScrollTrack = styled(Box)(({ theme }) => ({
   display: 'flex',
-  width: 'max-content',
-  animation: `${scrollLeft} ${($projectsCount || 1) * 12}s linear infinite`,
-  '&:hover': {
-    animationPlayState: 'paused',
+  gap: '30px',
+  overflowX: 'auto',
+  scrollBehavior: 'smooth',
+  msOverflowStyle: 'none',
+  scrollbarWidth: 'none',
+  padding: '20px 4px 40px 4px',
+  '&::-webkit-scrollbar': {
+    display: 'none',
   },
-  '&:active': {
-    animationPlayState: 'paused',
+  [theme.breakpoints.down('sm')]: {
+    gap: '16px',
+    padding: '10px 20px 20px 20px',
   },
 }));
 
-const BackgroundOrb = styled(Box)(({ size, top, right, color }) => ({
+const ScrollButton = styled(IconButton, {
+  shouldForwardProp: (prop) => prop !== "$direction",
+})(({ theme, $direction }) => ({
   position: 'absolute',
+  top: '50%',
+  transform: 'translateY(-50%) scale(0.9)',
+  [$direction === 'left' ? 'left' : 'right']: -25,
+  zIndex: 10,
+  backgroundColor: 'white',
+  color: colors.primary,
+  boxShadow: '0 12px 24px rgba(0,0,0,0.12)',
+  opacity: 0,
+  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+  '&:hover': {
+    backgroundColor: colors.primary,
+    color: 'white',
+    transform: 'translateY(-50%) scale(1.1)',
+  },
+  [theme.breakpoints.down('lg')]: {
+    display: 'none',
+  },
+}));
+
+const FloatingOrb = styled(Box)(({ size, top, bottom, left, right, color, delay }) => ({
+  position: "absolute",
   width: size,
   height: size,
-  borderRadius: '50%',
-  background: `radial-gradient(circle, ${color} 0%, transparent 70%)`,
-  top,
-  right,
-  filter: 'blur(60px)',
-  animation: `${floatAnimation} ${15 + Math.random() * 10}s ease-in-out infinite`,
-  pointerEvents: 'none',
+  borderRadius: "50%",
+  background: `radial-gradient(circle, ${color} 0%, transparent 75%)`,
+  top, bottom, left, right,
+  filter: "blur(70px)",
+  animation: `${floatAnimation} ${delay || 12}s ease-in-out infinite`,
+  pointerEvents: "none",
   zIndex: 0,
 }));
 
+// ─── Component ────────────────────────────────────────────────────────────────
+
 const StudentProjects = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [hoveredCard, setHoveredCard] = useState(null);
-  const [bookmarked, setBookmarked] = useState([]);
-  const navigate = useNavigate();
-  const theme = useTheme();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [hoveredCard, setHoveredCard] = useState(null);
+  const scrollRef = useRef(null);
+  const navigate = useNavigate();
+  const theme = useTheme();
 
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchProjects = async () => {
       try {
         setLoading(true);
@@ -256,66 +346,57 @@ const StudentProjects = () => {
         setLoading(false);
       }
     };
-
     fetchProjects();
   }, []);
 
-  const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [isAutoScrolling, setIsAutoScrolling] = useState(true);
 
-  const itemsPerPage = isTablet || isMobile ? 1 : 3;
+  useEffect(() => {
+    let interval;
+    if (isAutoScrolling && projects.length > 3) {
+      interval = setInterval(() => {
+        if (scrollRef.current) {
+          const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+          if (scrollLeft + clientWidth >= scrollWidth - 15) {
+            scrollRef.current.scrollTo({ left: 0, behavior: "smooth" });
+          } else {
+            scroll("right");
+          }
+        }
+      }, 3500);
+    }
+    return () => clearInterval(interval);
+  }, [isAutoScrolling, projects]);
 
-  React.useEffect(() => {
-    setCurrentIndex(0);
-  }, [itemsPerPage]);
-
-  const handleNext = () => {
-    if (!projects.length) return;
-    setCurrentIndex((prevIndex) =>
-      prevIndex + itemsPerPage >= projects.length ? 0 : prevIndex + itemsPerPage,
-    );
+  const scroll = (direction) => {
+    if (scrollRef.current) {
+      const container = scrollRef.current;
+      const scrollAmount = direction === 'left' ? -container.clientWidth : container.clientWidth;
+      container.scrollBy({
+        left: scrollAmount,
+        behavior: 'smooth',
+      });
+    }
   };
 
-  const handlePrev = () => {
-    if (!projects.length) return;
-    setCurrentIndex((prevIndex) =>
-      prevIndex - itemsPerPage < 0
-        ? Math.max(projects.length - itemsPerPage, 0)
-        : prevIndex - itemsPerPage,
-    );
-  };
-
-  const handleBookmark = (projectId, e) => {
-    e.stopPropagation();
-    setBookmarked((prev) =>
-      prev.includes(projectId)
-        ? prev.filter((id) => id !== projectId)
-        : [...prev, projectId],
-    );
-  };
-
-  const loopProjects = projects.length > 0 ? [...projects, ...projects] : [];
-
-  // Loading skeleton
+  // ── Loading skeleton ──
   if (loading) {
     return (
-      <Box sx={{ py: 8, bgcolor: colors.background.main }}>
-        <Container maxWidth="xl">
-          <Box sx={{ textAlign: "center", mb: 6 }}>
-            <Typography variant="h4" sx={{ fontWeight: 700, color: colors.textPrimary }}>
-              Loading <span style={{ color: colors.primary }}>Projects</span>
-            </Typography>
-          </Box>
-          <Grid container spacing={3} justifyContent="center">
-            {[1, 2, 3].map((i) => (
-              <Grid item xs={12} md={4} key={i}>
-                <Box sx={{
-                  height: 400,
-                  borderRadius: '30px',
-                  background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
-                  backgroundSize: '200% 100%',
-                  animation: `${shimmer} 1.5s infinite`,
-                }} />
+      <Box sx={{ py: 8, bgcolor: colors.background.main, minHeight: "50vh" }}>
+        <Container maxWidth="lg">
+          <Grid container spacing={2} justifyContent="center">
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
+              <Grid size={{ xs: 12, sm: 6, md: 3 }} key={i}>
+                <Box
+                  sx={{
+                    height: 280,
+                    borderRadius: "20px",
+                    background:
+                      "linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%)",
+                    backgroundSize: "200% 100%",
+                    animation: `${shimmer} 1.5s infinite`,
+                  }}
+                />
               </Grid>
             ))}
           </Grid>
@@ -324,204 +405,227 @@ const StudentProjects = () => {
     );
   }
 
+  if (!projects.length) return null;
+
+  const visibleProjects = projects;
+
   return (
     <Box
       sx={{
         py: { xs: 6, md: 10 },
         background: colors.background.gradient,
-        position: 'relative',
-        overflow: 'hidden',
+        position: "relative",
+        overflow: "hidden",
       }}
     >
-      {/* Background Orbs */}
-      <BackgroundOrb size="500px" top="-10%" right="-5%" color="rgba(61, 184, 67, 0.1)" />
-      <BackgroundOrb size="400px" bottom="-10%" left="-5%" color="rgba(211, 243, 107, 0.1)" />
-
-      {/* Floating Particles */}
-      {[...Array(12)].map((_, i) => (
-        <Box
-          key={i}
-          sx={{
-            position: 'absolute',
-            width: 5 + i * 3,
-            height: 5 + i * 3,
-            borderRadius: '50%',
-            background: alpha(colors.secondary, 0.1),
-            top: `${Math.random() * 100}%`,
-            left: `${Math.random() * 100}%`,
-            filter: 'blur(2px)',
-            animation: `${floatAnimation} ${15 + i * 2}s ease-in-out infinite`,
-            pointerEvents: 'none',
-          }}
-        />
-      ))}
+      {/* Background orbs */}
+      <FloatingOrb size="420px" top="-15%" right="-12%" color={alpha(colors.primary, 0.07)} delay="12" />
+      <FloatingOrb size="320px" bottom="-12%" left="-8%" color={alpha(colors.secondary, 0.07)} delay="15" />
+      <FloatingOrb size="240px" top="35%" left="18%" color={alpha(colors.accent, 0.05)} delay="9" />
 
       <Container maxWidth="xl">
-        {/* Header Section */}
-        <Box sx={{ textAlign: "center", mb: { xs: 6, md: 8 } }}>
-          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
+
+        {/* ── Header ── */}
+        <Box
+          sx={{
+            textAlign: "center",
+            mb: { xs: 5, md: 7 },
+            animation: `${slideInUp} 0.7s cubic-bezier(0.16, 1, 0.3, 1)`,
+          }}
+        >
+          <Stack
+            direction="row"
+            spacing={1.5}
+            justifyContent="center"
+            alignItems="center"
+            sx={{ mb: 3 }}
+          >
             <Chip
               label="SUCCESSFUL PROJECTS"
-              icon={<MenuBookIcon sx={{ fontSize: 18, color: 'var(--green-dark) !important' }} />}
+              icon={<SchoolIcon sx={{ fontSize: "13px !important" }} />}
               sx={{
-                bgcolor: 'var(--green-light)',
-                color: 'var(--green-dark)',
+                background: alpha(colors.primary, 0.08),
+                color: colors.primaryDark,
                 fontWeight: 800,
-                letterSpacing: 1,
-                border: '1px solid var(--green-mid)',
-                '& .MuiChip-label': { px: 2 }
+                letterSpacing: "0.08em",
+                borderRadius: "50px",
+                height: "32px",
+                border: `1px solid ${alpha(colors.primary, 0.15)}`,
+                "& .MuiChip-label": { px: 2, fontSize: "0.65rem" },
               }}
             />
-          </Box>
+          </Stack>
 
           <Typography
-            variant="h2"
+            variant="h1"
             sx={{
-              fontWeight: 600,
-              mb: 2.5,
-              fontSize: 'clamp(1.7rem, 3.2vw, 2.5rem)',
-              color: 'var(--green-dark)',
-              letterSpacing: '-0.02em',
-              lineHeight: 1.1
+              fontWeight: 900,
+              mb: 2,
+              fontSize: "clamp(2rem, 5vw, 3.2rem)",
+              color: colors.textPrimary,
+              letterSpacing: "-0.03em",
+              lineHeight: 1.15,
             }}
           >
-            <Box component="span" sx={{ color: 'black' }}>Insights &</Box> Future Tech
+            Insights & <Box
+              component="span"
+              sx={{
+                background: `linear-gradient(135deg, ${colors.primary}, ${colors.accent}, ${colors.primaryDark})`,
+                backgroundSize: "200% auto",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                animation: `${gradientShift} 4s linear infinite`,
+              }}
+            >
+              Future Tech
+            </Box>
           </Typography>
 
           <Typography
             variant="body1"
             sx={{
-              color: '#6b8f76',
-              maxWidth: "650px",
+              color: colors.textSecondary,
+              maxWidth: "600px",
               mx: "auto",
-              fontSize: "1rem",
-              lineHeight: 1.7,
-              mb: 2
+              fontSize: "0.95rem",
+              fontWeight: 500,
+              lineHeight: 1.75,
             }}
           >
             Explore the innovative projects built by our talented students during their training at DLK Software Solutions.
           </Typography>
         </Box>
 
-        {/* Blog Marquee Section */}
-        <MarqueeContainer>
-          <MarqueeTrack $projectsCount={projects.length}>
-            {loopProjects.map((project, index) => (
-              <Box key={`${project.id || 'project'}-${index}`} sx={{ py: 2 }}>
+        {/* Student Projects Scroll Track */}
+        <ScrollContainer>
+          <ScrollButton $direction="left" onClick={() => scroll('left')} className="scroll-button">
+            <ChevronLeftIcon />
+          </ScrollButton>
+
+          <ScrollTrack
+            ref={scrollRef}
+            onMouseEnter={() => setIsAutoScrolling(false)}
+            onMouseLeave={() => setIsAutoScrolling(true)}
+            sx={{
+              justifyContent: projects.length < 4 ? "center" : "flex-start",
+            }}
+          >
+            {projects.map((project, idx) => (
+              <Box
+                key={project.id || idx}
+                sx={{
+                  width: { xs: "280px", sm: "300px", md: "calc((100% - 90px) / 4)" },
+                  height: "auto",
+                  flexShrink: 0,
+                }}
+              >
                 <GlassCard
-                  $hovered={hoveredCard === index}
-                  onMouseEnter={() => setHoveredCard(index)}
+                  $hovered={hoveredCard === idx}
+                  onMouseEnter={() => setHoveredCard(idx)}
                   onMouseLeave={() => setHoveredCard(null)}
                   onClick={() => navigate(`/student-projects/${project.slug}`)}
+                  elevation={0}
                 >
-                  {/* Image Container */}
-                  <Box sx={{ position: "relative", pt: '60%', overflow: 'hidden' }}>
-                    <CardMedia
+                  {/* Image */}
+                  <ImageContainer>
+                    <StyledCardMedia
                       component="img"
                       image={getImgUrl(project.image)}
                       alt={project.title}
-                      sx={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        width: '100%',
-                        height: '100%',
-                        transition: "transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)",
-                        transform: hoveredCard === index ? "scale(1.1)" : "scale(1)",
-                      }}
                     />
+                    <CategoryChip
+                      label={
+                        project.category ||
+                        project.short_description?.split(",")[0] ||
+                        "Innovation"
+                      }
+                      size="small"
+                      sx={{ position: "absolute", top: 8, left: 8, zIndex: 2 }}
+                    />
+                    <BadgeIcon>
+                      <StarIcon sx={{ fontSize: 10, color: "#fff" }} />
+                      <span>Featured</span>
+                    </BadgeIcon>
+                  </ImageContainer>
+
+                  {/* Body */}
+                  <Box
+                    sx={{
+                      p: 1.5,
+                      flexGrow: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <MetaInfo>
+                      <div className="meta-item">
+                        <CalendarMonthIcon />
+                        <span>
+                          {project.createdAt
+                            ? new Date(project.createdAt).toLocaleDateString(
+                              "en-US",
+                              { month: "short", year: "numeric" }
+                            )
+                            : "Recent"}
+                        </span>
+                      </div>
+                      <div className="meta-item">
+                        <VisibilityIcon />
+                        <span>{project.views?.toLocaleString() || 0}</span>
+                      </div>
+                      <div className="meta-item">
+                        <TrendingUpIcon
+                          sx={{ color: colors.secondary, fontSize: "11px !important" }}
+                        />
+                        <span>Trending</span>
+                      </div>
+                    </MetaInfo>
+
+                    <ProjectTitle variant="h6">{project.title}</ProjectTitle>
+
+                    <ProjectDescription variant="body2">
+                      {project.short_description?.substring(0, 90)}...
+                    </ProjectDescription>
+
+                    {/* Footer */}
                     <Box
                       sx={{
-                        position: 'absolute',
-                        top: 20,
-                        left: 20,
-                        zIndex: 2
+                        mt: "auto",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
                       }}
                     >
-                      <CategoryChip
-                        label={project.short_description?.split(',')[0] || "Featured"}
-                        sx={{
-                          background: 'rgba(255, 255, 255, 0.9)',
-                          backdropFilter: 'blur(4px)',
-                          boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                      <ActionButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/student-projects/${project.slug}`);
                         }}
-                      />
-                    </Box>
-                  </Box>
-
-                  {/* Content Area */}
-                  <Box sx={{ p: 3.5, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2, flexWrap: 'wrap' }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: colors.textPrimary }}>
-                        <CalendarMonthIcon sx={{ fontSize: 16, color: colors.primary }} />
-                        <Typography variant="caption" sx={{ fontWeight: 600, lineHeight: 1 }}>
-                          {project.createdAt ? new Date(project.createdAt).toLocaleDateString("en-US", { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent'}
-                        </Typography>
-                      </Box>
-                      <Typography variant="caption" sx={{ color: 'divider', fontWeight: 900 }}>·</Typography>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: colors.textPrimary }}>
-                        <AccessTimeIcon sx={{ fontSize: 16, color: colors.secondary }} />
-                        <Typography variant="caption" sx={{ fontWeight: 600, lineHeight: 1 }}>3 min read</Typography>
-                      </Box>
-                      <Typography variant="caption" sx={{ color: 'divider', fontWeight: 900 }}>·</Typography>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: colors.textPrimary }}>
-                        <VisibilityIcon sx={{ fontSize: 16, color: colors.primary }} />
-                        <Typography variant="caption" sx={{ fontWeight: 600, lineHeight: 1 }}>{project.views || 0} views</Typography>
-                      </Box>
-                    </Box>
-
-                    <Typography
-                      variant="h5"
-                      sx={{
-                        fontWeight: 600,
-                        lineHeight: 1.3,
-                        color: colors.textPrimary,
-                        mb: 2.5,
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
-                        fontSize: '1.1rem',
-                        minHeight: '3.2rem'
-                      }}
-                    >
-                      {project.title}
-                    </Typography>
-
+                      >
+                        Explore Project
+                        <ArrowForwardIcon className="arrow-icon" />
+                      </ActionButton>
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                        <TrendingUpIcon sx={{ fontSize: 12, color: colors.secondary }} />
                         <Typography
-                          variant="body2"
-                          sx={{
-                            color: '#6b8f76',
-                            lineHeight: 1.6,
-                            display: '-webkit-box',
-                            WebkitLineClamp: 3,
-                            WebkitBoxOrient: 'vertical',
-                            overflow: 'hidden',
-                            mb: 3,
-                            fontSize: '0.95rem'
-                          }}
+                          variant="caption"
+                          sx={{ color: colors.textSecondary, fontWeight: 500, fontSize: "0.62rem" }}
                         >
-                          {project.short_description || project.description?.replace(/<[^>]*>?/gm, '').substring(0, 150)}
+                          Trending
                         </Typography>
-
-                      <Box sx={{ mt: 'auto', pt: 2 }}>
-                        <ModernButton
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/student-projects/${project.slug}`);
-                          }}
-                          endIcon={<ArrowForwardIosIcon sx={{ fontSize: '12px !important' }} />}
-                        >
-                          View Project
-                        </ModernButton>
                       </Box>
+                    </Box>
                   </Box>
                 </GlassCard>
               </Box>
             ))}
-          </MarqueeTrack>
-        </MarqueeContainer>
+          </ScrollTrack>
 
+          <ScrollButton $direction="right" onClick={() => scroll('right')} className="scroll-button">
+            <ChevronRightIcon />
+          </ScrollButton>
+        </ScrollContainer>
       </Container>
     </Box>
   );

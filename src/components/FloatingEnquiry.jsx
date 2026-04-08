@@ -9,9 +9,7 @@ import {
 } from "@mui/material";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import CloseIcon from "@mui/icons-material/Close";
-import FacebookIcon from '@mui/icons-material/Facebook';
-import InstagramIcon from '@mui/icons-material/Instagram';
-import YouTubeIcon from '@mui/icons-material/YouTube';
+
 
 export default function FloatingEnquiry() {
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -134,7 +132,7 @@ export default function FloatingEnquiry() {
                     content: '""',
                     position: "absolute",
                     bottom: -8,
-                    right: { xs: 25, sm: 30 },
+                    right: { xs: 35, sm: 40 },
                     width: 0,
                     height: 0,
                     borderLeft: "10px solid transparent",
@@ -143,7 +141,7 @@ export default function FloatingEnquiry() {
                   },
                 }}
               >
-                <Typography sx={{ fontSize: "0.9rem", fontWeight: 600, lineHeight: 1.2 }}>
+                <Typography sx={{ fontSize: "1rem", fontWeight: 700, lineHeight: 1.2 }}>
                   Need help? Chat with Lakshmi AI
                 </Typography>
                 <IconButton
@@ -161,136 +159,29 @@ export default function FloatingEnquiry() {
               sx={{
                 overflow: 'hidden',
                 padding: 0,
-                width: { xs: 75, sm: 85 },
-                height: { xs: 75, sm: 85 },
-                bgcolor: "transparent",
-                boxShadow: "none",
-                transition: "all 0.3s ease",
+                width: { xs: 90, sm: 100 },
+                height: { xs: 90, sm: 100 },
+                bgcolor: "white",
+                boxShadow: "0 10px 30px rgba(61, 184, 67, 0.4)",
+                transition: "all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                border: "4px solid white",
                 "&:hover": {
                   transform: "scale(1.1) rotate(5deg)",
-                  bgcolor: "transparent",
+                  boxShadow: "0 15px 40px rgba(61, 184, 67, 0.6)",
+                  bgcolor: "white",
                 }
               }}
             >
               <img
                 src="/photos/lakshmi_bot.png"
                 alt="Chatbot"
-                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             </Fab>
           </Box>
         </Stack>
       </Box>
 
-      {/* Left-side Social Buttons (Centered, Flush Left) */}
-      <Box
-        sx={{
-          position: "fixed",
-          top: "50%",
-          transform: "translateY(-50%)",
-          left: 0,
-          zIndex: 900,
-          display: "flex",
-          flexDirection: "column",
-          // gap: "4px",
-        }}
-      >
-        {/* Facebook */}
-        <Box
-          component="a"
-          href="https://www.facebook.com/profile.php?id=61569333069634"
-          target="_blank"
-          sx={{
-            width: 48,
-            height: 48,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "flex-start",
-            overflow: "hidden",
-            bgcolor: "#3b5998",
-            color: "white",
-            textDecoration: "none",
-            transition: "width 0.3s ease, box-shadow 0.3s ease",
-            boxShadow: "2px 2px 8px rgba(0,0,0,0.25)",
-            "&:hover": {
-              width: 140,
-              bgcolor: "#3b5998",
-              boxShadow: "4px 4px 16px rgba(59,89,152,0.5)",
-            }
-          }}
-        >
-          <Box sx={{ minWidth: 48, height: 48, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <FacebookIcon />
-          </Box>
-          <Typography sx={{ fontWeight: 600, fontSize: "0.9rem", whiteSpace: "nowrap" }}>
-            Facebook
-          </Typography>
-        </Box>
-
-        {/* Instagram */}
-        <Box
-          component="a"
-          href="https://instagram.com"
-          target="_blank"
-          sx={{
-            width: 48,
-            height: 48,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "flex-start",
-            overflow: "hidden",
-            bgcolor: "#E1306C",
-            color: "white",
-            textDecoration: "none",
-            transition: "width 0.3s ease, box-shadow 0.3s ease",
-            boxShadow: "2px 2px 8px rgba(0,0,0,0.25)",
-            "&:hover": {
-              width: 140,
-              bgcolor: "#E1306C",
-              boxShadow: "4px 4px 16px rgba(225,48,108,0.5)",
-            }
-          }}
-        >
-          <Box sx={{ minWidth: 48, height: 48, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <InstagramIcon />
-          </Box>
-          <Typography sx={{ fontWeight: 600, fontSize: "0.9rem", whiteSpace: "nowrap" }}>
-            Instagram
-          </Typography>
-        </Box>
-
-        {/* YouTube */}
-        <Box
-          component="a"
-          href="https://youtube.com"
-          target="_blank"
-          sx={{
-            width: 48,
-            height: 48,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "flex-start",
-            overflow: "hidden",
-            bgcolor: "#cd201f",
-            color: "white",
-            textDecoration: "none",
-            transition: "width 0.3s ease, box-shadow 0.3s ease",
-            boxShadow: "2px 2px 8px rgba(0,0,0,0.25)",
-            "&:hover": {
-              width: 140,
-              bgcolor: "#cd201f",
-              boxShadow: "4px 4px 16px rgba(205,32,31,0.5)",
-            }
-          }}
-        >
-          <Box sx={{ minWidth: 48, height: 48, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <YouTubeIcon />
-          </Box>
-          <Typography sx={{ fontWeight: 600, fontSize: "0.9rem", whiteSpace: "nowrap" }}>
-            YouTube
-          </Typography>
-        </Box>
-      </Box>
 
       {/* Left-side WhatsApp Button (Bottom) */}
       <Box
@@ -305,8 +196,16 @@ export default function FloatingEnquiry() {
           sx={{
             overflow: 'hidden',
             padding: 0,
-            width: { xs: 50, sm: 56 },
-            height: { xs: 50, sm: 56 }
+            width: { xs: 60, sm: 65 },
+            height: { xs: 60, sm: 65 },
+            bgcolor: "white",
+            boxShadow: "0 8px 25px rgba(37, 211, 102, 0.4)",
+            border: "3px solid white",
+            transition: "all 0.3s ease",
+            "&:hover": {
+              transform: "scale(1.1)",
+              boxShadow: "0 12px 30px rgba(37, 211, 102, 0.6)",
+            }
           }}
           href="https://wa.me/917708150152"
           target="_blank"

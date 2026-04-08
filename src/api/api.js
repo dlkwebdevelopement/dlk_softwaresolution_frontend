@@ -6,7 +6,6 @@ export const BASE_URL = import.meta.env.DEV
 
 const api = axios.create({
   baseURL: BASE_URL,
-  headers: { "Content-Type": "application/json" },
 });
 
 api.interceptors.request.use((config) => {
@@ -15,14 +14,43 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-/**
- * Helper to get full image URL.
- * Since backend now provides absolute URLs, we just return the path.
- * @param {string} path - Image path from backend.
- * @returns {string} - Complete URL for <img> src.
- */
+export default api;
+
+// ✅ Helper to get full image URL
 export const getImgUrl = (path) => {
-  return path || "";
+  if (!path) return "";
+  if (path.startsWith("http")) return path;
+  // Handle double slashes if any
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+  return `${BASE_URL}${cleanPath}`;
 };
 
-export default api;
+// ✅ GET request
+export const GetRequest = async (url) => {
+  const res = await api.get(url);
+  return res.data;
+};
+
+// ✅ POST request
+export const PostRequest = async (url, data) => {
+  const res = await api.post(url, data);
+  return res.data;
+};
+
+// ✅ PATCH request 
+export const PatchRequest = async (url, data) => {
+  const res = await api.patch(url, data);
+  return res.data;
+};
+
+// ✅ PUT request 
+export const PutRequest = async (url, data) => {
+  const res = await api.put(url, data);
+  return res.data;
+};
+
+// ✅ DELETE request
+export const DeleteRequest = async (url, config = {}) => {
+  const res = await api.delete(url, config);
+  return res.data;
+};

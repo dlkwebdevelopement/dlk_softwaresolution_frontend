@@ -13,7 +13,7 @@ import {
   FolderOpen as FolderIcon, ChevronRight as ChevronIcon
 } from "lucide-react";
 import { GetRequest } from "../../api/api";
-import { GET_ALL_GALLERY, GET_ALL_GALLERY_EVENTS } from "../../api/endpoints";
+import { GET_ALL_OFFICE_GALLERY, GET_ALL_OFFICE_GALLERY_EVENTS } from "../../api/endpoints";
 import dayjs from "dayjs";
 import { getImgUrl } from "../../api/api";
 
@@ -206,8 +206,8 @@ function EventCard({ event, onSelect }) {
   );
 }
 
-// ─── Main Gallery Page ─────────────────────────────────────────────────────────
-export default function Gallery() {
+// ─── Main Office Gallery Page ─────────────────────────────────────────────────────────
+export default function OfficeGallery() {
   const location = useLocation();
   const [albums, setAlbums] = useState([]);
   const [events, setEvents] = useState([]);
@@ -238,8 +238,8 @@ export default function Gallery() {
       try {
         setLoading(true);
         const [albumRes, eventRes] = await Promise.all([
-          GetRequest(GET_ALL_GALLERY),
-          GetRequest(GET_ALL_GALLERY_EVENTS),
+          GetRequest(GET_ALL_OFFICE_GALLERY),
+          GetRequest(GET_ALL_OFFICE_GALLERY_EVENTS),
         ]);
         setAlbums(albumRes || []);
         const eventData = eventRes?.data || [];
@@ -252,7 +252,7 @@ export default function Gallery() {
           setSelectedAlbum(matchingAlbum || albumFromState);
         }
       } catch (err) {
-        console.error("Gallery fetch error:", err);
+        console.error("Office Gallery fetch error:", err);
       } finally {
         setLoading(false);
       }
@@ -308,7 +308,7 @@ export default function Gallery() {
           >
             <Link underline="hover" onClick={() => setSelectedAlbum(null)}
               sx={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 0.5, fontWeight: 600 }}>
-              <FolderIcon size={14} /> Gallery
+              <FolderIcon size={14} /> Office Gallery
             </Link>
             {selectedAlbum && (
               <Typography sx={{ color: "white", fontWeight: 800 }}>{selectedAlbum.albumName}</Typography>
@@ -316,7 +316,7 @@ export default function Gallery() {
           </Breadcrumbs>
 
           <Typography variant="h3" sx={{ fontWeight: 600, fontSize: { xs: "2.4rem", md: "3.8rem" }, mb: 2, lineHeight: 1.1 }} color="white">
-            {selectedAlbum ? selectedAlbum.albumName : "Memories & Milestones"}
+            {selectedAlbum ? selectedAlbum.albumName : "Office & Culture"}
           </Typography>
 
           {selectedAlbum && (
@@ -399,7 +399,7 @@ export default function Gallery() {
           <Box sx={{ textAlign: "center", py: 15, bgcolor: "white", borderRadius: 8, border: "1px dashed #ced4cd" }}>
             <ImgIcon size={64} color="#ced4cd" style={{ marginBottom: 16 }} />
             <Typography variant="h5" color="text.secondary" sx={{ fontWeight: 600 }}>
-              No events in {selectedYear} for this album yet.
+              No office events in {selectedYear} yet.
             </Typography>
             <Button sx={{ mt: 3, color: COLORS.primary, fontWeight: 700 }} startIcon={<LeftIcon size={17} />} onClick={() => setSelectedAlbum(null)}>
               Explore other Albums

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Box, Typography, Button, Container, Paper, Chip, Avatar } from "@mui/material";
 import { styled, keyframes } from "@mui/material/styles";
 import { ADMIN_GET_BANNERS } from "../../api/endpoints";
-import { GetRequest } from "../../api/config";
+import { GetRequest } from "../../api/api";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL, getImgUrl } from "../../api/api";
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
@@ -516,7 +516,10 @@ export default function Banner() {
                 <Box
                   sx={{
                     display: 'grid',
-                    gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+                    gridTemplateColumns: {
+                      xs: '1fr',
+                      md: currentSlide.isContentActive === false ? '1fr' : '1fr 1fr'
+                    },
                     gap: { xs: 4, md: 10 },
                     width: '100%',
                     height: '100%',
@@ -524,85 +527,87 @@ export default function Banner() {
                   }}
                 >
                   {/* Text Content */}
-                  <SlideContent
-                    $isActive={isActive}
-                  >
-                    {/* New Redesign Layout */}
-                    <EyebrowBox>
-                      <EyebrowPill>{slide.tagline || "Chennai #1"}</EyebrowPill>
-                      IT Training & Placement Institute
-                    </EyebrowBox>
+                  {slide.isContentActive !== false && (
+                    <SlideContent
+                      $isActive={isActive}
+                    >
+                      {/* New Redesign Layout */}
+                      <EyebrowBox>
+                        <EyebrowPill>{slide.tagline || "Chennai #1"}</EyebrowPill>
+                        IT Training & Placement Institute
+                      </EyebrowBox>
 
-                    <MainHeading variant="h1">
-                      {slide.title}<br /><br />
-                      <UnderlineAccent>{slide.highlight}</UnderlineAccent><br />
-                      <TextAccent>{slide.subtitle}</TextAccent>
-                    </MainHeading>
+                      <MainHeading variant="h1">
+                        {slide.title}<br /><br />
+                        <UnderlineAccent>{slide.highlight}</UnderlineAccent><br />
+                        <TextAccent>{slide.subtitle}</TextAccent>
+                      </MainHeading>
 
-                    <HeroSub>
-                      {slide.description}
-                    </HeroSub>
+                      <HeroSub>
+                        {slide.description}
+                      </HeroSub>
 
-                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', mb: 4 }}>
-                      <Button
-                        variant="contained"
-                        onClick={() => setEnquiryOpen(true)}
-                        sx={{
-                          background: '#3DB843',
-                          color: 'white',
-                          px: 4,
-                          py: 1.5,
-                          borderRadius: '100px',
-                          fontSize: '0.9rem',
-                          fontWeight: 700,
-                          textTransform: 'none',
-                          fontFamily: 'inherit',
-                          '&:hover': {
-                            background: '#2e9133',
-                            transform: 'translateY(-2px)',
-                            boxShadow: '0 12px 32px rgba(61,184,67,0.35)',
-                          },
-                          transition: 'all 0.25s',
-                        }}
-                      >
-                        {slide.button || "Enroll Now — It's Free"} →
-                      </Button>
-                      <Button
-                        variant="contained"
-                        component="a"
-                        href="https://www.youtube.com/@StudentsLearningplatform2026"
-                        target="_blank"
-                        sx={{
-                          background: `linear-gradient(135deg, #1a4718 0%, #3DB843 100%)`,
-                          color: 'white',
-                          px: 4,
-                          py: 1.5,
-                          borderRadius: '100px',
-                          fontSize: '0.9rem',
-                          fontWeight: 600,
-                          textTransform: 'none',
-                          fontFamily: 'inherit',
-                          '&:hover': {
-                            transform: 'translateY(-2px)',
-                            boxShadow: '0 8px 24px rgba(61,184,67,0.3)',
-                            background: `linear-gradient(135deg, #1a4718 0%, #3DB843 100%)`, // Keep gradient on hover
-                            opacity: 0.9
-                          },
-                          transition: 'all 0.25s',
-                        }}
-                      >
-                        ▶ Watch How It Works
-                      </Button>
-                    </Box>
-
-
-
+                      <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', mb: 4 }}>
+                        <Button
+                          variant="contained"
+                          onClick={() => setEnquiryOpen(true)}
+                          sx={{
+                            background: '#3DB843',
+                            color: 'white',
+                            px: 4,
+                            py: 1.5,
+                            borderRadius: '100px',
+                            fontSize: '0.9rem',
+                            fontWeight: 700,
+                            textTransform: 'none',
+                            fontFamily: 'inherit',
+                            '&:hover': {
+                              background: '#2e9133',
+                              transform: 'translateY(-2px)',
+                              boxShadow: '0 12px 32px rgba(61,184,67,0.35)',
+                            },
+                            transition: 'all 0.25s',
+                          }}
+                        >
+                          {slide.button || "Enroll Now — It's Free"} →
+                        </Button>
+                        <Button
+                          variant="contained"
+                          component="a"
+                          href="https://www.youtube.com/@StudentsLearningplatform2026"
+                          target="_blank"
+                          sx={{
+                            background: `linear-gradient(135deg, #1a4718 0%, #3DB843 100%)`,
+                            color: 'white',
+                            px: 4,
+                            py: 1.5,
+                            borderRadius: '100px',
+                            fontSize: '0.9rem',
+                            fontWeight: 600,
+                            textTransform: 'none',
+                            fontFamily: 'inherit',
+                            '&:hover': {
+                              transform: 'translateY(-2px)',
+                              boxShadow: '0 8px 24px rgba(61,184,67,0.3)',
+                              background: `linear-gradient(135deg, #1a4718 0%, #3DB843 100%)`, // Keep gradient on hover
+                              opacity: 0.9
+                            },
+                            transition: 'all 0.25s',
+                          }}
+                        >
+                          ▶ Watch How It Works
+                        </Button>
+                      </Box>
 
 
 
 
 
-                  </SlideContent>
+
+
+
+                    </SlideContent>
+                  )}
 
                   {/* Image Container - Hidden on mobile */}
                   <SlideImage
@@ -639,20 +644,21 @@ export default function Banner() {
                           alt={slide.title}
                           sx={{
                             width: '100%',
-                            maxWidth: '700px',
+                            maxWidth: slide.isContentActive === false ? '1200px' : '700px',
                             height: '100%',
                             minHeight: '530px', // Reduced to fit 80vh
-                            objectFit: 'contain',
-                            transform: 'scale(1.6)',
+                            objectFit: slide.isContentActive === false ? 'cover' : 'contain',
+                            transform: slide.isContentActive === false ? 'scale(1.2)' : 'scale(1.6)',
                             filter: 'drop-shadow(0 30px 50px rgba(0, 0, 0, 0.4))',
                             WebkitMaskImage: {
                               xs: 'none',
-                              md: 'linear-gradient(to right, transparent, black 20%)'
+                              md: slide.isContentActive === false ? 'none' : 'linear-gradient(to right, transparent, black 20%)'
                             },
                             maskImage: {
                               xs: 'none',
-                              md: 'linear-gradient(to right, transparent, black 20%)'
+                              md: slide.isContentActive === false ? 'none' : 'linear-gradient(to right, transparent, black 20%)'
                             },
+                            borderRadius: slide.isContentActive === false ? '40px' : '0',
                           }}
                         />
                       </Box>

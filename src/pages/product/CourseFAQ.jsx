@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Box, Typography, Container, Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import { GetRequest } from "../../api/config";
+import { GetRequest } from "../../api/api";
 import { ADMIN_GET_ALL_QUESTIONS } from "../../api/endpoints";
 
 export default function CourseFAQ() {

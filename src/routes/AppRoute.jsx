@@ -38,6 +38,7 @@ import NotFound from "../pages/NotFound";
 import Help from "../pages/help/Help";
 import Videos from "../pages/videos/Videos";
 import Gallery from "../pages/gallery/Gallery";
+import OfficeGallery from "../pages/gallery/OfficeGallery";
 import Offers from "../pages/offers/Offers";
 import Placement from "../pages/placement/Placement";
 import GoogleReviewFloatingButton from "../components/GoogleReviewFloatingButton";
@@ -51,7 +52,7 @@ const AppRoute = () => {
     <>
       <ScrollToTop />
       <Routes>
-        {/* HOME */}
+        {/* HOME PAGE */}
         <Route
           path="/"
           element={
@@ -60,7 +61,7 @@ const AppRoute = () => {
               <Box sx={{ mt: 10 }}></Box>
               <Banner />
               <LiveClass />
-              <WorkshopPage />
+              <WorkshopPage viewMode="scroll" />
               <QuickEnquiry />
               <Category />
               <Ads />
@@ -78,7 +79,7 @@ const AppRoute = () => {
         {/* HELP PAGE */}
         <Route path="/help" element={<Help />} />
 
-        {/*PRODUCT PAGE */}
+        {/* PRODUCT/COURSE PAGE */}
         <Route
           path="/course/:slug"
           element={
@@ -97,7 +98,8 @@ const AppRoute = () => {
             </>
           }
         />
-        {/*CONTACT PAGE */}
+
+        {/* CONTACT PAGE */}
         <Route
           path="/contact"
           element={
@@ -110,7 +112,8 @@ const AppRoute = () => {
             </>
           }
         />
-        {/*Blog PAGE */}
+
+        {/* BLOG PAGES */}
         <Route
           path="/blogs"
           element={
@@ -123,6 +126,7 @@ const AppRoute = () => {
             </>
           }
         />
+
         <Route
           path="/blogs/:slug"
           element={
@@ -136,7 +140,8 @@ const AppRoute = () => {
             </>
           }
         />
-        {/*Student Project PAGE */}
+
+        {/* STUDENT PROJECT PAGES */}
         <Route
           path="/student-projects"
           element={
@@ -149,6 +154,7 @@ const AppRoute = () => {
             </>
           }
         />
+
         <Route
           path="/student-projects/:slug"
           element={
@@ -162,6 +168,7 @@ const AppRoute = () => {
             </>
           }
         />
+
         {/* VIDEOS PAGE */}
         <Route
           path="/videos"
@@ -175,7 +182,8 @@ const AppRoute = () => {
             </>
           }
         />
-        {/* GALLERY PAGE */}
+
+        {/* GALLERY PAGES */}
         <Route
           path="/gallery"
           element={
@@ -188,6 +196,20 @@ const AppRoute = () => {
             </>
           }
         />
+
+        <Route
+          path="/office-gallery"
+          element={
+            <>
+              <Navbar />
+              <Box sx={{ mt: 10 }}></Box>
+              <OfficeGallery />
+              <BottomInfo />
+              <Footer />
+            </>
+          }
+        />
+
         {/* OFFERS PAGE */}
         <Route
           path="/offers"
@@ -201,6 +223,7 @@ const AppRoute = () => {
             </>
           }
         />
+
         {/* CAREER PAGE */}
         <Route
           path="/career"
@@ -214,27 +237,49 @@ const AppRoute = () => {
             </>
           }
         />
+
         {/* PLACEMENT PAGE */}
         <Route
           path="/placement"
-          element={<Placement />}
+          element={
+            <>
+              <Navbar />
+              <Box sx={{ mt: 10 }}></Box>
+              <Placement />
+              <BottomInfo />
+              <Footer />
+            </>
+          }
         />
+
+        {/* WORKSHOP PAGE - Grid View Only */}
         <Route
           path="/workshop"
           element={
             <>
               <Navbar />
               <Box sx={{ mt: 10 }}></Box>
-              <WorkshopPage />
+              <WorkshopPage viewMode="grid" />
               <BottomInfo />
               <Footer />
             </>
           }
         />
+
+        {/* CATEGORY COURSE LIST PAGE */}
         <Route
           path="/category/:id"
-          element={<CategoryCourseList />}
+          element={
+            <>
+              <Navbar />
+              <Box sx={{ mt: 10 }}></Box>
+              <CategoryCourseList />
+              <BottomInfo />
+              <Footer />
+            </>
+          }
         />
+
         {/* LEGAL PAGES */}
         <Route
           path="/privacy-policy"
@@ -248,6 +293,7 @@ const AppRoute = () => {
             </>
           }
         />
+
         <Route
           path="/terms-of-service"
           element={
@@ -260,7 +306,8 @@ const AppRoute = () => {
             </>
           }
         />
-        {/* 404 PAGE */}
+
+        {/* 404 NOT FOUND PAGE */}
         <Route
           path="*"
           element={

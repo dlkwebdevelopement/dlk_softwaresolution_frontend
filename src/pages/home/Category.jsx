@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { Box, Typography, Container, Paper, useTheme, alpha } from "@mui/material";
 import { styled, keyframes } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
-import { GetRequest } from "../../api/config";
+import { GetRequest } from "../../api/api";
 import { ADMIN_GET_CATEGORIES } from "../../api/endpoints";
 import { BASE_URL, getImgUrl } from "../../api/api";
 

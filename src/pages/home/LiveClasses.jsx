@@ -12,9 +12,10 @@ import {
   Paper,
   Fade,
   Container,
+  alpha
 } from "@mui/material";
 import { styled, keyframes } from "@mui/material/styles";
-import { GetRequest } from "../../api/config";
+import { GetRequest } from "../../api/api";
 import { ADMIN_GET_LIVE_CLASSES } from "../../api/endpoints";
 import dayjs from "dayjs";
 import { BASE_URL, getImgUrl } from "../../api/api";
@@ -58,8 +59,25 @@ const marquee = keyframes`
   100% { transform: translateX(-50%); }
 `;
 
+const pulse = keyframes`
+  0% { opacity: 0.6; transform: scale(0.98); }
+  50% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0.6; transform: scale(0.98); }
+`;
+
+const colors = {
+  primary: "#3DB843",
+  primaryDark: "#2e9133",
+  primaryLight: "#e8f7e9",
+  textPrimary: "#1a2b1b",
+  textSecondary: "#6b8f6d",
+  border: "#d4ead5",
+};
+
 // Styled Components
-const GlassCard = styled(({ $hovered, ...other }) => <Paper {...other} />)(({ theme, $hovered }) => ({
+const GlassCard = styled(Paper, {
+  shouldForwardProp: (prop) => prop !== "$hovered",
+})(({ theme, $hovered }) => ({
   background: 'rgba(255, 255, 255, 0.7)',
   backdropFilter: 'blur(10px)',
   WebkitBackdropFilter: 'blur(10px)',
@@ -150,23 +168,61 @@ export default function LiveClass() {
   const [classes, setClasses] = useState([]);
   const [hoveredCard, setHoveredCard] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const sliderRef = useRef(null);
   const theme = useTheme();
 
   useEffect(() => {
+    let isMounted = true;
     const fetchLiveClasses = async () => {
       try {
         setLoading(true);
-        const data = await GetRequest(ADMIN_GET_LIVE_CLASSES);
-        setClasses(data);
+        const res = await GetRequest(ADMIN_GET_LIVE_CLASSES);
+        if (isMounted) {
+          // Backend may return array directly OR { success, data } wrapped
+          // Mirror admin panel logic: accept either shape
+          let data = [];
+          if (Array.isArray(res)) {
+            data = res;
+          } else if (res && Array.isArray(res.data)) {
+            data = res.data;
+          } else if (res && res.success && Array.isArray(res.data)) {
+            data = res.data;
+          }
+          setClasses(data);
+          setError(null);
+        }
       } catch (err) {
         console.error("Failed to fetch Live Classes:", err);
+        if (isMounted) {
+          setError("Online sessions temporarily unavailable.");
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
     fetchLiveClasses();
+    return () => { isMounted = false; };
   }, []);
+
+  const [isAutoScrolling, setIsAutoScrolling] = useState(true);
+
+  useEffect(() => {
+    let interval;
+    if (isAutoScrolling && classes.length > 3) {
+      interval = setInterval(() => {
+        if (sliderRef.current) {
+          const { scrollLeft, scrollWidth, clientWidth } = sliderRef.current;
+          if (scrollLeft + clientWidth >= scrollWidth - 15) {
+            sliderRef.current.scrollTo({ left: 0, behavior: "smooth" });
+          } else {
+            scroll("right");
+          }
+        }
+      }, 3500);
+    }
+    return () => clearInterval(interval);
+  }, [isAutoScrolling, classes]);
 
   const formatTime12 = (time) => {
     if (!time) return "";
@@ -195,8 +251,8 @@ export default function LiveClass() {
     if (!sliderRef.current) return;
     const container = sliderRef.current;
     const scrollAmount = direction === "left"
-      ? -container.clientWidth * 0.8
-      : container.clientWidth * 0.8;
+      ? -container.clientWidth
+      : container.clientWidth;
     container.scrollBy({ left: scrollAmount, behavior: "smooth" });
   };
 
@@ -238,45 +294,20 @@ export default function LiveClass() {
         }}
       />
 
-      {/* Floating Particles */}
-      {[...Array(10)].map((_, i) => (
-        <Box
-          key={i}
-          sx={{
-            position: 'absolute',
-            width: 10 + i * 15,
-            height: 10 + i * 15,
-            borderRadius: '50%',
-            background: `rgba(61, 184, 67, ${0.05 + i * 0.01})`,
-            top: `${Math.random() * 100}%`,
-            left: `${Math.random() * 100}%`,
-            filter: 'blur(5px)',
-            animation: `${floatAnimation} ${10 + i * 2}s ease-in-out infinite`,
-            pointerEvents: 'none',
-          }}
-        />
-      ))}
-
       <Container maxWidth="xl">
-        {/* HEADER SECTION */}
-        <Box sx={{ textAlign: "center", mb: { xs: 2, sm: 3, md: 4 } }}>
-          {/* Premium Badge */}
+        <Box sx={{ textAlign: "center", mb: { xs: 4, md: 6 } }}>
           <FloatingElement>
             <Chip
-              label="LIVE SESSIONS"
-              icon={<StarIcon />}
+              label="ONLINE TRAINING"
+              icon={<StarIcon sx={{ fontSize: 16 }} />}
               sx={{
-                bgcolor: 'var(--green-light)',
-                backdropFilter: 'blur(10px)',
-                WebkitBackdropFilter: 'blur(10px)',
-                color: 'var(--green-dark)',
-                border: '1px solid var(--green-mid)',
-                fontWeight: 600,
+                bgcolor: alpha(colors.primary, 0.1),
+                color: colors.primaryDark,
+                fontWeight: 800,
+                fontSize: '0.7rem',
+                border: `1px solid ${alpha(colors.primary, 0.2)}`,
                 letterSpacing: 1,
-                mb: 2,
-                '& .MuiChip-icon': {
-                  color: 'var(--green-dark)',
-                },
+                mb: 2.5,
               }}
             />
           </FloatingElement>
@@ -285,298 +316,141 @@ export default function LiveClass() {
           <Typography
             variant="h3"
             sx={{
-              fontWeight: 600,
+              fontWeight: 900,
               mb: 2,
-              fontSize: 'clamp(1.7rem, 3.2vw, 2.5rem)',
-              color: 'var(--green-dark)', // Base color for Classes
+              fontSize: 'clamp(2rem, 5vw, 3rem)',
+              color: colors.textPrimary,
+              letterSpacing: '-0.02em',
             }}
           >
-            <Box component="span" sx={{ color: 'black' }}>Upcoming Live</Box> Classes
+            Live <Box component="span" sx={{ color: colors.primary }}>Career Classes</Box>
           </Typography>
 
           <Typography
             variant="body1"
             sx={{
-              color: '#6b8f76',
+              color: colors.textSecondary,
               maxWidth: 700,
               mx: "auto",
-              fontWeight: 400,
-              fontSize: '1rem',
+              fontWeight: 500,
+              fontSize: '1.1rem',
+              lineHeight: 1.6
             }}
           >
-            Join our interactive live sessions with expert instructors and transform your learning experience
+            Join our interactive live sessions with industry experts and transform your career path with hands-on learning.
           </Typography>
         </Box>
 
-
-
-        {/* SLIDER SECTION */}
-        <Box
-          sx={{
-            position: "relative",
-            overflow: "hidden",
-            maskImage: 'linear-gradient(to right, transparent, black 2%, black 98%, transparent)',
-            WebkitMaskImage: 'linear-gradient(to right, transparent, black 2%, black 98%, transparent)',
-          }}
-        >
-          {/* HORIZONTAL SCROLL CONTAINER */}
-          <Box
-            ref={sliderRef}
-            sx={{
-              display: "flex",
-              gap: { xs: 2, sm: 3, md: 4 },
-              overflowX: "auto",
-              scrollSnapType: "x mandatory",
-              scrollBehavior: "smooth",
-              pb: 4,
-              pt: 2,
-              px: { xs: 1, md: 2 },
-              "&::-webkit-scrollbar": {
-                height: 6,
-              },
-              "&::-webkit-scrollbar-track": {
-                background: 'var(--green-pale)',
-                borderRadius: 10,
-              },
-              "&::-webkit-scrollbar-thumb": {
-                background: 'var(--green-mid)',
-                borderRadius: 10,
-                "&:hover": {
-                  background: 'var(--green)',
-                },
-              },
-            }}
-          >
-            {classes.length > 0 && classes.map((cls, i) => (
-              <Box
-                key={i}
-                sx={{
-                  width: {
-                    xs: "250px",
-                    sm: "280px",
-                    md: "300px",
-                  },
-                  flexShrink: 0,
-                  scrollSnapAlign: "start",
-                }}
-              >
-                <GlassCard
-                  $hovered={hoveredCard === i}
-                  onMouseEnter={() => setHoveredCard(i)}
-                  onMouseLeave={() => setHoveredCard(null)}
-                  onClick={() => navigate("/contact")}
-                  sx={{ cursor: 'pointer' }}
-                >
-                  {/* CARD MEDIA */}
-                  <Box sx={{ position: "relative", overflow: "hidden" }}>
-                    <CardMedia
-                      component="img"
-                      height="150"
-                      src={cls.image ? `${BASE_URL}/${getImgUrl(cls.image)}` : (cls.courseId?.image ? `${BASE_URL}/${getImgUrl(cls.courseId.image)}` : "https://via.placeholder.com/400x180?text=No+Image")}
-                      alt={cls.title || "Live Class"}
-                      sx={{
-                        transition: "transform 0.5s ease",
-                        transform: hoveredCard === i ? "scale(1.15)" : "scale(1)",
-                      }}
-                    />
-
-                    {/* GLASS OVERLAY */}
-                    <Box
-                      sx={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        background: 'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.1) 100%)',
-                        pointerEvents: 'none',
-                      }}
-                    />
-
-                    {/* BADGES */}
-                    <Box
-                      sx={{
-                        position: "absolute",
-                        top: 16,
-                        left: 16,
-                        right: 16,
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Chip
-                        label={cls.courseId?.categoryName || "Category"}
-                        size="small"
-                        sx={{
-                          bgcolor: '#c2eac4',
-                          color: '#2e9133',
-                          fontWeight: 800,
-                          fontSize: '0.7rem',
-                          borderRadius: '8px',
-                          border: 'none',
-                          px: 0.5
-                        }}
-                      />
-
-                      <GlassChip
-                        label={getDaysRemaining(cls.startDate)}
-                        size="small"
-                        sx={{
-                          color: cls.startDate && dayjs(cls.startDate).isBefore(dayjs())
-                            ? '#ff5252'
-                            : 'var(--green-mid)',
-                        }}
-                      />
-                    </Box>
-
-                    {/* CATEGORY ICON */}
-                    <Box
-                      sx={{
-                        position: 'absolute',
-                        bottom: 16,
-                        right: 16,
-                      }}
-                    >
-                      <StyledIcon>
-                        <SchoolIcon sx={{ fontSize: 16 }} />
-                      </StyledIcon>
-                    </Box>
-                  </Box>
-
-                  {/* CARD CONTENT */}
-                  <CardContent 
-                    sx={{ 
-                      p: 2, 
-                      flex: 1, 
-                      display: 'flex', 
-                      flexDirection: 'column', 
-                      justifyContent: 'space-between' 
-                    }}
-                  >
-                    {/* TITLE */}
-                    <Box>
-                      <Typography
-                        variant="h6"
-                        sx={{
-                          fontWeight: 600,
-                          mb: 1.5,
-                          fontSize: "1.05rem",
-                          color: 'black',
-                          lineHeight: 1.4,
-                        }}
-                      >
-                        {cls.title || "Live Class"}
-                      </Typography>
-
-                      {/* INSTRUCTOR INFO */}
-                      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                        <GlassAvatar sx={{ width: 32, height: 32, mr: 1.5, bgcolor: 'var(--green-light)', border: 'none' }}>
-                          <SchoolIcon sx={{ fontSize: 16, color: 'var(--green-dark)' }} />
-                        </GlassAvatar>
-                        <Typography variant="body2" sx={{ color: 'black', fontWeight: 600 }}>
-                          Expert Instructor
-                        </Typography>
-                      </Box>
-                    </Box>
-
-                    {/* COURSE DETAILS */}
-                    <Box sx={{ display: "grid", gap: 1, mb: 2 }}>
-                      {/* DATE */}
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                        <StyledIcon sx={{ width: 28, height: 28, bgcolor: 'var(--green-light)' }}>
-                          <CalendarTodayIcon sx={{ fontSize: 14 }} />
-                        </StyledIcon>
-                        <Typography variant="body2" sx={{ color: 'black' }}>
-                          <span style={{ fontWeight: 600, color: 'black' }}>
-                            Starts:{' '}
-                          </span>
-                          {dayjs(cls.startDate).format("DD MMM YYYY")}
-                        </Typography>
-                      </Box>
-
-                      {/* TIME */}
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                        <StyledIcon sx={{ width: 28, height: 28, bgcolor: 'var(--green-light)' }}>
-                          <AccessTimeIcon sx={{ fontSize: 14 }} />
-                        </StyledIcon>
-                        <Typography variant="body2" sx={{ color: 'black' }}>
-                          <span style={{ fontWeight: 600, color: 'black' }}>
-                            Time:{' '}
-                          </span>
-                          {formatTime12(cls.startTime)} – {formatTime12(cls.endTime)}
-                        </Typography>
-                      </Box>
-
-                      {/* DURATION */}
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                        <StyledIcon sx={{ width: 28, height: 28, bgcolor: 'var(--green-light)' }}>
-                          <PeopleIcon sx={{ fontSize: 14 }} />
-                        </StyledIcon>
-                        <Typography variant="body2" sx={{ color: 'black' }}>
-                          <span style={{ fontWeight: 600, color: 'black' }}>
-                            Duration:{' '}
-                          </span>
-                          {cls.durationDays} {cls.durationDays === 1 ? "day" : "days"}
-                        </Typography>
-                      </Box>
-                    </Box>
-
-                    {/* ACTION BUTTON */}
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        pt: 2,
-                        borderTop: '1px solid rgba(72, 114, 62, 0.1)',
-                      }}
-                    >
-                      <Typography variant="caption" sx={{ color: '#8a9b7e', fontWeight: 500 }}>
-                        Limited seats
-                      </Typography>
-
-                      <Chip
-                        label="Join Now"
-                        icon={<VideoCallIcon />}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate("/contact");
-                        }}
-                        sx={{
-                          bgcolor: 'var(--green)',
-                          color: 'white',
-                          fontWeight: 600,
-                          transition: 'all 0.3s ease',
-                          '&:hover': {
-                            bgcolor: 'var(--green-dark)',
-                            transform: 'scale(1.05)',
-                          },
-                          '& .MuiChip-icon': {
-                            color: 'white',
-                          },
-                        }}
-                      />
-                    </Box>
-                  </CardContent>
-                </GlassCard>
-              </Box>
+        {error ? (
+          <Box sx={{ textAlign: 'center', py: 8, bgcolor: '#fff5f5', borderRadius: 6, border: '1px dashed #feb2b2' }}>
+            <Typography color="#c53030" fontWeight={600}>{error}</Typography>
+          </Box>
+        ) : loading ? (
+          <Box sx={{ display: 'flex', gap: 4, overflow: 'hidden', py: 4 }}>
+            {[...Array(4)].map((_, i) => (
+              <Box key={i} sx={{ minWidth: 300, height: 450, bgcolor: 'rgba(0,0,0,0.03)', borderRadius: '28px', animation: `${pulse} 1.5s infinite` }} />
             ))}
           </Box>
-
-          {/* Loading State Skeleton */}
-          {loading && (
-            <Box sx={{ display: 'flex', gap: 4, px: 2, py: 4 }}>
-              {[...Array(6)].map((_, i) => (
-                <Box key={i} sx={{ minWidth: 280, height: 400, bgcolor: 'rgba(0,0,0,0.05)', borderRadius: '24px' }} />
+        ) : classes.length === 0 ? (
+          <Box sx={{ textAlign: 'center', py: 8, bgcolor: '#f8fafc', borderRadius: 6 }}>
+            <Typography variant="h6" color="text.secondary" fontWeight={600}>No live classes scheduled at the moment.</Typography>
+          </Box>
+        ) : (
+          <Box sx={{ position: "relative", overflow: "visible" }}>
+            <Box
+              ref={sliderRef}
+              onMouseEnter={() => setIsAutoScrolling(false)}
+              onMouseLeave={() => setIsAutoScrolling(true)}
+              sx={{
+                display: "flex",
+                gap: { xs: 2, sm: 3, md: 4 },
+                overflowX: "auto",
+                scrollSnapType: "x mandatory",
+                scrollBehavior: "smooth",
+                pb: 4,
+                pt: 2,
+                px: { xs: 1, md: 2 },
+                "&::-webkit-scrollbar": { height: 6 },
+                "&::-webkit-scrollbar-track": { background: 'var(--green-pale)', borderRadius: 10 },
+                "&::-webkit-scrollbar-thumb": { background: 'var(--green-mid)', borderRadius: 10, "&:hover": { background: 'var(--green)' } },
+              }}
+            >
+              {classes.map((cls, i) => (
+                <Box
+                  key={cls._id || i}
+                  sx={{
+                    width: { xs: "250px", sm: "260px", md: "calc((100% - 96px) / 4)" },
+                    flexShrink: 0,
+                    scrollSnapAlign: "start",
+                  }}
+                >
+                  <GlassCard
+                    $hovered={hoveredCard === i}
+                    onMouseEnter={() => setHoveredCard(i)}
+                    onMouseLeave={() => setHoveredCard(null)}
+                    onClick={() => navigate("/contact")}
+                    sx={{ cursor: 'pointer' }}
+                  >
+                    <Box sx={{ position: "relative", overflow: "hidden" }}>
+                      <CardMedia
+                        component="img"
+                        height="180"
+                        image={getImgUrl(cls.image || cls.courseId?.image)}
+                        alt={cls.title || "Live Class"}
+                        sx={{
+                          transition: "transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)",
+                          transform: hoveredCard === i ? "scale(1.1)" : "scale(1)",
+                        }}
+                      />
+                      <Box sx={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.1) 100%)', pointerEvents: 'none' }} />
+                      <Box sx={{ position: "absolute", top: 16, left: 16, right: 16, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <Chip label={cls.courseId?.categoryName || "Category"} size="small" sx={{ bgcolor: '#c2eac4', color: '#2e9133', fontWeight: 800, fontSize: '0.7rem', borderRadius: '8px', px: 0.5 }} />
+                        <GlassChip label={getDaysRemaining(cls.startDate)} size="small" sx={{ color: cls.startDate && dayjs(cls.startDate).isBefore(dayjs()) ? '#ff5252' : 'var(--green-mid)' }} />
+                      </Box>
+                      <Box sx={{ position: 'absolute', bottom: 16, right: 16 }}>
+                        <StyledIcon><SchoolIcon sx={{ fontSize: 16 }} /></StyledIcon>
+                      </Box>
+                    </Box>
+                    <CardContent sx={{ p: 2, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                      <Box>
+                        <Typography variant="h6" sx={{ fontWeight: 600, mb: 1.5, fontSize: "1.05rem", color: 'black', lineHeight: 1.4 }}>
+                          {cls.title || "Live Class"}
+                        </Typography>
+                        <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                          <GlassAvatar sx={{ width: 32, height: 32, mr: 1.5, bgcolor: 'var(--green-light)', border: 'none' }}>
+                            <SchoolIcon sx={{ fontSize: 16, color: 'var(--green-dark)' }} />
+                          </GlassAvatar>
+                          <Typography variant="body2" sx={{ color: 'black', fontWeight: 600 }}>Expert Instructor</Typography>
+                        </Box>
+                      </Box>
+                      <Box sx={{ display: "grid", gap: 1, mb: 2 }}>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                          <StyledIcon sx={{ width: 28, height: 28, bgcolor: 'var(--green-light)' }}><CalendarTodayIcon sx={{ fontSize: 14 }} /></StyledIcon>
+                          <Typography variant="body2" sx={{ color: 'black' }}><span style={{ fontWeight: 600 }}>Starts: </span>{dayjs(cls.startDate).format("DD MMM YYYY")}</Typography>
+                        </Box>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                          <StyledIcon sx={{ width: 28, height: 28, bgcolor: 'var(--green-light)' }}><AccessTimeIcon sx={{ fontSize: 14 }} /></StyledIcon>
+                          <Typography variant="body2" sx={{ color: 'black' }}><span style={{ fontWeight: 600 }}>Time: </span>{formatTime12(cls.startTime)} – {formatTime12(cls.endTime)}</Typography>
+                        </Box>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                          <StyledIcon sx={{ width: 28, height: 28, bgcolor: 'var(--green-light)' }}><PeopleIcon sx={{ fontSize: 14 }} /></StyledIcon>
+                          <Typography variant="body2" sx={{ color: 'black' }}><span style={{ fontWeight: 600 }}>Duration: </span>{cls.durationDays} {cls.durationDays === 1 ? "day" : "days"}</Typography>
+                        </Box>
+                      </Box>
+                      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", pt: 2, borderTop: '1px solid rgba(72, 114, 62, 0.1)' }}>
+                        <Typography variant="caption" sx={{ color: '#8a9b7e', fontWeight: 500 }}>Limited seats</Typography>
+                        <Chip label="Join Now" icon={<VideoCallIcon />} onClick={(e) => { e.stopPropagation(); navigate("/contact"); }} sx={{ bgcolor: 'var(--green)', color: 'white', fontWeight: 600, transition: 'all 0.3s ease', '&:hover': { bgcolor: 'var(--green-dark)', transform: 'scale(1.05)' }, '& .MuiChip-icon': { color: 'white' } }} />
+                      </Box>
+                    </CardContent>
+                  </GlassCard>
+                </Box>
               ))}
             </Box>
-          )}
-        </Box>
-        {/* GALLERY SECTION */}
+          </Box>
+        )}
+        
         <Gallery />
 
-        {/* STATS STRIP */}
         <Box
           className="stats-strip"
           sx={{
@@ -591,7 +465,6 @@ export default function LiveClass() {
             mt: 6,
           }}
         >
-          {/* Internal stat-block styling applied directly using MUI sx */}
           {[
             { value: "2.5k+", label: "Students Placed" },
             { value: "20+", label: "Years Experience" },
@@ -620,27 +493,10 @@ export default function LiveClass() {
                 })
               }}
             >
-              <Typography
-                component="h3"
-                sx={{
-                  fontFamily: "'Poppins', sans-serif",
-                  fontSize: { xs: '2.4rem', md: '3.2rem' },
-                  fontWeight: 600,
-                  color: 'var(--green, #3DB843)',
-                  letterSpacing: '-0.04em',
-                  lineHeight: 1.2
-                }}
-              >
+              <Typography component="h3" sx={{ fontFamily: "'Poppins', sans-serif", fontSize: { xs: '2.4rem', md: '3.2rem' }, fontWeight: 600, color: 'var(--green, #3DB843)', letterSpacing: '-0.04em', lineHeight: 1.2 }}>
                 {stat.value}
               </Typography>
-              <Typography
-                sx={{
-                  fontSize: '0.82rem',
-                  color: 'var(--text-muted, #6b8f6d)',
-                  marginTop: '3px',
-                  fontWeight: 500
-                }}
-              >
+              <Typography sx={{ fontSize: '0.82rem', color: 'var(--text-muted, #6b8f6d)', marginTop: '3px', fontWeight: 500 }}>
                 {stat.label}
               </Typography>
             </Box>

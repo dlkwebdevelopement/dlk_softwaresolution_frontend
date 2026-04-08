@@ -27,7 +27,7 @@ import School from "@mui/icons-material/School";
 import StarIcon from "@mui/icons-material/Star";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import { PostRequest } from "../../api/config";
+import { PostRequest } from "../../api/api";
 import { ADMIN_POST_REGISTRATIONS } from "../../api/endpoints";
 import { BASE_URL, getImgUrl } from "../../api/api";
 import toast from "react-hot-toast";

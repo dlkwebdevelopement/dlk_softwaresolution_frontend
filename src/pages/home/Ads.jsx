@@ -45,7 +45,7 @@ import {
   Group,
   Timeline,
 } from "@mui/icons-material";
-import { GetRequest, PostRequest } from "../../api/config";
+import { GetRequest, PostRequest } from "../../api/api";
 import {
   ADMIN_GET_CATEGORIES,
   ADMIN_POST_REGISTRATIONS,

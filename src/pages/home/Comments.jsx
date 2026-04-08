@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Box, Typography, Avatar, IconButton, Paper, Rating, Chip, alpha, Button } from "@mui/material";
 import { styled, keyframes } from "@mui/material/styles";
 import { ArrowBackIosNew, ArrowForwardIos, FormatQuote } from "@mui/icons-material";
-import { GetRequest } from "../../api/config";
+import { GetRequest } from "../../api/api";
 import { GET_ALL_TESTIMONIALS } from "../../api/endpoints";
 
 // Animations

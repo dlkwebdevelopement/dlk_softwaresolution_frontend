@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { Box, Typography, Container, IconButton } from "@mui/material";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useParams } from "react-router-dom";
-import { GetRequest } from "../../api/config";
+import { GetRequest } from "../../api/api";
 import { ADMIN_GET_COURSE_SLUG } from "../../api/endpoints";
 
 // Illustrations from Storyset/Freepik or placeholders resembling the screenshot

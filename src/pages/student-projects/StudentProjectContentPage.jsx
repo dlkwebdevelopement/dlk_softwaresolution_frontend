@@ -14,10 +14,12 @@ import {
   CardContent,
   Avatar,
   Fade,
-  Grow
+  Grow,
+  Chip
 } from "@mui/material";
 import { 
   Calendar, 
+  Clock,
   ChevronRight, 
   TrendingUp, 
   School, 
@@ -26,7 +28,7 @@ import {
   User
 } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
-import { GetRequest, PostRequest } from "../../api/config";
+import { GetRequest, PostRequest } from "../../api/api";
 import { ADMIN_GET_STUDENT_PROJECTS_SLUG, GET_ALL_STUDENT_PROJECTS, ADMIN_POST_ENQUIRIES } from "../../api/endpoints";
 import { getImgUrl } from "../../api/api";
 import SendIcon from '@mui/icons-material/Send';
@@ -202,6 +204,76 @@ export default function StudentProjectContentPage() {
     <Box sx={{ bgcolor: "#fafafa", minHeight: "100vh", pb: 10 }}>
       <Container maxWidth="lg" sx={{ mt: 8, position: 'relative', zIndex: 10 }}>
         
+        {/* 📋 Project Header Section (Clean Typography Layout) */}
+        <Box sx={{ mb: 6, pb: 4, borderBottom: "1px solid #e2e8f0" }} data-aos="fade-up">
+          
+          {/* Breadcrumb / Category Chip */}
+          <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3 }}>
+            <Chip
+              label="Success Story"
+              sx={{
+                bgcolor: alpha("#1b365d", 0.08),
+                color: "#1b365d",
+                fontWeight: 700,
+                fontSize: "11px",
+                textTransform: "uppercase",
+                letterSpacing: "1px",
+                borderRadius: "6px",
+                height: "26px"
+              }}
+            />
+            <ChevronRight size={14} className="opacity-50" />
+            <Typography sx={{ fontSize: "11px", fontWeight: 700, opacity: 0.6, textTransform: "uppercase", letterSpacing: "1px" }}>
+              Reading Now
+            </Typography>
+          </Stack>
+
+          {/* Project Title */}
+          <Typography
+            variant="h1"
+            sx={{
+              fontWeight: 700,
+              lineHeight: 1.2,
+              mb: 4,
+              fontSize: { xs: "32px", md: "48px" },
+              color: "#0f172a",
+              letterSpacing: "-0.01em"
+            }}
+          >
+            {project?.title}
+          </Typography>
+
+          {/* Meta Information Bar */}
+          <Box 
+            sx={{ 
+              display: "flex",
+              flexDirection: { xs: "column", sm: "row" },
+              gap: { xs: 3, sm: 6 },
+              alignItems: { xs: "flex-start", sm: "center" }
+            }}
+          >
+            <Stack direction="row" spacing={1.5} alignItems="center">
+              <Box sx={{ p: 1.2, bgcolor: alpha("#10b981", 0.08), borderRadius: "12px", color: "#10b981" }}>
+                <Calendar size={18} />
+              </Box>
+              <Box>
+                <Typography sx={{ fontSize: "11px", fontWeight: 700, color: "text.secondary", textTransform: "uppercase", letterSpacing: 0.5 }}>Published On</Typography>
+                <Typography sx={{ fontWeight: 600, fontSize: "15px", color: "#0f172a" }}>{getFormattedDate(project?.createdAt)}</Typography>
+              </Box>
+            </Stack>
+
+            <Stack direction="row" spacing={1.5} alignItems="center">
+              <Box sx={{ p: 1.2, bgcolor: alpha("#3b82f6", 0.08), borderRadius: "12px", color: "#3b82f6" }}>
+                <Clock size={18} />
+              </Box>
+              <Box>
+                <Typography sx={{ fontSize: "11px", fontWeight: 700, color: "text.secondary", textTransform: "uppercase", letterSpacing: 0.5 }}>Reading Time</Typography>
+                <Typography sx={{ fontWeight: 600, fontSize: "15px", color: "#0f172a" }}>5 Min Read</Typography>
+              </Box>
+            </Stack>
+          </Box>
+        </Box>
+
         <Box
           sx={{
             display: "grid",

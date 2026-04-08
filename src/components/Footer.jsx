@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link as RouterLink } from "react-router-dom";
-import { GetRequest, PostRequest } from "../api/config";
+import { GetRequest, PostRequest } from "../api/api";
 import { ADMIN_GET_CATEGORIES, ADMIN_POST_CONTACT } from "../api/endpoints";
 import toast from "react-hot-toast";
 import {

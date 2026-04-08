@@ -1,83 +1,155 @@
 import React from "react";
-import { Box, Typography, Button, Container } from "@mui/material";
+import { Box, Typography, Button, Container, alpha } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import SentimentVeryDissatisfiedIcon from "@mui/icons-material/SentimentVeryDissatisfied";
+import { Rocket, ArrowLeft } from "lucide-react";
 
+/**
+ * NotFound Component - Now serving as a premium "Coming Soon" placeholder
+ * Designed to look premium and integrate with existing Navbar/Footer
+ */
 const NotFound = () => {
     const navigate = useNavigate();
 
     return (
-        <Container maxWidth="md">
+        <Box
+            sx={{
+                minHeight: "70vh",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "linear-gradient(180deg, #ffffff 0%, #f7fdf7 100%)",
+                py: { xs: 10, md: 15 },
+                position: "relative",
+                overflow: "hidden"
+            }}
+        >
+            {/* Decorative background gradients */}
             <Box
                 sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    minHeight: "100vh",
-                    textAlign: "center",
-                    py: 10,
+                    position: "absolute",
+                    top: "-10%",
+                    right: "-5%",
+                    width: "400px",
+                    height: "400px",
+                    background: alpha("#3DB843", 0.05),
+                    borderRadius: "50%",
+                    filter: "blur(80px)",
+                    zIndex: 0
                 }}
-            >
-                <SentimentVeryDissatisfiedIcon
-                    sx={{ fontSize: 120, mb: 4, color: "primary.main" }}
-                />
-                <Typography
-                    variant="h1"
+            />
+            <Box
+                sx={{
+                    position: "absolute",
+                    bottom: "-10%",
+                    left: "-5%",
+                    width: "300px",
+                    height: "300px",
+                    background: alpha("#1a4718", 0.05),
+                    borderRadius: "50%",
+                    filter: "blur(60px)",
+                    zIndex: 0
+                }}
+            />
+
+            <Container maxWidth="md" sx={{ position: "relative", zIndex: 1 }}>
+                <Box
                     sx={{
-                        fontWeight: 800,
-                        fontSize: { xs: "80px", md: "120px" },
-                        color: "primary.dark",
-                        lineHeight: 1,
-                        mb: 2,
+                        textAlign: "center",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center"
                     }}
                 >
-                    404
-                </Typography>
-                <Typography
-                    variant="h4"
-                    sx={{
-                        fontWeight: 600,
-                        mb: 3,
-                        color: "text.primary",
-                    }}
-                >
-                    Oops! Page Not Found
-                </Typography>
-                <Typography
-                    variant="body1"
-                    sx={{
-                        maxWidth: "500px",
-                        mb: 5,
-                        color: "text.secondary",
-                        fontSize: "1.1rem",
-                    }}
-                >
-                    The page you are looking for might have been removed, had its name
-                    changed, or is temporarily unavailable.
-                </Typography>
-                <Button
-                    variant="contained"
-                    size="large"
-                    onClick={() => navigate("/")}
-                    sx={{
-                        px: 6,
-                        py: 1.5,
-                        borderRadius: "12px",
-                        textTransform: "none",
-                        fontSize: "1.1rem",
-                        boxShadow: "0 10px 20px rgba(72, 114, 62, 0.2)",
-                        "&:hover": {
-                            transform: "translateY(-2px)",
-                            boxShadow: "0 15px 30px rgba(72, 114, 62, 0.3)",
-                        },
-                        transition: "all 0.3s ease",
-                    }}
-                >
-                    Back to Homepage
-                </Button>
-            </Box>
-        </Container>
+                    <Box
+                        sx={{
+                            display: "inline-flex",
+                            p: 2.5,
+                            borderRadius: "24px",
+                            bgcolor: alpha("#3DB843", 0.1),
+                            color: "#3DB843",
+                            mb: 4,
+                            animation: "rocketFloat 3s infinite ease-in-out",
+                            boxShadow: "0 20px 40px rgba(61, 184, 67, 0.1)"
+                        }}
+                    >
+                        <Rocket size={48} strokeWidth={2} />
+                    </Box>
+
+                    <Typography
+                        variant="h1"
+                        sx={{
+                            fontWeight: 900,
+                            fontSize: { xs: "3rem", md: "5rem" },
+                            color: "#1a4718",
+                            letterSpacing: "-0.03em",
+                            lineHeight: 1,
+                            mb: 2
+                        }}
+                    >
+                        Coming Soon
+                    </Typography>
+
+                    <Typography
+                        variant="h5"
+                        sx={{
+                            color: "#3DB843",
+                            fontWeight: 700,
+                            mb: 3,
+                            textTransform: "uppercase",
+                            letterSpacing: "4px"
+                        }}
+                    >
+                        Innovation in Progress
+                    </Typography>
+
+                    <Typography
+                        variant="body1"
+                        sx={{
+                            maxWidth: "550px",
+                            mb: 6,
+                            color: "text.secondary",
+                            fontSize: "1.1rem",
+                            lineHeight: 1.7
+                        }}
+                    >
+                        We're building something exceptional. Our teams are currently putting
+                        the finishing touches on this section to provide you with the best
+                        possible experience.
+                    </Typography>
+
+                    <Button
+                        variant="contained"
+                        size="large"
+                        startIcon={<ArrowLeft size={20} />}
+                        onClick={() => navigate("/")}
+                        sx={{
+                            px: 6,
+                            py: 1.8,
+                            borderRadius: "16px",
+                            fontWeight: 800,
+                            fontSize: "1rem",
+                            bgcolor: "#3DB843",
+                            "&:hover": {
+                                bgcolor: "#2e9133",
+                                transform: "translateY(-3px)",
+                                boxShadow: "0 20px 40px rgba(61, 184, 67, 0.3)"
+                            },
+                            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+                        }}
+                    >
+                        Back
+                    </Button>
+                </Box>
+            </Container>
+
+            <style dangerouslySetInnerHTML={{
+                __html: `
+                @keyframes rocketFloat {
+                    0%, 100% { transform: translateY(0) rotate(0deg); }
+                    50% { transform: translateY(-15px) rotate(5deg); }
+                }
+            `}} />
+        </Box>
     );
 };
 

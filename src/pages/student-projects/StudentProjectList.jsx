@@ -25,7 +25,7 @@ import {
   Code
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { GetRequest } from "../../api/config";
+import { GetRequest } from "../../api/api";
 import { GET_ALL_STUDENT_PROJECTS } from "../../api/endpoints";
 import { getImgUrl } from "../../api/api";
 import Navbar from "../../components/Navbar";
@@ -129,7 +129,7 @@ export default function StudentProjectList() {
             {loading ? (
               // SKELETON LOADERS
               Array.from(new Array(6)).map((_, index) => (
-                <Grid item xs={12} sm={6} md={4} key={index}>
+                <Grid item xs={12} sm={6} md={3} key={index}>
                   <Skeleton
                     variant="rectangular"
                     height={400}
@@ -139,7 +139,7 @@ export default function StudentProjectList() {
               ))
             ) : projects.length > 0 ? (
               projects.map((project) => (
-                <Grid item xs={12} sm={6} md={4} key={project.id}>
+                <Grid item xs={12} sm={6} md={3} key={project.id}>
                   <Card
                     onClick={() => navigate(`/student-projects/${project.slug}`)}
                     sx={{
@@ -151,10 +151,11 @@ export default function StudentProjectList() {
                       boxShadow: "0 10px 30px rgba(0,0,0,0.05)",
                       transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
                       cursor: "pointer",
-                      border: "1px solid rgba(0,0,0,0.05)",
+                      border: "1px solid rgba(61, 184, 67, 0.2)",
                       "&:hover": {
                         transform: "translateY(-12px)",
                         boxShadow: "0 25px 50px rgba(61, 184, 67, 0.15)",
+                        border: "1px solid #3DB843",
                         "& .MuiCardMedia-root": { transform: "scale(1.08)" },
                         "& .view-btn": { bgcolor: "#3DB843", color: "white" }
                       },
@@ -207,6 +208,7 @@ export default function StudentProjectList() {
                         sx={{
                           mb: 2,
                           lineHeight: 1.3,
+                          height: "2.6em",
                           display: "-webkit-box",
                           WebkitLineClamp: 2,
                           WebkitBoxOrient: "vertical",
@@ -223,6 +225,7 @@ export default function StudentProjectList() {
                         sx={{
                           mb: 3,
                           lineHeight: 1.6,
+                          height: "4.8em",
                           display: "-webkit-box",
                           WebkitLineClamp: 3,
                           WebkitBoxOrient: "vertical",

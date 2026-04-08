@@ -1,225 +1,358 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
   Box,
-  Card,
   CardMedia,
-  Chip,
   Typography,
   Grid,
   Button,
-  IconButton,
   Container,
-  Paper,
-  Avatar,
-  Rating,
   alpha,
-  Fade,
-  Grow,
-  Zoom,
+  Skeleton,
+  IconButton,
+  Paper,
+  TextField,
+  InputAdornment,
+  Chip,
 } from "@mui/material";
 import { styled, keyframes } from "@mui/material/styles";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import MenuBookIcon from "@mui/icons-material/MenuBook";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import PersonIcon from "@mui/icons-material/Person";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { useTheme, useMediaQuery } from "@mui/material";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import SearchIcon from "@mui/icons-material/Search";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import MenuBookIcon from "@mui/icons-material/MenuBook";
 import { useNavigate } from "react-router-dom";
-import { GetRequest } from "../../api/config";
+import { GetRequest } from "../../api/api";
 import { GET_ALL_BLOGS } from "../../api/endpoints";
 import { getImgUrl } from "../../api/api";
 
-// Animations
-const floatAnimation = keyframes`
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
+const slideInUp = keyframes`
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
 `;
 
-const pulseGlow = keyframes`
-  0% { box-shadow: 0 0 0 0 rgba(61, 184, 67, 0.4); }
-  70% { box-shadow: 0 0 0 20px rgba(61, 184, 67, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(61, 184, 67, 0); }
-`;
-
-const shimmer = keyframes`
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-`;
-
-const slideInLeft = keyframes`
-  from {
-    opacity: 0;
-    transform: translateX(-50px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-`;
-
-const slideInRight = keyframes`
-  from {
-    opacity: 0;
-    transform: translateX(50px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-`;
-
-const rotateGradient = keyframes`
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-`;
-
-const scrollLeft = keyframes`
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-`;
-
-// Color scheme
+// Color Palette
 const colors = {
-  primary: "#3DB843",
-  secondary: "#D3F36B",
-  dark: "#1a4718",
+  primary: "#4CAF50",
+  primaryDark: "#388E3C",
+  primaryLight: "#81C784",
+  secondary: "#C8E6C9",
+  accent: "#2D3748",
+  dark: "#1A202C",
   light: "#ffffff",
-  grey: "#f5f5f5",
-  textPrimary: "#111c12",
-  textSecondary: "#2e9133",
-  accent: "#c2eac4",
+  textPrimary: "#2D3748",
+  textSecondary: "#718096",
   background: {
-    main: "#fbfdf3",
+    main: "#f8f9fa",
     light: "#ffffff",
-    gradient: "linear-gradient(180deg, #fbfdf3 0%, #ffffff 100%)",
-  }
+    gradient: "linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%)",
+    card: "#ffffff",
+  },
 };
 
 // Styled Components
-const GlassCard = styled(({ $hovered, ...other }) => <Paper {...other} />)(({ theme, $hovered }) => ({
-  background: 'rgba(255, 255, 255, 0.4)',
-  backdropFilter: 'blur(20px)',
-  WebkitBackdropFilter: 'blur(20px)',
-  border: '1px solid rgba(72, 114, 62, 0.1)',
-  borderRadius: '32px',
-  overflow: 'hidden',
-  position: 'relative',
-  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-  transform: $hovered ? 'translateY(-12px)' : 'translateY(0)',
+const BlogCard = styled(Paper, {
+  shouldForwardProp: (prop) => prop !== "$hovered",
+})(({ theme, $hovered }) => ({
+  background: colors.background.card,
+  borderRadius: "24px",
+  overflow: "hidden",
+  position: "relative",
+  transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+  transform: $hovered ? "translateY(-12px)" : "translateY(0)",
+  border: `1px solid ${$hovered ? colors.primary : alpha(colors.primary, 0.2)}`,
   boxShadow: $hovered
-    ? '0 25px 50px -12px rgba(72, 114, 62, 0.2)'
-    : '0 10px 30px -12px rgba(72, 114, 62, 0.1)',
-  height: '100%',
-  display: 'flex',
-  flexDirection: 'column',
-  width: 380, // Matched with Comments.jsx
-  margin: theme.spacing(0, 2),
-  [theme.breakpoints.down('sm')]: {
-    width: 300,
-    margin: theme.spacing(0, 1),
-  }
+    ? `0 25px 50px -12px rgba(61, 184, 67, 0.15)`
+    : `0 4px 6px -1px rgba(0, 0, 0, 0.05)`,
+  flex: 1,               // fills the full height of its flex-column parent
+  display: "flex",
+  flexDirection: "column",
+  cursor: "pointer",
 }));
 
-const GradientText = styled('span')({
-  background: 'linear-gradient(135deg, var(--green), var(--green-mid))',
-  backgroundSize: '200% 200%',
-  WebkitBackgroundClip: 'text',
-  WebkitTextFillColor: 'transparent',
-  animation: `${rotateGradient} 3s ease infinite`,
-});
-
-const FloatingElement = styled(Box)({
-  animation: `${floatAnimation} 3s ease-in-out infinite`,
-});
-
-const MarqueeContainer = styled(Box)(({ theme }) => ({
-  width: '100%',
-  overflowX: 'auto',
-  [theme.breakpoints.up('md')]: {
-    overflowX: 'hidden',
-  },
-  position: 'relative',
-  padding: theme.spacing(4, 0),
-  scrollbarWidth: 'none',
-  '&::-webkit-scrollbar': { display: 'none' },
-  '&::before, &::after': {
+const ImageContainer = styled(Box)(({ theme }) => ({
+  position: "relative",
+  paddingTop: "56.25%",
+  width: "100%",
+  overflow: "hidden",
+  backgroundColor: "#f5f5f5",
+  "&::after": {
     content: '""',
-    position: 'absolute',
-    top: 0,
-    width: '150px',
-    height: '100%',
-    zIndex: 2,
-    pointerEvents: 'none',
+    position: "absolute",
+    inset: 0,
+    background: "linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.3) 100%)",
+    pointerEvents: "none",
   },
-  '&::before': {
-    left: 0,
-    background: 'linear-gradient(90deg, #f8faf7 0%, transparent 100%)',
+  [theme.breakpoints.down("sm")]: {
+    paddingTop: "66.67%",
   },
-  '&::after': {
-    right: 0,
-    background: 'linear-gradient(-90deg, #f8faf7 0%, transparent 100%)',
+}));
+
+const StyledCardMedia = styled(CardMedia)(() => ({
+  position: "absolute",
+  top: 0,
+  left: 0,
+  width: "100%",
+  height: "100%",
+  transition: "transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
+  objectFit: "cover",
+}));
+
+const MetaInfo = styled(Box)(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  gap: 12,
+  marginBottom: 12,
+  flexWrap: "wrap",
+  "& .meta-item": {
+    display: "flex",
+    alignItems: "center",
+    gap: 4,
+    "& svg": {
+      fontSize: 14,
+      color: colors.primary,
+      [theme.breakpoints.down("sm")]: {
+        fontSize: 12,
+      },
+    },
+    "& span": {
+      fontSize: "0.75rem",
+      fontWeight: 500,
+      color: colors.textSecondary,
+      [theme.breakpoints.down("sm")]: {
+        fontSize: "0.7rem",
+      },
+    },
+  },
+  [theme.breakpoints.down("sm")]: {
+    gap: 8,
+    marginBottom: 8,
+  },
+}));
+
+const BlogTitle = styled(Typography)(({ theme }) => ({
+  fontWeight: 700,
+  fontSize: "1.15rem",
+  lineHeight: 1.4,
+  color: colors.textPrimary,
+  marginBottom: 10,
+  display: "-webkit-box",
+  WebkitLineClamp: 2,
+  WebkitBoxOrient: "vertical",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  height: "3.22em",          // FIXED: exactly 2 lines at lineHeight 1.4 + small buffer
+  transition: "color 0.2s ease",
+  [theme.breakpoints.down("sm")]: {
+    fontSize: "1rem",
+    height: "2.9em",
+    marginBottom: 8,
+  },
+}));
+
+const BlogDescription = styled(Typography)(({ theme }) => ({
+  color: colors.textSecondary,
+  fontSize: "0.85rem",
+  lineHeight: 1.6,
+  display: "-webkit-box",
+  WebkitLineClamp: 3,
+  WebkitBoxOrient: "vertical",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  height: "4.08em",          // FIXED: exactly 3 lines at lineHeight 1.6 - no shifting
+  marginBottom: 16,
+  [theme.breakpoints.down("sm")]: {
+    fontSize: "0.8rem",
+    height: "3.84em",
+    marginBottom: 12,
+  },
+}));
+
+
+const ActionButton = styled(Button)(({ theme }) => ({
+  color: colors.primary,
+  fontWeight: 700,
+  fontSize: "0.9rem",
+  textTransform: "none",
+  padding: "0",
+  minWidth: "auto",
+  background: "transparent",
+  transition: "all 0.3s ease",
+  "& .arrow-icon": {
+    transition: "transform 0.3s ease",
+    fontSize: 18,
+    marginLeft: 6,
+  },
+  "&:hover": {
+    background: "transparent",
+    opacity: 0.8,
+    "& .arrow-icon": { transform: "translateX(6px)" },
+  },
+  [theme.breakpoints.down("sm")]: {
+    fontSize: "0.85rem",
+  },
+}));
+
+const NavigationButton = styled(IconButton)(({ theme }) => ({
+  background: colors.light,
+  boxShadow: `0 4px 12px -4px ${alpha(colors.dark, 0.1)}`,
+  border: `1px solid ${alpha(colors.primary, 0.15)}`,
+  color: colors.primary,
+  width: 44,
+  height: 44,
+  transition: "all 0.3s ease",
+  "&:hover": {
+    background: colors.primary,
+    color: "#fff",
+    transform: "scale(1.08) translateY(-2px)",
+    borderColor: "transparent",
+    boxShadow: `0 10px 20px -6px ${alpha(colors.primary, 0.4)}`,
+  },
+  "&.Mui-disabled": { opacity: 0.35, background: colors.background.main },
+  [theme.breakpoints.down("sm")]: {
+    width: 36,
+    height: 36,
+    "& svg": { fontSize: 18 },
+  },
+}));
+
+const DotIndicator = styled(Box)(({ $active }) => ({
+  width: $active ? 32 : 8,
+  height: 6,
+  borderRadius: 3,
+  background: $active
+    ? `linear-gradient(90deg, ${colors.primary}, ${colors.secondary})`
+    : alpha(colors.primary, 0.2),
+  transition: "all 0.3s ease",
+  cursor: "pointer",
+  "&:hover": {
+    background: colors.primary,
+    opacity: 0.75,
+    width: $active ? 32 : 16,
+  },
+}));
+
+const ScrollContainer = styled(Box)({
+  position: 'relative',
+  width: '100%',
+  overflow: 'visible',
+  '&:hover .scroll-button': {
+    opacity: 1,
+    transform: 'translateY(-50%) scale(1)',
+  },
+});
+
+const ScrollTrack = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'stretch',
+  gap: '30px',
+  overflowX: 'auto',
+  scrollBehavior: 'smooth',
+  msOverflowStyle: 'none',
+  scrollbarWidth: 'none',
+  padding: '20px 4px 40px 4px',
+  '&::-webkit-scrollbar': {
+    display: 'none',
   },
   [theme.breakpoints.down('sm')]: {
-    '&::before, &::after': {
-      width: '60px',
+    gap: '16px',
+    padding: '10px 20px 20px 20px',
+  },
+}));
+
+const ScrollButton = styled(IconButton, {
+  shouldForwardProp: (prop) => prop !== "$direction",
+})(({ theme, $direction }) => ({
+  position: 'absolute',
+  top: '50%',
+  transform: 'translateY(-50%) scale(0.9)',
+  [$direction === 'left' ? 'left' : 'right']: -25,
+  zIndex: 10,
+  backgroundColor: 'white',
+  color: colors.primary,
+  boxShadow: '0 12px 24px rgba(0,0,0,0.12)',
+  opacity: 0,
+  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+  '&:hover': {
+    backgroundColor: colors.primary,
+    color: 'white',
+    transform: 'translateY(-50%) scale(1.1)',
+  },
+  [theme.breakpoints.down('lg')]: {
+    display: 'none',
+  },
+}));
+
+const SearchWrapper = styled(Box)(({ theme }) => ({
+  maxWidth: "650px",
+  margin: "0 auto 32px auto",
+  position: "relative",
+  animation: `${slideInUp} 0.7s ease-out`,
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "50px",
+    backgroundColor: "#fff",
+    boxShadow: "0 10px 30px -10px rgba(0,0,0,0.08)",
+    transition: "all 0.3s ease",
+    padding: "4px 20px",
+    "& fieldset": {
+      borderColor: alpha(colors.primary, 0.15),
+    },
+    "&:hover fieldset": {
+      borderColor: colors.primary,
+    },
+    "&.Mui-focused": {
+      boxShadow: `0 15px 40px -10px ${alpha(colors.primary, 0.15)}`,
+      "& fieldset": {
+        borderColor: colors.primary,
+        borderWidth: "2px",
+      },
     },
   },
 }));
 
-const CategoryChip = styled(Chip)({
-  background: alpha("#83a561", 0.2),
-  color: "#48723e",
-  fontWeight: 600,
-  fontSize: '0.85rem',
-  borderRadius: '30px',
-  border: `1px solid ${alpha("#48723e", 0.2)}`,
-  backdropFilter: 'blur(10px)',
-  WebkitBackdropFilter: 'blur(10px)',
-  '& .MuiChip-label': {
-    padding: '6px 12px',
-  },
-});
+const CategoryContainer = styled(Box)(({ theme }) => ({
+  display: "flex",
+  justifyContent: "center",
+  gap: "12px",
+  flexWrap: "wrap",
+  marginBottom: "48px",
+  animation: `${slideInUp} 0.8s ease-out`,
+}));
 
-const MarqueeTrack = styled(Box, {
-  shouldForwardProp: (prop) => prop !== '$blogsCount'
-})(({ $blogsCount }) => ({
-  display: 'flex',
-  width: 'max-content',
-  animation: `${scrollLeft} ${($blogsCount || 1) * 12}s linear infinite`,
-  '&:hover': {
-    animationPlayState: 'paused',
-  },
-  '&:active': {
-    animationPlayState: 'paused',
+const CategoryChip = styled(Chip, {
+  shouldForwardProp: (prop) => prop !== "$active",
+})(({ theme, $active }) => ({
+  fontWeight: 700,
+  fontSize: "0.9rem",
+  padding: "20px 10px",
+  borderRadius: "30px",
+  backgroundColor: $active ? colors.primary : "transparent",
+  color: $active ? "#fff" : colors.textPrimary,
+  border: $active ? "none" : `1px solid transparent`,
+  transition: "all 0.3s ease",
+  cursor: "pointer",
+  "&:hover": {
+    backgroundColor: $active ? colors.primaryDark : alpha(colors.primary, 0.08),
   },
 }));
 
-const BackgroundOrb = styled(Box)(({ size, top, right, color }) => ({
-  position: 'absolute',
-  width: size,
-  height: size,
-  borderRadius: '50%',
-  background: `radial-gradient(circle, ${color} 0%, transparent 70%)`,
-  top,
-  right,
-  filter: 'blur(60px)',
-  animation: `${floatAnimation} ${15 + Math.random() * 10}s ease-in-out infinite`,
-  pointerEvents: 'none',
-  zIndex: 0,
-}));
-
+// Main Component
 const Blog = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [hoveredCard, setHoveredCard] = useState(null);
-  const [bookmarked, setBookmarked] = useState([]);
-  const navigate = useNavigate();
-  const theme = useTheme();
   const [blogs, setBlogs] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [hoveredCard, setHoveredCard] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const scrollRef = useRef(null);
+  const navigate = useNavigate();
 
-  React.useEffect(() => {
+  const [isAutoScrolling, setIsAutoScrolling] = useState(true);
+
+  // 1. Fetch data
+  useEffect(() => {
     const fetchBlogs = async () => {
       try {
         setLoading(true);
@@ -231,66 +364,72 @@ const Blog = () => {
         setLoading(false);
       }
     };
-
     fetchBlogs();
   }, []);
 
-  const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  // 2. Memoize category and filters
+  const categories = useMemo(() => ["All", ...new Set(blogs.map((blog) => blog.category || "General"))], [blogs]);
 
-  const itemsPerPage = isTablet || isMobile ? 1 : 3;
+  const filteredBlogs = useMemo(() => {
+    return blogs.filter((blog) => {
+      const matchesSearch =
+        blog.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        blog.short_description?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = selectedCategory === "All" || (blog.category || "General") === selectedCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [blogs, searchTerm, selectedCategory]);
 
-  React.useEffect(() => {
-    setCurrentIndex(0);
-  }, [itemsPerPage]);
+  // 3. Auto-scroll logic (pauses on hover)
+  useEffect(() => {
+    let interval;
+    if (isAutoScrolling && filteredBlogs.length > 3) { // Only scroll if there are more than 3 blogs
+      interval = setInterval(() => {
+        if (scrollRef.current) {
+          const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+          if (scrollLeft + clientWidth >= scrollWidth - 15) {
+            scrollRef.current.scrollTo({ left: 0, behavior: "smooth" });
+          } else {
+            scroll("right");
+          }
+        }
+      }, 3500);
+    }
+    return () => clearInterval(interval);
+  }, [isAutoScrolling, filteredBlogs]);
 
-  const handleNext = () => {
-    if (!blogs.length) return;
-    setCurrentIndex((prevIndex) =>
-      prevIndex + itemsPerPage >= blogs.length ? 0 : prevIndex + itemsPerPage,
-    );
+  const scroll = (direction) => {
+    if (scrollRef.current) {
+      const container = scrollRef.current;
+      const scrollAmount = direction === 'left' ? -container.clientWidth : container.clientWidth;
+      container.scrollBy({
+        left: scrollAmount,
+        behavior: 'smooth',
+      });
+    }
   };
-
-  const handlePrev = () => {
-    if (!blogs.length) return;
-    setCurrentIndex((prevIndex) =>
-      prevIndex - itemsPerPage < 0
-        ? Math.max(blogs.length - itemsPerPage, 0)
-        : prevIndex - itemsPerPage,
-    );
-  };
-
-  const handleBookmark = (blogId, e) => {
-    e.stopPropagation();
-    setBookmarked((prev) =>
-      prev.includes(blogId)
-        ? prev.filter((id) => id !== blogId)
-        : [...prev, blogId],
-    );
-  };
-
-  const loopBlogs = blogs.length > 0 ? [...blogs, ...blogs] : [];
 
   // Loading skeleton
   if (loading) {
     return (
-      <Box sx={{ py: 8, bgcolor: colors.background.main }}>
-        <Container maxWidth="xl">
-          <Box sx={{ textAlign: "center", mb: 6 }}>
-            <Typography variant="h4" sx={{ fontWeight: 700, color: colors.textPrimary }}>
-              Loading <span style={{ color: colors.primary }}>Articles</span>
-            </Typography>
-          </Box>
+      <Box sx={{ py: 8, bgcolor: colors.background.main, minHeight: "60vh" }}>
+        <Container maxWidth="lg">
           <Grid container spacing={3} justifyContent="center">
-            {[1, 2, 3].map((i) => (
-              <Grid item xs={12} md={4} key={i}>
-                <Box sx={{
-                  height: 400,
-                  borderRadius: '30px',
-                  background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
-                  backgroundSize: '200% 100%',
-                  animation: `${shimmer} 1.5s infinite`,
-                }} />
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <Grid size={{ xs: 12, sm: 6, md: 3 }} key={i}>
+                <Box sx={{ height: "100%" }}>
+                  <Skeleton
+                    variant="rectangular"
+                    height={240}
+                    sx={{ borderRadius: "24px 24px 0 0" }}
+                  />
+                  <Box sx={{ p: 2 }}>
+                    <Skeleton variant="text" width="60%" height={24} />
+                    <Skeleton variant="text" width="40%" height={20} />
+                    <Skeleton variant="text" width="90%" height={60} />
+                    <Skeleton variant="rectangular" width="100px" height={32} sx={{ borderRadius: "30px" }} />
+                  </Box>
+                </Box>
               </Grid>
             ))}
           </Grid>
@@ -302,49 +441,31 @@ const Blog = () => {
   return (
     <Box
       sx={{
-        py: { xs: 6, md: 10 },
-        background: colors.background.gradient,
-        position: 'relative',
-        overflow: 'hidden',
+        py: { xs: 8, md: 12 },
+        background: colors.background.main,
+        position: "relative",
+        overflow: "hidden",
       }}
     >
-      {/* Background Orbs */}
-      <BackgroundOrb size="500px" top="-10%" right="-5%" color="rgba(61, 184, 67, 0.1)" />
-      <BackgroundOrb size="400px" bottom="-10%" left="-5%" color="rgba(211, 243, 107, 0.1)" />
-
-      {/* Floating Particles */}
-      {[...Array(12)].map((_, i) => (
-        <Box
-          key={i}
-          sx={{
-            position: 'absolute',
-            width: 5 + i * 3,
-            height: 5 + i * 3,
-            borderRadius: '50%',
-            background: alpha(colors.secondary, 0.1),
-            top: `${Math.random() * 100}%`,
-            left: `${Math.random() * 100}%`,
-            filter: 'blur(2px)',
-            animation: `${floatAnimation} ${15 + i * 2}s ease-in-out infinite`,
-            pointerEvents: 'none',
-          }}
-        />
-      ))}
-
       <Container maxWidth="xl">
         {/* Header Section */}
-        <Box sx={{ textAlign: "center", mb: { xs: 6, md: 8 } }}>
-          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
+        <Box
+          sx={{
+            textAlign: "center",
+            mb: { xs: 6, md: 8 },
+            animation: `${slideInUp} 0.6s ease-out`,
+          }}
+        >
+          <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
             <Chip
-              label="LATEST ARTICLES"
-              icon={<MenuBookIcon sx={{ fontSize: 18, color: 'var(--green-dark) !important' }} />}
+              icon={<MenuBookIcon sx={{ fontSize: "16px !important", color: "inherit !important" }} />}
+              label="KNOWLEDGE HUB"
               sx={{
-                bgcolor: 'var(--green-light)',
-                color: 'var(--green-dark)',
+                bgcolor: alpha(colors.primary, 0.1),
+                color: colors.textPrimary,
                 fontWeight: 800,
-                letterSpacing: 1,
-                border: '1px solid var(--green-mid)',
-                '& .MuiChip-label': { px: 2 }
+                px: 1,
+                "& .MuiChip-label": { paddingLeft: "8px" },
               }}
             />
           </Box>
@@ -352,184 +473,171 @@ const Blog = () => {
           <Typography
             variant="h2"
             sx={{
-              fontWeight: 600,
-              mb: 2.5,
-              fontSize: 'clamp(1.7rem, 3.2vw, 2.5rem)',
-              color: 'var(--green-dark)',
-              letterSpacing: '-0.02em',
-              lineHeight: 1.1
+              fontWeight: 800,
+              mb: 2,
+              fontSize: { xs: "2.2rem", sm: "2.8rem", md: "3.5rem" },
+              color: colors.textPrimary,
+              letterSpacing: "-0.02em",
+              lineHeight: 1.1,
             }}
           >
-            <Box component="span" sx={{ color: 'black' }}>Insights &</Box> Future Tech
+            Insights & <span style={{ color: colors.primary }}>Innovation</span>
           </Typography>
 
           <Typography
             variant="body1"
             sx={{
-              color: '#6b8f76',
-              maxWidth: "650px",
+              color: colors.textSecondary,
+              maxWidth: "700px",
               mx: "auto",
-              fontSize: "1rem",
-              lineHeight: 1.7,
-              mb: 4
+              fontSize: { xs: "1rem", sm: "1.1rem" },
+              lineHeight: 1.6,
+              px: 2,
+              mb: 4,
             }}
           >
-            Stay ahead of the curve with expert perspectives and deep dives into the software solutions shaping tomorrow's digital landscape.
+            Stay ahead with expert tech insights
           </Typography>
 
-          <Button
-            variant="outlined"
-            onClick={() => navigate("/blogs")}
-            endIcon={<ArrowForwardIosIcon sx={{ fontSize: '14px !important' }} />}
-            sx={{
-              color: colors.primary,
-              borderColor: alpha(colors.primary, 0.3),
-              borderRadius: '12px',
-              px: 4,
-              py: 1.2,
-              fontWeight: 700,
-              textTransform: 'none',
-              '&:hover': {
-                borderColor: colors.primary,
-                bgcolor: alpha(colors.primary, 0.05),
-                '& .MuiButton-endIcon': { transform: 'translateX(4px)' }
-              },
-              transition: 'all 0.3s ease'
-            }}
-          >
-            View All Articles
-          </Button>
+          {/* Search Bar */}
+          <SearchWrapper>
+            <TextField
+              fullWidth
+              placeholder="Search articles..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ color: colors.textSecondary }} />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <FilterListIcon sx={{ color: colors.textSecondary, cursor: "pointer" }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </SearchWrapper>
+
+          {/* Category Filters */}
+          <CategoryContainer>
+            {categories.map((cat) => (
+              <CategoryChip
+                key={cat}
+                label={cat}
+                $active={selectedCategory === cat}
+                onClick={() => setSelectedCategory(cat)}
+              />
+            ))}
+          </CategoryContainer>
         </Box>
 
-        {/* Blog Marquee Section */}
-        <MarqueeContainer>
-          <MarqueeTrack $blogsCount={blogs.length}>
-            {loopBlogs.map((blog, index) => (
-              <Box key={`${blog.id || 'blog'}-${index}`} sx={{ py: 2 }}>
-                <GlassCard
-                  $hovered={hoveredCard === index}
-                  onMouseEnter={() => setHoveredCard(index)}
-                  onMouseLeave={() => setHoveredCard(null)}
-                  onClick={() => navigate(`/blogs/${blog.slug}`)}
+        {/* Blog Scroll Track */}
+        <ScrollContainer>
+          <ScrollButton $direction="left" onClick={() => scroll('left')} className="scroll-button">
+            <ChevronLeftIcon />
+          </ScrollButton>
+
+          <ScrollTrack
+            ref={scrollRef}
+            onMouseEnter={() => setIsAutoScrolling(false)}
+            onMouseLeave={() => setIsAutoScrolling(true)}
+          >
+            {filteredBlogs.length > 0 ? (
+              filteredBlogs.map((blog, idx) => (
+                <Box
+                  key={blog.id || idx}
+                  sx={{
+                    width: { xs: "280px", sm: "300px", md: "calc((100% - 90px) / 4)" },
+                    height: "480px",   // FIXED HEIGHT — every card identical
+                    flexShrink: 0,
+                  }}
                 >
-                  {/* Image Container */}
-                  <Box sx={{ position: "relative", pt: '60%', overflow: 'hidden' }}>
-                    <CardMedia
-                      component="img"
-                      image={getImgUrl(blog.image)}
-                      alt={blog.title}
-                      sx={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        width: '100%',
-                        height: '100%',
-                        transition: "transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)",
-                        transform: hoveredCard === index ? "scale(1.1)" : "scale(1)",
-                      }}
-                    />
+                  <BlogCard
+                    $hovered={hoveredCard === idx}
+                    onMouseEnter={() => setHoveredCard(idx)}
+                    onMouseLeave={() => setHoveredCard(null)}
+                    onClick={() => navigate(`/blogs/${blog.slug || blog.id}`)}
+                    elevation={0}
+                  >
+                    {/* Image Section */}
+                    <ImageContainer>
+                      <StyledCardMedia
+                        component="img"
+                        image={getImgUrl(blog.image)}
+                        alt={blog.title}
+                        loading="lazy"
+                      />
+                    </ImageContainer>
+
+                    {/* Content Section */}
                     <Box
                       sx={{
-                        position: 'absolute',
-                        top: 20,
-                        left: 20,
-                        zIndex: 2
+                        p: { xs: 2.5, sm: 3 },
+                        flexGrow: 1,
+                        display: "flex",
+                        flexDirection: "column",
+                        overflow: "hidden",
                       }}
                     >
-                      <CategoryChip
-                        label={blog.short_description?.split(',')[0] || "Featured"}
-                        sx={{
-                          background: 'rgba(255, 255, 255, 0.9)',
-                          backdropFilter: 'blur(4px)',
-                          boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-                        }}
-                      />
-                    </Box>
-                  </Box>
+                      <MetaInfo>
+                        <div className="meta-item">
+                          <CalendarMonthIcon />
+                          <span>
+                            {blog.createdAt
+                              ? new Date(blog.createdAt).toLocaleDateString("en-US", {
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              })
+                              : "Recent"}
+                          </span>
+                        </div>
+                        <div className="meta-item">
+                          <PersonIcon />
+                          <span>{blog.author || "Admin"}</span>
+                        </div>
+                        <div className="meta-item">
+                          <VisibilityIcon />
+                          <span>{blog.views?.toLocaleString() || 0}</span>
+                        </div>
+                      </MetaInfo>
 
-                  {/* Content Area */}
-                  <Box sx={{ p: 3.5, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2, flexWrap: 'wrap' }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: colors.textPrimary }}>
-                        <CalendarMonthIcon sx={{ fontSize: 16, color: colors.primary }} />
-                        <Typography variant="caption" sx={{ fontWeight: 600, lineHeight: 1 }}>
-                          {blog.createdAt ? new Date(blog.createdAt).toLocaleDateString("en-US", { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent'}
-                        </Typography>
-                      </Box>
-                      <Typography variant="caption" sx={{ color: 'divider', fontWeight: 900 }}>·</Typography>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: colors.textPrimary }}>
-                        <AccessTimeIcon sx={{ fontSize: 16, color: colors.secondary }} />
-                        <Typography variant="caption" sx={{ fontWeight: 600, lineHeight: 1 }}>3 min read</Typography>
-                      </Box>
-                      <Typography variant="caption" sx={{ color: 'divider', fontWeight: 900 }}>·</Typography>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: colors.textPrimary }}>
-                        <VisibilityIcon sx={{ fontSize: 16, color: colors.primary }} />
-                        <Typography variant="caption" sx={{ fontWeight: 600, lineHeight: 1 }}>{blog.views || 0} views</Typography>
-                      </Box>
-                    </Box>
+                      <BlogTitle variant="h6">{blog.title}</BlogTitle>
 
-                    <Typography
-                      variant="h5"
-                      sx={{
-                        fontWeight: 600,
-                        lineHeight: 1.3,
-                        color: colors.textPrimary,
-                        mb: 2.5,
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
-                        fontSize: '1.1rem',
-                        minHeight: '3.2rem'
-                      }}
-                    >
-                      {blog.title}
-                    </Typography>
+                      <BlogDescription variant="body2">
+                        {blog.short_description || blog.content?.substring(0, 150)}...
+                      </BlogDescription>
 
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          color: '#6b8f76',
-                          lineHeight: 1.6,
-                          display: '-webkit-box',
-                          WebkitLineClamp: 3,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden',
-                          mb: 3,
-                          fontSize: '0.95rem'
-                        }}
-                      >
-                        {blog.short_description || blog.content?.replace(/<[^>]*>?/gm, '').substring(0, 150)}
-                      </Typography>
-
-                      <Box sx={{ mt: 'auto' }}>
-                        <Button
-                          onClick={() => navigate(`/blogs/${blog.slug}`)}
-                          endIcon={<ArrowForwardIosIcon sx={{ fontSize: '12px !important' }} />}
-                          sx={{
-                            color: colors.primary,
-                            fontWeight: 700,
-                            fontSize: '0.9rem',
-                            textTransform: 'none',
-                            p: 0,
-                            '&:hover': {
-                              background: 'transparent',
-                              color: colors.dark,
-                              '& .MuiButton-endIcon': { transform: 'translateX(4px)' }
-                            },
-                            transition: 'all 0.3s ease'
+                      {/* Footer */}
+                      <Box sx={{ mt: "auto", pt: 1 }}>
+                        <ActionButton
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/blogs/${blog.slug || blog.id}`);
                           }}
                         >
-                          Read More
-                        </Button>
+                          Read Article
+                          <ArrowForwardIcon className="arrow-icon" />
+                        </ActionButton>
                       </Box>
-                  </Box>
-                </GlassCard>
+                    </Box>
+                  </BlogCard>
+                </Box>
+              ))
+            ) : (
+              <Box sx={{ width: "100%", textAlign: "center", py: 4 }}>
+                <Typography color="textSecondary">No blogs found matching your criteria.</Typography>
               </Box>
-            ))}
-          </MarqueeTrack>
-        </MarqueeContainer>
+            )}
+          </ScrollTrack>
 
+          <ScrollButton $direction="right" onClick={() => scroll('right')} className="scroll-button">
+            <ChevronRightIcon />
+          </ScrollButton>
+        </ScrollContainer>
       </Container>
     </Box>
   );

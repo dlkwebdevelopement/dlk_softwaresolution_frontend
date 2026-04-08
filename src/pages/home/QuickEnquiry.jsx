@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Box, Typography, TextField, Button, Container, alpha } from "@mui/material";
+import { Box, Typography, TextField, Button, Container, alpha, Grid } from "@mui/material";
 import { styled, keyframes } from "@mui/material/styles";
-import { PostRequest } from "../../api/config";
+import { PostRequest } from "../../api/api";
 import { ADMIN_POST_ENQUIRIES } from "../../api/endpoints";
 import SendIcon from '@mui/icons-material/Send';
 import InfoIcon from '@mui/icons-material/Info';
@@ -99,6 +99,27 @@ const FeatureItem = styled(Box)(({ theme }) => ({
   },
 }));
 
+const ImageBox = styled(Box)(({ theme }) => ({
+  width: '100%',
+  height: 'auto',
+  minHeight: '400px',
+  borderRadius: '30px',
+  overflow: 'hidden',
+  position: 'relative',
+  border: '8px solid rgba(255, 255, 255, 0.5)',
+  boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+  animation: `${float} 6s ease-in-out infinite`,
+  '& img': {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+  },
+  [theme.breakpoints.down('md')]: {
+    minHeight: '300px',
+    marginBottom: theme.spacing(4),
+  },
+}));
+
 export default function QuickEnquiry() {
   const [formData, setFormData] = useState({
     name: "",
@@ -168,17 +189,27 @@ export default function QuickEnquiry() {
       }} />
 
       <Container maxWidth="lg">
-        <Box sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          textAlign: "center"
-        }}
-        >
+        <Grid container spacing={{ xs: 2, md: 6 }} alignItems="center">
+          {/* IMAGE SECTION */}
+          <Grid size={{ xs: 12, md: 5 }}>
+            <ImageBox>
+              <img src="/photos/c.jpg" alt="Software Training Academy" />
+              <Box sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.2) 100%)',
+                pointerEvents: 'none'
+              }} />
+            </ImageBox>
+          </Grid>
+
           {/* CONTENT SECTION */}
-          <Box sx={{ maxWidth: '800px', mx: 'auto' }}>
+          <Grid size={{ xs: 12, md: 7 }}>
             <InfoCard>
-              <Box sx={{ mb: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <Box sx={{ mb: 2, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                 <FloatingBadge>
                   <Box sx={{
                     bgcolor: 'var(--green-light)',
@@ -200,9 +231,10 @@ export default function QuickEnquiry() {
                   fontWeight: 600,
                   mb: 2,
                   color: "var(--dark)",
-                  fontSize: { xs: '2rem', md: '2.8rem' },
+                  fontSize: { xs: '1.8rem', md: '2.4rem' },
                   lineHeight: 1.2,
-                  letterSpacing: '-0.02em'
+                  letterSpacing: '-0.02em',
+                  textAlign: 'left'
                 }}>
                   The Best <span style={{
                     background: 'linear-gradient(135deg, var(--green-dark) 0%, var(--green) 100%)',
@@ -210,7 +242,7 @@ export default function QuickEnquiry() {
                     WebkitTextFillColor: 'transparent',
                   }}>Software Training</span> Academy
                 </Typography>
-                <Typography sx={{ color: "#4b5563", lineHeight: 1.8, fontSize: '1rem', fontWeight: 400, mb: 3 }}>
+                <Typography sx={{ color: "#4b5563", lineHeight: 1.8, fontSize: '1rem', fontWeight: 400, mb: 3, textAlign: 'left' }}>
                   DLK is <strong>the Best Software Training Institute in Chennai</strong>, led by IT experts with 20+ years of experience and a track record of 100% placement guidance.
                 </Typography>
               </Box>
@@ -314,10 +346,9 @@ export default function QuickEnquiry() {
                 border: '1px solid var(--green-mid)',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
+                justifyContent: 'flex-start',
                 gap: 2,
-                maxWidth: '450px',
-                mx: 'auto'
+                maxWidth: '100%'
               }}>
                 <Box sx={{
                   minWidth: 50,
@@ -332,7 +363,7 @@ export default function QuickEnquiry() {
                 }}>
                   <VerifiedIcon />
                 </Box>
-                <Box>
+                <Box sx={{ textAlign: 'left' }}>
                   <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'var(--dark)', lineHeight: 1.2 }}>
                     ISO 9001:2015 Certified
                   </Typography>
@@ -342,8 +373,8 @@ export default function QuickEnquiry() {
                 </Box>
               </Box>
             </InfoCard>
-          </Box>
-        </Box>
+          </Grid>
+        </Grid>
       </Container>
     </Box>
   );

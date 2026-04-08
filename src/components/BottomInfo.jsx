@@ -1,13 +1,17 @@
-import { Box, Typography, Stack, useTheme, useMediaQuery, Chip, alpha } from "@mui/material";
+import { Box, Typography, Stack, useTheme, useMediaQuery, Chip, alpha, IconButton } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { styled, keyframes } from "@mui/material/styles";
-import PhoneIcon from "@mui/icons-material/Phone";
-import EmailIcon from "@mui/icons-material/Email";
-import TelegramIcon from "@mui/icons-material/Telegram";
-import WhatsAppIcon from "@mui/icons-material/WhatsApp";
-import CallIcon from "@mui/icons-material/Call";
-import VerifiedIcon from "@mui/icons-material/Verified";
-import LocalOfferIcon from "@mui/icons-material/LocalOffer";
+import {
+  Phone,
+  Mail,
+  Facebook,
+  Instagram,
+  Linkedin,
+  Youtube,
+  Verified,
+  PhoneCall,
+  Tag
+} from "lucide-react";
 
 // Animations
 const floatAnimation = keyframes`
@@ -171,25 +175,18 @@ const CTABox = styled(Box)(({ theme }) => ({
 }));
 
 const IconWrapper = styled(Box)({
-  width: { xs: 24, sm: 28 },
-  height: { xs: 24, sm: 28 },
+  width: { xs: 28, sm: 34 },
+  height: { xs: 28, sm: 34 },
   borderRadius: '50%',
-  background: alpha(colors.light, 0.2),
+  background: alpha(colors.primary, 0.1),
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   transition: 'all 0.3s ease',
-  '&:hover': {
-    background: colors.primary,
-    transform: 'scale(1.1)',
-    '& svg': {
-      color: colors.light,
-    },
-  },
   '& svg': {
-    fontSize: 16,
-    color: colors.dark,
-    transition: 'color 0.3s ease',
+    fontSize: 18,
+    color: colors.primary,
+    transition: 'all 0.3s ease',
   },
 });
 
@@ -230,16 +227,16 @@ const BottomInfo = () => {
             }}
           >
             {/* Phone Numbers */}
-            <Stack 
-              direction="row" 
-              spacing={1} 
-              alignItems="center" 
-              sx={{ 
+            <Stack
+              direction="row"
+              spacing={1}
+              alignItems="center"
+              sx={{
                 flexShrink: 0,
                 cursor: 'pointer',
                 '&:hover': {
                   '& .MuiTypography-root': { color: colors.primary },
-                  '& .IconWrapper-root': { 
+                  '& .IconWrapper-root': {
                     background: colors.primary,
                     '& svg': { color: colors.light }
                   }
@@ -248,7 +245,7 @@ const BottomInfo = () => {
               onClick={() => window.location.href = 'tel:+917708150152'}
             >
               <IconWrapper className="IconWrapper-root">
-                <PhoneIcon />
+                <Phone size={18} />
               </IconWrapper>
               <AnimatedText
                 sx={{
@@ -268,12 +265,12 @@ const BottomInfo = () => {
             </Stack>
 
             {/* Email Section */}
-            <Stack 
-              direction="row" 
-              spacing={1} 
-              alignItems="center" 
-              sx={{ 
-                flexShrink: 0, 
+            <Stack
+              direction="row"
+              spacing={1}
+              alignItems="center"
+              sx={{
+                flexShrink: 0,
                 cursor: 'pointer',
                 '&:hover': {
                   '& .MuiTypography-root': {
@@ -297,7 +294,7 @@ const BottomInfo = () => {
               }}
             >
               <IconWrapper className="IconWrapper-root">
-                <EmailIcon />
+                <Mail size={18} />
               </IconWrapper>
               <Typography
                 sx={{
@@ -313,9 +310,75 @@ const BottomInfo = () => {
               </Typography>
             </Stack>
 
-            
+
           </Box>
         </Stack>
+
+        {/* Middle Section - Social Media Icons */}
+        {!isMobile && (
+          <Stack
+            direction="row"
+            spacing={1}
+            alignItems="center"
+            sx={{
+              animation: `${floatAnimation} 3s ease-in-out infinite`,
+              px: 2,
+              borderLeft: `1px solid ${alpha(colors.primary, 0.1)}`,
+              borderRight: `1px solid ${alpha(colors.primary, 0.1)}`,
+              mx: 2
+            }}
+          >
+            <IconButton
+              href="https://www.facebook.com/profile.php?id=61569333069634"
+              target="_blank"
+              sx={{
+                color: '#1877F2',
+                transition: 'all 0.3s ease',
+                p: 1,
+                '&:hover': { transform: 'translateY(-3px) scale(1.1)', filter: 'brightness(1.1)' }
+              }}
+            >
+              <Facebook size={20} />
+            </IconButton>
+            <IconButton
+              href="https://www.instagram.com/dlk_softwaresolutions/"
+              target="_blank"
+              sx={{
+                color: '#E4405F',
+                transition: 'all 0.3s ease',
+                p: 1,
+                '&:hover': { transform: 'translateY(-3px) scale(1.1)', filter: 'brightness(1.1)' }
+              }}
+            >
+              <Instagram size={20} />
+            </IconButton>
+            <IconButton
+              href="https://www.linkedin.com/company/107134148/admin/dashboard/"
+              target="_blank"
+              sx={{
+                color: '#0A66C2',
+                transition: 'all 0.3s ease',
+                p: 1,
+                '&:hover': { transform: 'translateY(-3px) scale(1.1)', filter: 'brightness(1.1)' }
+              }}
+            >
+              <Linkedin size={20} />
+            </IconButton>
+            <IconButton
+              href="https://www.youtube.com/@StudentsLearningplatform2026"
+              target="_blank"
+              sx={{
+                color: '#FF0000',
+                transition: 'all 0.3s ease',
+                p: 1,
+                '&:hover': { transform: 'translateY(-3px) scale(1.1)', filter: 'brightness(1.1)' }
+              }}
+            >
+              <Youtube size={20} />
+            </IconButton>
+
+          </Stack>
+        )}
 
         {/* Right Section - CTA */}
         <Stack
@@ -331,7 +394,7 @@ const BottomInfo = () => {
           {!isMobile && (
             <CTABox onClick={() => navigate("/contact")}>
               <Stack direction="row" spacing={1} alignItems="center" sx={{ position: 'relative', zIndex: 2 }}>
-                <VerifiedIcon sx={{ fontSize: 16, color: colors.secondary }} />
+                <Verified size={20} color={colors.secondary} />
                 <Typography
                   sx={{
                     color: colors.light,
@@ -343,14 +406,14 @@ const BottomInfo = () => {
                 >
                   Free Counselling
                 </Typography>
-                <LocalOfferIcon sx={{ fontSize: 14, color: colors.secondary }} />
+                <Tag size={18} color={colors.secondary} />
               </Stack>
             </CTABox>
           )}
 
           {/* Quick Call Button */}
           <ContactChip
-            icon={<CallIcon sx={{ fontSize: '18px !important' }} />}
+            icon={<PhoneCall size={20} style={{ marginRight: 4 }} />}
             label={isMobile ? "Call" : "Call Now"}
             onClick={() => window.location.href = 'tel:+917708150152'}
             sx={{

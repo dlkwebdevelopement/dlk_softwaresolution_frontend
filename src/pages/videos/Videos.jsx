@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { GetRequest } from "../../api/config";
+import { GetRequest } from "../../api/api";
 import { GET_ALL_VIDEOS } from "../../api/endpoints";
 import {
   Box,

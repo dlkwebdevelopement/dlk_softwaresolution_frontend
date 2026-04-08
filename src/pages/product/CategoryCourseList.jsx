@@ -24,7 +24,7 @@ import {
   NavigateNext as NavigateNextIcon
 } from "@mui/icons-material";
 import { Link } from "react-router-dom";
-import { GetRequest } from "../../api/config";
+import { GetRequest } from "../../api/api";
 import { ADMIN_GET_CATEGORIES } from "../../api/endpoints";
 import { getImgUrl } from "../../api/api";
 import Navbar from "../../components/Navbar";

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Box, Typography, Container, Grid, alpha } from "@mui/material";
 import { useParams } from "react-router-dom";
-import { GetRequest } from "../../api/config";
+import { GetRequest } from "../../api/api";
 import { ADMIN_GET_COURSE_SLUG } from "../../api/endpoints";
 
 // Standard CDNs/Icons for backwards compatibility or fallback

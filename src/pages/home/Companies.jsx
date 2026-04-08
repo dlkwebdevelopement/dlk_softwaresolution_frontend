@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Box, Typography } from "@mui/material";
-import { GetRequest } from "../../api/config";
+import { GetRequest } from "../../api/api";
 import { ADMIN_GET_COMPANIES, ADMIN_GET_HIRING } from "../../api/endpoints";
 
 // Duplicate logos for seamless loop

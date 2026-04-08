@@ -7,7 +7,7 @@ import PeopleIcon from "@mui/icons-material/People";
 import CircleIcon from "@mui/icons-material/Circle";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import { GetRequest, PostRequest } from "../../api/config";
+import { GetRequest, PostRequest } from "../../api/api";
 import { ADMIN_GET_COURSE_SLUG, ADMIN_POST_REGISTRATIONS } from "../../api/endpoints";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";

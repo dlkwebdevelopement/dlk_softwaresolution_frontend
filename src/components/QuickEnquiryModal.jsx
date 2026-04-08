@@ -17,7 +17,7 @@ import { styled } from "@mui/material/styles";
 import CloseIcon from "@mui/icons-material/Close";
 import SendIcon from "@mui/icons-material/Send";
 import VerifiedIcon from "@mui/icons-material/Verified";
-import { PostRequest } from "../api/config";
+import { PostRequest } from "../api/api";
 import { ADMIN_POST_ENQUIRIES } from "../api/endpoints";
 import toast from "react-hot-toast";
 import ReCAPTCHA from "react-google-recaptcha";

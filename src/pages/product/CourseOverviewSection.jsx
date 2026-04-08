@@ -28,7 +28,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import AOS from "aos";
 import "aos/dist/aos.css";
 import { useNavigate, useParams } from "react-router-dom";
-import { GetRequest, PostRequest } from "../../api/config";
+import { GetRequest, PostRequest } from "../../api/api";
 import {
   ADMIN_GET_CATEGORIES,
   ADMIN_GET_COURSE_SLUG,

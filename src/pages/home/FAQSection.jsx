@@ -18,7 +18,7 @@ import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import QuestionAnswerIcon from "@mui/icons-material/QuestionAnswer";
 import LiveHelpIcon from "@mui/icons-material/LiveHelp";
 import ContactSupportIcon from "@mui/icons-material/ContactSupport";
-import { GetRequest } from "../../api/config";
+import { GetRequest } from "../../api/api";
 import { ADMIN_GET_ALL_QUESTIONS } from "../../api/endpoints";
 
 // Animations

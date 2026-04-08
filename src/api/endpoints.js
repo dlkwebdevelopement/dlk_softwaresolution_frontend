@@ -10,6 +10,7 @@ export const ADMIN_POST_ENQUIRIES = "/admin/enquiries";
 
 // 🖼️ Banners
 export const ADMIN_GET_BANNERS = "/admin/banners";
+export const ADMIN_TOGGLE_BANNER = (id) => `admin/banner/${id}/toggle`;
 
 // 🏢 Company Images
 export const ADMIN_GET_COMPANIES = "/admin/companies";
@@ -51,6 +52,8 @@ export const GET_ALL_VIDEOS = "/admin/videos";
 // 🖼️ Gallery
 export const GET_ALL_GALLERY = "/admin/gallery";
 export const GET_ALL_GALLERY_EVENTS = "/admin/gallery-events";
+export const GET_ALL_OFFICE_GALLERY = "/admin/office-gallery";
+export const GET_ALL_OFFICE_GALLERY_EVENTS = "/admin/office-gallery-events";
 // ?? Offers
 export const GET_ALL_OFFERS = '/admin/offers';
 

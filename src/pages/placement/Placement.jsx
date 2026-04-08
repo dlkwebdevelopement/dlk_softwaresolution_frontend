@@ -11,7 +11,7 @@ import {
   Breadcrumbs,
   Link,
 } from "@mui/material";
-import { GetRequest } from "../../api/config";
+import { GetRequest } from "../../api/api";
 import { GET_ALL_PLACEMENTS } from "../../api/endpoints";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";

@@ -11,7 +11,7 @@ import {
   alpha,
 } from "@mui/material";
 import { ShoppingBag, ArrowRight } from "@mui/icons-material";
-import { GetRequest } from "../../api/config";
+import { GetRequest } from "../../api/api";
 import { GET_ALL_OFFERS } from "../../api/endpoints";
 import { useNavigate } from "react-router-dom";
 import QuickEnquiryModal from "../../components/QuickEnquiryModal";

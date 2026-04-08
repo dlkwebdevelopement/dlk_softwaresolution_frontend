@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Box, Typography, Container } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { GetRequest } from "../../api/config";
+import { GetRequest } from "../../api/api";
 import { ADMIN_GET_COMPANIES } from "../../api/endpoints";
 import { getImgUrl } from "../../api/api";
 

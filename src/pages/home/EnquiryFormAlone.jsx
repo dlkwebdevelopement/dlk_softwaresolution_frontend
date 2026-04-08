@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { Box, Typography, TextField, Button, alpha } from "@mui/material";
 import { styled, keyframes } from "@mui/material/styles";
-import { PostRequest } from "../../api/config";
+import { PostRequest } from "../../api/api";
 import { ADMIN_POST_ENQUIRIES } from "../../api/endpoints";
 import SendIcon from '@mui/icons-material/Send';
 import ReCAPTCHA from "react-google-recaptcha";
