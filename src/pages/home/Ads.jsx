@@ -253,7 +253,19 @@ const Ads = () => {
       setLoadingCourses(true);
       try {
         const res = await GetRequest(`/admin/course/category/${activeCategory}`);
-        setCourses(res?.data || []);
+        console.log("FETCHED COURSES RES:", res);
+        
+        let fetchedArray = [];
+        if (Array.isArray(res)) {
+          fetchedArray = res;
+        } else if (res && Array.isArray(res.data)) {
+          fetchedArray = res.data;
+        } else if (res && res.success && Array.isArray(res.courses)) {
+          fetchedArray = res.courses;
+        }
+        
+        console.log("FINAL COURSES ARRAY:", fetchedArray);
+        setCourses(fetchedArray);
       } catch (err) {
         console.error("Failed to fetch Courses", err);
       } finally {

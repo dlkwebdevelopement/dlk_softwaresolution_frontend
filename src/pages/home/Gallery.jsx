@@ -14,7 +14,8 @@ import {
   Paper,
   alpha,
   Dialog,
-  LinearProgress
+  LinearProgress,
+  Fab
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -362,17 +363,11 @@ const Gallery = () => {
               lineHeight: 1.15,
             }}
           >
-            Memories & <Box
+            Our <Box
               component="span"
-              sx={{
-                background: `linear-gradient(135deg, ${colors.primary}, #D3F36B, ${colors.primaryDark})`,
-                backgroundSize: "200% auto",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                animation: `${gradientShift} 4s linear infinite`,
-              }}
+              sx={{ color: colors.primary }}
             >
-              Innovation
+              Gallery
             </Box>
           </Typography>
 
@@ -387,7 +382,7 @@ const Gallery = () => {
               lineHeight: 1.75,
             }}
           >
-            Explore our state-of-the-art facilities and vibrant learning environment through these captured moments.
+            Explore our state-of-the-art facilities and vibrant learning environment through these moments.
           </Typography>
         </Box>
 

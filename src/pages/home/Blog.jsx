@@ -481,7 +481,7 @@ const Blog = () => {
               lineHeight: 1.1,
             }}
           >
-            Insights & <span style={{ color: colors.primary }}>Innovation</span>
+            Insights & <span style={{ color: colors.primary }}>Future Tech</span>
           </Typography>
 
           <Typography
@@ -496,30 +496,8 @@ const Blog = () => {
               mb: 4,
             }}
           >
-            Stay ahead with expert tech insights
+            Stay ahead of the curve with expert perspectives and deep dives into the software solutions shaping tomorrow's digital landscape.
           </Typography>
-
-          {/* Search Bar */}
-          <SearchWrapper>
-            <TextField
-              fullWidth
-              placeholder="Search articles..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon sx={{ color: colors.textSecondary }} />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <FilterListIcon sx={{ color: colors.textSecondary, cursor: "pointer" }} />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </SearchWrapper>
 
           {/* Category Filters */}
           <CategoryContainer>
