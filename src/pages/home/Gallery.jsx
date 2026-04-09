@@ -113,42 +113,42 @@ const GalleryItem = ({ album, onOpen, height = 300 }) => {
         bottom: 0,
         left: 0,
         right: 0,
-        p: 2.5,
+        p: 1,
         zIndex: 2,
         color: 'white',
         transform: isHovered ? 'translateY(-5px)' : 'none',
         transition: 'all 0.3s ease'
       }}>
         <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
-          <Chip 
-            label={["Training", "Workshop", "Certification"][album.albumName.length % 3]} 
+          <Chip
+            label={["Training", "Workshop", "Certification"][album.albumName.length % 3]}
             size="small"
             variant="outlined"
-            sx={{ 
-              borderColor: 'rgba(255,255,255,0.5)', 
-              color: 'white', 
-              fontSize: '0.65rem', 
+            sx={{
+              borderColor: 'rgba(255,255,255,0.5)',
+              color: 'white',
+              fontSize: '0.65rem',
               height: '24px',
               fontWeight: 800,
               textTransform: 'uppercase',
               backdropFilter: 'blur(4px)'
-            }} 
+            }}
           />
         </Stack>
 
-        <Typography variant="h6" sx={{ 
-          fontWeight: 900, 
+        <Typography variant="h6" sx={{
+          fontWeight: 900,
           fontSize: '1.15rem',
-          lineHeight: 1.2,
+          lineHeight: 1,
           mb: 1,
           color: '#fff'
         }}>
           {album.albumName || "Untitled"}
         </Typography>
 
-        <Box sx={{ 
-          display: 'flex', 
-          alignItems: 'center', 
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
           gap: 0.5,
           color: '#fff',
           opacity: isHovered ? 1 : 0.9,
@@ -352,7 +352,7 @@ const Gallery = () => {
   }
 
   return (
-    <Box component="section" sx={{ py: { xs: 8, md: 10 }, bgcolor: "#fff", position: "relative", overflow: "hidden" }}>
+    <Box component="section" sx={{ pt: 1, pb: { xs: 8, md: 10 }, bgcolor: "#fff", position: "relative", overflow: "hidden" }}>
       <Container maxWidth="xl">
         {/* Header Section */}
         <Box sx={{ textAlign: "center", mb: 8, animation: `${fadeIn} 0.8s ease-out` }}>

@@ -681,7 +681,7 @@ const Navbar = () => {
                     }}
                   >
                     {[
-                      { icon: <PhotoLibraryIcon />, text: "Gallery", path: "/gallery" },
+                      { icon: <PhotoLibraryIcon />, text: "College Testimonial", path: "/gallery" },
                       { icon: <PhotoLibraryIcon />, text: "Office Testimonial", path: "/office-gallery" },
                       { icon: <VideoLibraryIcon />, text: "Videos", path: "/videos" },
                     ].map((item, index) => (

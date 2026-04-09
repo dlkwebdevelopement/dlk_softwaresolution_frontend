@@ -6,6 +6,7 @@ import Footer from "../components/Footer";
 
 import Banner from "../pages/home/Banner";
 import Category from "../pages/home/Category";
+import Gallerys from "../pages/home/Gallery";
 import Ads from "../pages/home/Ads";
 import Product from "../pages/product/Product";
 import LogoCarousel from "../pages/home/LogoCarousel";
@@ -61,15 +62,19 @@ const AppRoute = () => {
               <Box sx={{ mt: 10 }}></Box>
               <Banner />
               <LiveClass />
+
               <WorkshopPage viewMode="scroll" />
+              <Gallerys />
               <QuickEnquiry />
+
               <Category />
               <Ads />
               {/* <Companies /> */}
               <LogoCarousel />
               <Comments />
-              <Blog />
               <StudentProjects />
+              <Blog />
+
               <BottomInfo />
               <Footer />
             </>
