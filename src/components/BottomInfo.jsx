@@ -90,7 +90,7 @@ const GlassBar = styled(Box)(({ theme }) => ({
   left: 0,
   width: "100%",
   minHeight: "40px",
-  height: { xs: "auto", sm: "40px" },
+  height: "auto",
   background: 'rgba(255, 255, 255, 0.98)',
   backdropFilter: 'blur(20px)',
   WebkitBackdropFilter: 'blur(20px)',
@@ -99,8 +99,8 @@ const GlassBar = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.08)',
-  padding: theme.spacing(0.5, 0),
-  overflow: 'hidden',
+  padding: theme.spacing(1, 0),
+  overflow: "visible",
   maxWidth: "100vw",
   '&::before': {
     content: '""',
@@ -199,11 +199,12 @@ const BottomInfo = () => {
   return (
     <GlassBar>
       <Stack
-        direction="row"
+        direction={{ xs: "column", sm: "row" }}
         justifyContent="space-between"
         alignItems="center"
         width="100%"
-        sx={{ px: { xs: 2, md: 10 } }}
+        spacing={{ xs: 1.5, sm: 0 }}
+        sx={{ px: { xs: 1, sm: 2, md: 10 } }}
       >
         {/* Left Section - Contact Info */}
         <Stack
@@ -220,9 +221,10 @@ const BottomInfo = () => {
           <Box
             sx={{
               display: "flex",
+              flexDirection: { xs: "column", sm: "row" },
               alignItems: "center",
-              justifyContent: { xs: "space-between", md: "flex-start" },
-              gap: { xs: 0, md: 5 },
+              justifyContent: { xs: "center", md: "flex-start" },
+              gap: { xs: 1, sm: 3, md: 5 },
               width: "100%",
             }}
           >
@@ -249,20 +251,20 @@ const BottomInfo = () => {
               </IconWrapper>
               <AnimatedText
                 sx={{
-                  fontSize: { xs: '0.75rem', md: '0.85rem' },
+                  fontSize: { xs: '0.7rem', md: '0.85rem' },
                   fontWeight: 800,
-                  whiteSpace: 'nowrap',
+                  whiteSpace: { xs: 'normal', sm: 'nowrap' },
+                  textAlign: 'center',
                   color: colors.dark,
                   transition: 'color 0.3s ease',
+                  lineHeight: 1.2
                 }}
               >
-                {isMobile
-                  ? "+91 77081 50152"
-                  : isTablet
-                    ? "+91 77081 50152, +91 97518 00789"
-                    : "+91 77081 50152, +91 97518 00789, +91 79043 20834"}
+                +91 77081 50152, +91 97518 00789, +91 79043 20834
               </AnimatedText>
             </Stack>
+
+            <Box sx={{ display: { xs: 'none', sm: 'block' }, width: '1px', height: '24px', bgcolor: alpha(colors.primary, 0.1) }} />
 
             {/* Email Section */}
             <Stack
@@ -300,13 +302,13 @@ const BottomInfo = () => {
                 sx={{
                   color: colors.dark,
                   fontSize: { xs: '0.75rem', md: '0.9rem' },
-                  fontWeight: 600,
+                  fontWeight: 700,
                   whiteSpace: 'nowrap',
                   opacity: 0.9,
                   transition: 'color 0.3s ease',
                 }}
               >
-                {isMobile ? "Email Us" : "dlksoftwaresolutions@gmail.com"}
+                dlksoftwaresolutions@gmail.com
               </Typography>
             </Stack>
 
@@ -315,70 +317,68 @@ const BottomInfo = () => {
         </Stack>
 
         {/* Middle Section - Social Media Icons */}
-        {!isMobile && (
-          <Stack
-            direction="row"
-            spacing={1}
-            alignItems="center"
+        <Stack
+          direction="row"
+          spacing={1}
+          alignItems="center"
+          sx={{
+            animation: `${floatAnimation} 3s ease-in-out infinite`,
+            px: 2,
+            borderLeft: { sm: `1px solid ${alpha(colors.primary, 0.1)}` },
+            borderRight: { sm: `1px solid ${alpha(colors.primary, 0.1)}` },
+            mx: { xs: 0, sm: 2 },
+            flexShrink: 0
+          }}
+        >
+          <IconButton
+            href="https://www.facebook.com/profile.php?id=61569333069634"
+            target="_blank"
             sx={{
-              animation: `${floatAnimation} 3s ease-in-out infinite`,
-              px: 2,
-              borderLeft: `1px solid ${alpha(colors.primary, 0.1)}`,
-              borderRight: `1px solid ${alpha(colors.primary, 0.1)}`,
-              mx: 2
+              color: '#1877F2',
+              transition: 'all 0.3s ease',
+              p: 1,
+              '&:hover': { transform: 'translateY(-3px) scale(1.1)', filter: 'brightness(1.1)' }
             }}
           >
-            <IconButton
-              href="https://www.facebook.com/profile.php?id=61569333069634"
-              target="_blank"
-              sx={{
-                color: '#1877F2',
-                transition: 'all 0.3s ease',
-                p: 1,
-                '&:hover': { transform: 'translateY(-3px) scale(1.1)', filter: 'brightness(1.1)' }
-              }}
-            >
-              <Facebook size={20} />
-            </IconButton>
-            <IconButton
-              href="https://www.instagram.com/dlk_softwaresolutions/"
-              target="_blank"
-              sx={{
-                color: '#E4405F',
-                transition: 'all 0.3s ease',
-                p: 1,
-                '&:hover': { transform: 'translateY(-3px) scale(1.1)', filter: 'brightness(1.1)' }
-              }}
-            >
-              <Instagram size={20} />
-            </IconButton>
-            <IconButton
-              href="https://www.linkedin.com/company/107134148/admin/dashboard/"
-              target="_blank"
-              sx={{
-                color: '#0A66C2',
-                transition: 'all 0.3s ease',
-                p: 1,
-                '&:hover': { transform: 'translateY(-3px) scale(1.1)', filter: 'brightness(1.1)' }
-              }}
-            >
-              <Linkedin size={20} />
-            </IconButton>
-            <IconButton
-              href="https://www.youtube.com/@StudentsLearningplatform2026"
-              target="_blank"
-              sx={{
-                color: '#FF0000',
-                transition: 'all 0.3s ease',
-                p: 1,
-                '&:hover': { transform: 'translateY(-3px) scale(1.1)', filter: 'brightness(1.1)' }
-              }}
-            >
-              <Youtube size={20} />
-            </IconButton>
-
-          </Stack>
-        )}
+            <Facebook size={20} />
+          </IconButton>
+          <IconButton
+            href="https://www.instagram.com/dlk_softwaresolutions/"
+            target="_blank"
+            sx={{
+              color: '#E4405F',
+              transition: 'all 0.3s ease',
+              p: 1,
+              '&:hover': { transform: 'translateY(-3px) scale(1.1)', filter: 'brightness(1.1)' }
+            }}
+          >
+            <Instagram size={20} />
+          </IconButton>
+          <IconButton
+            href="https://www.linkedin.com/company/107134148/admin/dashboard/"
+            target="_blank"
+            sx={{
+              color: '#0A66C2',
+              transition: 'all 0.3s ease',
+              p: 1,
+              '&:hover': { transform: 'translateY(-3px) scale(1.1)', filter: 'brightness(1.1)' }
+            }}
+          >
+            <Linkedin size={20} />
+          </IconButton>
+          <IconButton
+            href="https://www.youtube.com/@StudentsLearningplatform2026"
+            target="_blank"
+            sx={{
+              color: '#FF0000',
+              transition: 'all 0.3s ease',
+              p: 1,
+              '&:hover': { transform: 'translateY(-3px) scale(1.1)', filter: 'brightness(1.1)' }
+            }}
+          >
+            <Youtube size={20} />
+          </IconButton>
+        </Stack>
 
         {/* Right Section - CTA */}
         <Stack
@@ -387,29 +387,27 @@ const BottomInfo = () => {
           alignItems="center"
           sx={{
             animation: `${slideInRight} 0.5s ease-out`,
-            display: { xs: "none", sm: "flex" },
+            flexShrink: 0
           }}
         >
           {/* Free Career Counselling */}
-          {!isMobile && (
-            <CTABox onClick={() => navigate("/contact")}>
-              <Stack direction="row" spacing={1} alignItems="center" sx={{ position: 'relative', zIndex: 2 }}>
-                <Verified size={20} color={colors.secondary} />
-                <Typography
-                  sx={{
-                    color: colors.light,
-                    fontSize: { xs: 10, md: 11.5 },
-                    fontWeight: 800,
-                    letterSpacing: '0.8px',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  Free Counselling
-                </Typography>
-                <Tag size={18} color={colors.secondary} />
-              </Stack>
-            </CTABox>
-          )}
+          <CTABox onClick={() => navigate("/contact")}>
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ position: 'relative', zIndex: 2 }}>
+              <Verified size={20} color={colors.secondary} />
+              <Typography
+                sx={{
+                  color: colors.light,
+                  fontSize: { xs: 10, md: 11.5 },
+                  fontWeight: 800,
+                  letterSpacing: '0.8px',
+                  textTransform: 'uppercase',
+                }}
+              >
+                Free Counselling
+              </Typography>
+              <Tag size={18} color={colors.secondary} />
+            </Stack>
+          </CTABox>
 
           {/* Quick Call Button */}
           <ContactChip
@@ -418,7 +416,8 @@ const BottomInfo = () => {
             onClick={() => window.location.href = 'tel:+917708150152'}
             sx={{
               height: '36px',
-              px: isMobile ? 0.5 : 1.5,
+              px: 1.5,
+              flexShrink: 0,
               '& .MuiChip-label': {
                 fontSize: isMobile ? '0.75rem' : '0.85rem',
               },

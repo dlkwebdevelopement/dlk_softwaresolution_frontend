@@ -23,12 +23,12 @@ import { BASE_URL, getImgUrl } from "../../api/api";
 import { styled, keyframes } from "@mui/material/styles";
 
 // Icons (Standardizing on Lucide for premium look)
-import { 
-  X, 
-  Play, 
-  Pause, 
-  ChevronLeft, 
-  ChevronRight, 
+import {
+  X,
+  Play,
+  Pause,
+  ChevronLeft,
+  ChevronRight,
   ArrowRight,
   Image as ImgIcon,
   Library as PhotoLibraryIcon
@@ -60,12 +60,12 @@ const colors = {
 // Styled Components
 const GalleryItem = ({ album, onOpen, height = 300 }) => {
   const [isHovered, setIsHovered] = useState(false);
-  
+  const navigate = useNavigate();
   return (
     <Box
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onClick={onOpen}
+      onClick={() => navigate("/gallery")}
       sx={{
         position: 'relative',
         height: height,
@@ -96,11 +96,11 @@ const GalleryItem = ({ album, onOpen, height = 300 }) => {
           transform: isHovered ? 'scale(1.1)' : 'scale(1)'
         }}
       />
-      
+
       {/* Fallback for missing image */}
       {!album.images?.length && (
-        <Box sx={{ 
-          position: 'absolute', inset: 0, 
+        <Box sx={{
+          position: 'absolute', inset: 0,
           background: `linear-gradient(135deg, ${colors.primaryLight} 0%, ${colors.white} 100%)`,
           display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.6
         }}>
@@ -117,25 +117,46 @@ const GalleryItem = ({ album, onOpen, height = 300 }) => {
         zIndex: 2,
         color: 'white',
         transform: isHovered ? 'translateY(-5px)' : 'none',
-        transition: 'transform 0.3s ease'
+        transition: 'all 0.3s ease'
       }}>
-        <Typography variant="subtitle2" sx={{ 
-          opacity: 0.9, 
-          fontWeight: 700, 
-          textTransform: 'uppercase', 
-          letterSpacing: 1.5,
-          fontSize: '0.65rem'
-        }}>
-          {album.images?.length || 0} Photos
-        </Typography>
+        <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
+          <Chip 
+            label={["Training", "Workshop", "Certification"][album.albumName.length % 3]} 
+            size="small"
+            variant="outlined"
+            sx={{ 
+              borderColor: 'rgba(255,255,255,0.5)', 
+              color: 'white', 
+              fontSize: '0.65rem', 
+              height: '24px',
+              fontWeight: 800,
+              textTransform: 'uppercase',
+              backdropFilter: 'blur(4px)'
+            }} 
+          />
+        </Stack>
+
         <Typography variant="h6" sx={{ 
-          fontWeight: 800, 
-          fontSize: '1.1rem',
-          mt: 0.5,
-          lineHeight: 1.2
+          fontWeight: 900, 
+          fontSize: '1.15rem',
+          lineHeight: 1.2,
+          mb: 1,
+          color: '#fff'
         }}>
           {album.albumName || "Untitled"}
         </Typography>
+
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: 0.5,
+          color: '#fff',
+          opacity: isHovered ? 1 : 0.9,
+          transition: 'all 0.3s ease'
+        }}>
+          <Typography sx={{ fontSize: '0.9rem', fontWeight: 800 }}>View Events</Typography>
+          <ArrowRight size={18} />
+        </Box>
       </Box>
     </Box>
   );
@@ -246,10 +267,10 @@ const Lightbox = ({ open, images, currentIndex, onClose, onNext, onPrev, isPlayi
 const Gallery = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  
+
   const [albums, setAlbums] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   // Lightbox State
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -331,7 +352,7 @@ const Gallery = () => {
   }
 
   return (
-    <Box component="section" sx={{ py: { xs: 8, md: 12 }, bgcolor: "#fff", position: "relative", overflow: "hidden" }}>
+    <Box component="section" sx={{ py: { xs: 8, md: 10 }, bgcolor: "#fff", position: "relative", overflow: "hidden" }}>
       <Container maxWidth="xl">
         {/* Header Section */}
         <Box sx={{ textAlign: "center", mb: 8, animation: `${fadeIn} 0.8s ease-out` }}>
@@ -340,13 +361,13 @@ const Gallery = () => {
               label="KNOWLEDGE HUB"
               icon={<PhotoLibraryIcon size={14} style={{ color: colors.primaryDark }} />}
               sx={{
-                background: alpha(colors.primary, 0.08),
+                background: alpha(colors.primary, 0.1),
                 color: colors.primaryDark,
                 fontWeight: 800,
                 letterSpacing: "0.08em",
                 borderRadius: "50px",
                 height: "32px",
-                border: `1px solid ${alpha(colors.primary, 0.15)}`,
+                border: `1px solid ${alpha(colors.primary, 0.2)}`,
                 "& .MuiChip-label": { px: 2, fontSize: "0.65rem" },
               }}
             />
@@ -358,7 +379,7 @@ const Gallery = () => {
               fontWeight: 900,
               mb: 2,
               fontSize: "clamp(2rem, 5vw, 3.2rem)",
-              color: colors.textPrimary,
+              color: "#000",
               letterSpacing: "-0.03em",
               lineHeight: 1.15,
             }}
@@ -374,16 +395,44 @@ const Gallery = () => {
           <Typography
             variant="body1"
             sx={{
-              color: colors.textSecondary,
+              color: "#444",
               maxWidth: "600px",
               mx: "auto",
               fontSize: "0.95rem",
               fontWeight: 500,
               lineHeight: 1.75,
+              mb: 4,
             }}
           >
-            Explore our state-of-the-art facilities and vibrant learning environment through these moments.
+            Explore our state-of-the-art facilities and vibrant learning environment through these captured moments.
           </Typography>
+
+          <Box sx={{ mt: 2 }}>
+            <Button
+              variant="contained"
+              onClick={() => navigate("/gallery")}
+              endIcon={<ArrowRight size={20} />}
+              sx={{
+                bgcolor: colors.primary,
+                color: "white",
+                px: { xs: 4, md: 6 },
+                py: 1.5,
+                borderRadius: "50px",
+                fontWeight: 800,
+                fontSize: "0.95rem",
+                textTransform: "none",
+                boxShadow: `0 10px 20px ${alpha(colors.primary, 0.3)}`,
+                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                "&:hover": {
+                  bgcolor: colors.primaryDark,
+                  transform: "translateY(-4px)",
+                  boxShadow: `0 15px 30px ${alpha(colors.primary, 0.4)}`,
+                },
+              }}
+            >
+              View All Moments
+            </Button>
+          </Box>
         </Box>
 
         {/* Gallery Grid Section */}
@@ -396,11 +445,11 @@ const Gallery = () => {
         >
           {isMobile ? (
             albums.map((album, idx) => (
-              <GalleryItem 
-                key={album._id || idx} 
-                album={album} 
-                onOpen={() => handleOpenLightbox(album.images)} 
-                height={260} 
+              <GalleryItem
+                key={album._id || idx}
+                album={album}
+                onOpen={() => handleOpenLightbox(album.images)}
+                height={260}
               />
             ))
           ) : (
@@ -409,10 +458,10 @@ const Gallery = () => {
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {/* Top (Large) */}
                 {albums[0] && (
-                  <GalleryItem 
-                    album={albums[0]} 
-                    onOpen={() => handleOpenLightbox(albums[0].images)} 
-                    height={460} 
+                  <GalleryItem
+                    album={albums[0]}
+                    onOpen={() => handleOpenLightbox(albums[0].images)}
+                    height={460}
                   />
                 )}
 
@@ -433,10 +482,10 @@ const Gallery = () => {
 
                 {/* Bottom (Large) */}
                 {albums[1] && (
-                  <GalleryItem 
-                    album={albums[1]} 
-                    onOpen={() => handleOpenLightbox(albums[1].images)} 
-                    height={460} 
+                  <GalleryItem
+                    album={albums[1]}
+                    onOpen={() => handleOpenLightbox(albums[1].images)}
+                    height={460}
                   />
                 )}
               </Box>

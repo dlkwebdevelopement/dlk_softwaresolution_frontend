@@ -117,28 +117,7 @@ const NotFound = () => {
                         possible experience.
                     </Typography>
 
-                    <Button
-                        variant="contained"
-                        size="large"
-                        startIcon={<ArrowLeft size={20} />}
-                        onClick={() => navigate("/")}
-                        sx={{
-                            px: 6,
-                            py: 1.8,
-                            borderRadius: "16px",
-                            fontWeight: 800,
-                            fontSize: "1rem",
-                            bgcolor: "#3DB843",
-                            "&:hover": {
-                                bgcolor: "#2e9133",
-                                transform: "translateY(-3px)",
-                                boxShadow: "0 20px 40px rgba(61, 184, 67, 0.3)"
-                            },
-                            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
-                        }}
-                    >
-                        Back
-                    </Button>
+
                 </Box>
             </Container>
 
