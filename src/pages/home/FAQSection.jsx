@@ -377,36 +377,34 @@ export default function FAQSection() {
 
                       <AccordionDetails sx={{ px: 3, pb: 3, pt: 0 }}>
                         <AnswerBox>
-                          {item.answers && item.answers.map((ans, idx) => (
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              gap: 2,
+                            }}
+                          >
                             <Box
-                              key={idx}
                               sx={{
-                                display: 'flex',
-                                gap: 2,
-                                mt: idx > 0 ? 2 : 0,
+                                width: 6,
+                                height: 6,
+                                borderRadius: '50%',
+                                bgcolor: colors.secondary,
+                                mt: 1.5,
+                                shrink: 0
+                              }}
+                            />
+                            <Typography
+                              sx={{
+                                color: alpha(colors.dark, 0.7),
+                                lineHeight: 1.8,
+                                fontSize: '0.95rem',
+                                flex: 1,
+                                whiteSpace: 'pre-wrap'
                               }}
                             >
-                              <Box
-                                sx={{
-                                  width: 6,
-                                  height: 6,
-                                  borderRadius: '50%',
-                                  bgcolor: colors.secondary,
-                                  mt: 1.5,
-                                }}
-                              />
-                              <Typography
-                                sx={{
-                                  color: alpha(colors.dark, 0.7),
-                                  lineHeight: 1.8,
-                                  fontSize: '0.95rem',
-                                  flex: 1,
-                                }}
-                              >
-                                {ans.answer}
-                              </Typography>
-                            </Box>
-                          ))}
+                              {item.answer || "No answer provided yet."}
+                            </Typography>
+                          </Box>
                         </AnswerBox>
 
                         {/* Helpful Section */}

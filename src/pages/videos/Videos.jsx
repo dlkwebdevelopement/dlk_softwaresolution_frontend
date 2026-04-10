@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import {
   Box,
@@ -230,11 +230,13 @@ export default function Videos() {
   }, []);
 
   return (
-    <Box sx={{ bgcolor: "#f8faf7", minHeight: "80vh", pb: 10 }}>
+    <Box sx={{ bgcolor: "#f8faf7", minHeight: "80vh", pt: 0, pb: 10 }}>
       {/* Header Banner */}
       <Box sx={{
         background: `linear-gradient(135deg,${COLORS.dark} 0%,${COLORS.primary} 100%)`,
-        py: { xs: 8, md: 12 }, color: "white", textAlign: "center",
+        pt: { xs: 8, md: 15 },
+        pb: { xs: 8, md: 12 },
+        color: "white", textAlign: "center",
         mb: 6, position: "relative", overflow: "hidden",
       }}>
         <Box sx={{
@@ -252,12 +254,11 @@ export default function Videos() {
           >
             <Link component={RouterLink} to="/" underline="hover"
               sx={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 0.5, fontWeight: 600 }}>
-              <LayoutIcon size={14} /> Home
+              <FolderIcon size={14} /> Video Library
             </Link>
-            <Typography sx={{ color: "white", fontWeight: 800 }}>Video Library</Typography>
           </Breadcrumbs>
 
-          <Typography variant="h2" sx={{ fontWeight: 800, fontSize: { xs: "2.4rem", md: "3.8rem" }, mb: 2, lineHeight: 1.1, letterSpacing: '-0.02em' }} color="white">
+          <Typography variant="h3" sx={{ fontWeight: 600, fontSize: { xs: "2.4rem", md: "3.8rem" }, mb: 2, lineHeight: 1.1 }} color="white">
             Our Learning <span style={{ color: alpha('#fff', 0.8) }}>Library</span>
           </Typography>
 
@@ -353,5 +354,3 @@ export default function Videos() {
     </Box>
   );
 }
-
-

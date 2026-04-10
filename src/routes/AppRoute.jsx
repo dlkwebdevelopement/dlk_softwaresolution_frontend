@@ -180,7 +180,6 @@ const AppRoute = () => {
           element={
             <>
               <Navbar />
-              <Box sx={{ mt: 16 }}></Box>
               <Videos />
               <BottomInfo />
               <Footer />
