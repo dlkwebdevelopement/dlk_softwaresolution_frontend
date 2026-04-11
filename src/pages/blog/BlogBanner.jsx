@@ -44,29 +44,12 @@ export default function BlogBanner() {
           maxWidth: "1300px",
           display: "flex",
           alignItems: "center",
-          backgroundImage: `
-            linear-gradient(
-              to right,
-              rgba(0, 0, 0, 0.8) 0%,
-              rgba(0, 0, 0, 0.6) 30%,
-              rgba(0, 0, 0, 0) 100%
-            ),
-            url("${getImgUrl(blog?.image)}")
-          `,
+          backgroundImage: `url("${getImgUrl(blog?.image)}")`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           boxShadow: "0 20px 50px rgba(0,0,0,0.15)" 
         }}
       >
-        {/* Decorative Overlay for depth */}
-        <Box 
-          sx={{
-            position: "absolute",
-            inset: 0,
-            background: "linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 40%)",
-            zIndex: 1
-          }}
-        />
 
         {/* Banner is now purely visual - Content moved to Page Body */}
       </Box>

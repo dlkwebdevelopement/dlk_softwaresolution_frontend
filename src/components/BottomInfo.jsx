@@ -1,17 +1,6 @@
-import { Box, Typography, Stack, useTheme, useMediaQuery, Chip, alpha, IconButton } from "@mui/material";
+import { Box, Typography, Stack, useTheme, useMediaQuery, Chip, alpha } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { styled, keyframes } from "@mui/material/styles";
-import {
-  Phone,
-  Mail,
-  Facebook,
-  Instagram,
-  Linkedin,
-  Youtube,
-  Verified,
-  PhoneCall,
-  Tag
-} from "lucide-react";
 
 // Animations
 const floatAnimation = keyframes`
@@ -53,12 +42,6 @@ const shimmer = keyframes`
   100% { background-position: 1000px 0; }
 `;
 
-const gradientMove = keyframes`
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-`;
-
 const rotateGradient = keyframes`
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
@@ -80,6 +63,12 @@ const colors = {
     main: "linear-gradient(135deg, #D3F36B, #c2eac4, #3DB843)",
     text: "linear-gradient(270deg, #1a4718, #3DB843, #c2eac4, #D3F36B)",
     accent: "linear-gradient(135deg, #3DB843, #c2eac4)",
+  },
+  social: {
+    facebook: "#1877F2",
+    instagram: "#E4405F",
+    linkedin: "#0A66C2",
+    youtube: "#FF0000",
   }
 };
 
@@ -183,18 +172,42 @@ const IconWrapper = styled(Box)({
   alignItems: 'center',
   justifyContent: 'center',
   transition: 'all 0.3s ease',
-  '& svg': {
+  '& i': {
     fontSize: 18,
     color: colors.primary,
     transition: 'all 0.3s ease',
   },
 });
 
+const SocialIconButton = styled(Box)(({ theme, socialcolor }) => ({
+  width: 34,
+  height: 34,
+  borderRadius: '50%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  cursor: 'pointer',
+  transition: 'all 0.3s ease',
+  backgroundColor: alpha(socialcolor, 0.1),
+  color: socialcolor,
+  '& i': {
+    fontSize: 18,
+    transition: 'all 0.3s ease',
+  },
+  '&:hover': {
+    transform: 'translateY(-3px) scale(1.1)',
+    backgroundColor: socialcolor,
+    '& i': {
+      color: '#ffffff',
+    },
+    boxShadow: `0 4px 12px ${alpha(socialcolor, 0.4)}`,
+  },
+}));
+
 const BottomInfo = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
 
   return (
     <GlassBar>
@@ -217,7 +230,6 @@ const BottomInfo = () => {
             animation: `${slideInLeft} 0.5s ease-out`,
           }}
         >
-          {/* Scrolling Contact Info for Mobile */}
           <Box
             sx={{
               display: "flex",
@@ -240,14 +252,14 @@ const BottomInfo = () => {
                   '& .MuiTypography-root': { color: colors.primary },
                   '& .IconWrapper-root': {
                     background: colors.primary,
-                    '& svg': { color: colors.light }
+                    '& i': { color: colors.light }
                   }
                 }
               }}
               onClick={() => window.location.href = 'tel:+917708150152'}
             >
               <IconWrapper className="IconWrapper-root">
-                <Phone size={18} />
+                <i className="bi bi-telephone-fill"></i>
               </IconWrapper>
               <AnimatedText
                 sx={{
@@ -280,7 +292,7 @@ const BottomInfo = () => {
                   },
                   '& .IconWrapper-root': {
                     background: colors.primary,
-                    '& svg': { color: colors.light }
+                    '& i': { color: colors.light }
                   }
                 }
               }}
@@ -296,7 +308,7 @@ const BottomInfo = () => {
               }}
             >
               <IconWrapper className="IconWrapper-root">
-                <Mail size={18} />
+                <i className="bi bi-envelope-fill"></i>
               </IconWrapper>
               <Typography
                 sx={{
@@ -311,15 +323,13 @@ const BottomInfo = () => {
                 dlksoftwaresolutions@gmail.com
               </Typography>
             </Stack>
-
-
           </Box>
         </Stack>
 
         {/* Middle Section - Social Media Icons */}
         <Stack
           direction="row"
-          spacing={1}
+          spacing={1.5}
           alignItems="center"
           sx={{
             animation: `${floatAnimation} 3s ease-in-out infinite`,
@@ -330,54 +340,41 @@ const BottomInfo = () => {
             flexShrink: 0
           }}
         >
-          <IconButton
+          <SocialIconButton
+            component="a"
             href="https://www.facebook.com/profile.php?id=61569333069634"
             target="_blank"
-            sx={{
-              color: '#1877F2',
-              transition: 'all 0.3s ease',
-              p: 1,
-              '&:hover': { transform: 'translateY(-3px) scale(1.1)', filter: 'brightness(1.1)' }
-            }}
+            socialcolor={colors.social.facebook}
           >
-            <Facebook size={20} />
-          </IconButton>
-          <IconButton
+            <i className="bi bi-facebook"></i>
+          </SocialIconButton>
+
+          <SocialIconButton
+            component="a"
             href="https://www.instagram.com/dlk_softwaresolutions/"
             target="_blank"
-            sx={{
-              color: '#E4405F',
-              transition: 'all 0.3s ease',
-              p: 1,
-              '&:hover': { transform: 'translateY(-3px) scale(1.1)', filter: 'brightness(1.1)' }
-            }}
+            socialcolor={colors.social.instagram}
           >
-            <Instagram size={20} />
-          </IconButton>
-          <IconButton
-            href="https://www.linkedin.com/company/107134148/admin/dashboard/"
+            <i className="bi bi-instagram"></i>
+          </SocialIconButton>
+
+          <SocialIconButton
+            component="a"
+            href="https://www.linkedin.com/company/dlk-software-solutions/"
             target="_blank"
-            sx={{
-              color: '#0A66C2',
-              transition: 'all 0.3s ease',
-              p: 1,
-              '&:hover': { transform: 'translateY(-3px) scale(1.1)', filter: 'brightness(1.1)' }
-            }}
+            socialcolor={colors.social.linkedin}
           >
-            <Linkedin size={20} />
-          </IconButton>
-          <IconButton
+            <i className="bi bi-linkedin"></i>
+          </SocialIconButton>
+
+          <SocialIconButton
+            component="a"
             href="https://www.youtube.com/@StudentsLearningplatform2026"
             target="_blank"
-            sx={{
-              color: '#FF0000',
-              transition: 'all 0.3s ease',
-              p: 1,
-              '&:hover': { transform: 'translateY(-3px) scale(1.1)', filter: 'brightness(1.1)' }
-            }}
+            socialcolor={colors.social.youtube}
           >
-            <Youtube size={20} />
-          </IconButton>
+            <i className="bi bi-youtube"></i>
+          </SocialIconButton>
         </Stack>
 
         {/* Right Section - CTA */}
@@ -393,7 +390,7 @@ const BottomInfo = () => {
           {/* Free Career Counselling */}
           <CTABox onClick={() => navigate("/contact")}>
             <Stack direction="row" spacing={1} alignItems="center" sx={{ position: 'relative', zIndex: 2 }}>
-              <Verified size={20} color={colors.secondary} />
+              <i className="bi bi-patch-check-fill" style={{ fontSize: 20, color: colors.secondary }}></i>
               <Typography
                 sx={{
                   color: colors.light,
@@ -405,13 +402,13 @@ const BottomInfo = () => {
               >
                 Free Counselling
               </Typography>
-              <Tag size={18} color={colors.secondary} />
+              <i className="bi bi-tag-fill" style={{ fontSize: 18, color: colors.secondary }}></i>
             </Stack>
           </CTABox>
 
           {/* Quick Call Button */}
           <ContactChip
-            icon={<PhoneCall size={20} style={{ marginRight: 4 }} />}
+            icon={<i className="bi bi-telephone-forward-fill" style={{ fontSize: 20, marginRight: 4 }}></i>}
             label={isMobile ? "Call" : "Call Now"}
             onClick={() => window.location.href = 'tel:+917708150152'}
             sx={{
@@ -430,8 +427,6 @@ const BottomInfo = () => {
             }}
           />
         </Stack>
-
-
       </Stack>
 
       {/* Decorative Elements */}

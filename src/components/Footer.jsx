@@ -162,26 +162,28 @@ const NewsletterButton = styled(Button)({
   },
 });
 
-const SocialIconButton = styled(IconButton)({
-  background: 'rgba(255, 255, 255, 0.2)',
+const SocialIconButton = styled(IconButton, {
+  shouldForwardProp: (prop) => prop !== 'brandcolor',
+})(({ brandcolor }) => ({
+  background: alpha(brandcolor || '#ffffff', 0.1),
   backdropFilter: 'blur(10px)',
   WebkitBackdropFilter: 'blur(10px)',
-  border: '1px solid rgba(255, 255, 255, 0.3)',
+  border: `1px solid ${alpha(brandcolor || '#ffffff', 0.2)}`,
   transition: 'all 0.3s ease',
   '&:hover': {
-    background: colors.primary,
+    background: brandcolor || colors.primary,
     transform: 'translateY(-5px) scale(1.1)',
-    boxShadow: `0 10px 20px ${alpha(colors.primary, 0.3)}`,
+    boxShadow: `0 10px 20px ${alpha(brandcolor || colors.primary, 0.4)}`,
     '& svg': {
       color: colors.light,
     },
   },
   '& svg': {
-    color: '#ffffff',
+    color: brandcolor || '#ffffff',
     fontSize: 24,
     transition: 'color 0.3s ease',
   },
-});
+}));
 
 const FooterLink = styled(Link)({
   textDecoration: 'none',
@@ -529,7 +531,7 @@ const Footer = () => {
               <Box sx={{ mt: 2 }}>
                 <ContactInfo icon={LocationOnIcon} text="Chennai, Tamil Nadu" subtext="India" />
                 <ContactInfo icon={PhoneIcon} text="+91 77081 50152" subtext="Mon-Sat, 9AM-8PM" />
-                <ContactInfo icon={EmailIcon} text="dlksoftwaresolutions@gmail.com" subtext="Support 24/7" />
+                <ContactInfo icon={EmailIcon} text="dlksoftwaresolutions@gmail.com" />
               </Box>
             </Box>
           </Grow>
@@ -545,15 +547,14 @@ const Footer = () => {
             ]}
             delay={600}
           />
-          <FooterColumn 
-            title="Top Courses" 
-            items={topCourses} 
-            delay={800} 
+          <FooterColumn
+            title="Top Courses"
+            items={topCourses}
+            delay={800}
           />
           <FooterColumn
             title="Important Links"
             items={[
-              { name: "Help Center", path: "/help" },
               { name: "Workshops", path: "/workshop" },
               { name: "Terms & Services", path: "/terms-of-service" },
               { name: "Privacy Policy", path: "/privacy-policy" }
@@ -591,7 +592,7 @@ const Footer = () => {
                 {[
                   { icon: FacebookIcon, color: '#1877f2', link: "https://www.facebook.com/profile.php?id=61569333069634" },
                   { icon: InstagramIcon, color: '#e4405f', link: "https://www.instagram.com/dlk_softwaresolutions/" },
-                  { icon: LinkedInIcon, color: '#0a66c2', link: "https://www.linkedin.com/company/107134148/admin/dashboard/" },
+                  { icon: LinkedInIcon, color: '#0a66c2', link: "https://www.linkedin.com/company/dlk-software-solutions/" },
                   { icon: YouTubeIcon, color: '#ff0000', link: "https://www.youtube.com/@StudentsLearningplatform2026" },
                 ].map((Social, index) => (
                   <SocialIconButton
@@ -599,11 +600,7 @@ const Footer = () => {
                     component="a"
                     href={Social.link}
                     target="_blank"
-                    sx={{
-                      '&:hover': {
-                        background: Social.color,
-                      },
-                    }}
+                    brandcolor={Social.color}
                   >
                     <Social.icon />
                   </SocialIconButton>

@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { styled, keyframes } from "@mui/material/styles";
 import {
-  X, Image as ImgIcon, Calendar as CalIcon, Clock as ClockIcon,
+  X, Image as ImgIcon, Calendar as CalIcon, Building2 as CollegeIcon,
   ArrowRight as RightIcon, ArrowLeft as LeftIcon,
   FolderOpen as FolderIcon, ChevronRight as ChevronIcon
 } from "lucide-react";
@@ -182,22 +182,8 @@ function EventCard({ event, onSelect }) {
                     </Typography>
                   </Box>
                 </Box>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                  <IconBox sx={{ bgcolor: "#f1f5f9", color: "#0f172a" }}><ClockIcon size={17} /></IconBox>
-                  <Box>
-                    <Typography variant="caption" color="text.secondary" sx={{ display: "block", fontWeight: 500 }}>Time</Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 600, color: "#334155" }}>{event.eventTime}</Typography>
-                  </Box>
-                </Box>
               </Stack>
 
-              <Box sx={{
-                mt: "auto", pt: 2, borderTop: "1px solid rgba(0,0,0,0.05)",
-                display: "flex", alignItems: "center", justifyContent: "space-between",
-                color: COLORS.primary, fontWeight: 700, fontSize: "0.9rem",
-              }}>
-                View Gallery <RightIcon size={18} />
-              </Box>
             </CardContent>
           </GlassCard>
         </Box>

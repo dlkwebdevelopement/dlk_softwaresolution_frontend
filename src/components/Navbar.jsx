@@ -764,7 +764,6 @@ const Navbar = () => {
                       { icon: <MapIcon />, text: "Roadmap", path: "/roadmap" },
                       { icon: <MenuBookIcon />, text: "Blog", path: "/blogs" },
                       { icon: <LocalOfferIcon />, text: "Offers", path: "/offers" },
-                      { icon: <LiveHelpIcon />, text: "Help", path: "/help" },
                     ].map((item, index) => (
                       <ListItemButton
                         key={index}
@@ -1135,7 +1134,6 @@ const Navbar = () => {
                     { icon: <MapIcon />, text: "Roadmap", path: "/roadmap" },
                     { icon: <MenuBookIcon />, text: "Blog", path: "/blogs" },
                     { icon: <LocalOfferIcon />, text: "Offers", path: "/offers" },
-                    { icon: <LiveHelpIcon />, text: "Help", path: "/help" },
                   ].map((item, index) => (
                     <MobileMenuItem
                       key={index}
