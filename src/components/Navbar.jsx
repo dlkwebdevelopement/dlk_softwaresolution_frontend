@@ -26,6 +26,7 @@ import {
 } from "@mui/material";
 import { styled, keyframes } from "@mui/material/styles";
 import CloseIcon from "@mui/icons-material/Close";
+import HomeIcon from "@mui/icons-material/Home";
 import toast from "react-hot-toast";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useNavigate } from "react-router-dom";
@@ -549,6 +550,11 @@ const Navbar = () => {
                 alignItems: "center",
               }}
             >
+              <NavItem onClick={() => navigate("/")}>
+                <HomeIcon className="nav-icon" sx={{ fontSize: 20, mr: 1, color: colors.dark, transition: "all 0.4s ease" }} />
+                <NavText className="nav-text">Home</NavText>
+              </NavItem>
+
               {/* All Courses with MegaMenu */}
               <Box
                 sx={{ position: "relative" }}
@@ -868,6 +874,29 @@ const Navbar = () => {
         </IconButton>
         <Container maxWidth="sm">
           <Stack spacing={1} alignItems="center" sx={{ width: "100%" }}>
+            <List sx={{ width: "100%" }}>
+              <MobileMenuItem
+                onClick={() => handleNavigation("/")}
+                sx={{
+                  backgroundColor: alpha(colors.primary, 0.04),
+                  borderRadius: "16px",
+                  border: `1px solid ${alpha(colors.primary, 0.08)}`,
+                }}
+              >
+                <ListItemIcon sx={{ color: colors.primary, minWidth: 40 }}>
+                  <HomeIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Home"
+                  primaryTypographyProps={{
+                    fontWeight: 700,
+                    color: colors.dark,
+                    fontSize: "1.05rem"
+                  }}
+                />
+              </MobileMenuItem>
+            </List>
+
             {/* All Courses Section */}
             <List sx={{ width: "100%" }}>
               <MobileMenuItem
