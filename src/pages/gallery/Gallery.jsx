@@ -156,7 +156,7 @@ function EventCard({ event, onSelect }) {
               }} />
               <Box sx={{ position: "absolute", bottom: 14, right: 14 }}>
                 <Chip
-                  label={`${event.galleryImages?.length || 0} Photos`}
+                  label={`${(event.galleryImages?.length || 0) + (event.mainImage ? 1 : 0)} Photos`}
                   size="small"
                   sx={{ bgcolor: "rgba(0,0,0,0.6)", color: "white", backdropFilter: "blur(4px)", fontWeight: 600, fontSize: "0.65rem" }}
                 />
@@ -164,6 +164,15 @@ function EventCard({ event, onSelect }) {
             </Box>
 
             <CardContent sx={{ p: 3, flexGrow: 1, display: "flex", flexDirection: "column" }}>
+              
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1.5 }}>
+                <IconBox sx={{ bgcolor: "#f1f5f9", color: "#0f172a" }}><CollegeIcon size={17} /></IconBox>
+                <Box>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: "block", fontWeight: 500 }}>College</Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 600, color: "#334155" }}>{event.collegeName || "N/A"}</Typography>
+                </Box>
+              </Box>
+
               <Typography variant="h6" sx={{
                 fontWeight: 700, fontSize: "1.1rem", mb: 2, color: "#1e293b",
                 lineHeight: 1.4, minHeight: "3em",
@@ -180,13 +189,6 @@ function EventCard({ event, onSelect }) {
                     <Typography variant="body2" sx={{ fontWeight: 600, color: "#334155" }}>
                       {dayjs(event.eventDate).format("DD MMM, YYYY")}
                     </Typography>
-                  </Box>
-                </Box>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                  <IconBox sx={{ bgcolor: "#f1f5f9", color: "#0f172a" }}><CollegeIcon size={17} /></IconBox>
-                  <Box>
-                    <Typography variant="caption" color="text.secondary" sx={{ display: "block", fontWeight: 500 }}>College</Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 600, color: "#334155" }}>{event.collegeName || "N/A"}</Typography>
                   </Box>
                 </Box>
               </Stack>
@@ -416,10 +418,10 @@ export default function Gallery() {
         sx={{ '& .MuiDialog-container': { p: 0 } }}
       >
         {activeEvent && (() => {
-          const allImages = [activeEvent.mainImage, ...(activeEvent.galleryImages || [])];
+          const allImages = activeEvent.galleryImages || [];
           const total = allImages.length;
-          const prev = () => setSliderIndex(i => (i - 1 + total) % total);
-          const next = () => setSliderIndex(i => (i + 1) % total);
+          const prev = () => setSliderIndex(i => total > 0 ? (i - 1 + total) % total : 0);
+          const next = () => setSliderIndex(i => total > 0 ? (i + 1) % total : 0);
           return (
             <Box sx={{ position: 'relative', width: '100%', height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#0a0a0a' }}>
               {/* Close button */}
@@ -444,46 +446,54 @@ export default function Gallery() {
 
               {/* Main image area */}
               <Box sx={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', px: 10 }}>
-                <Fade in key={sliderIndex} timeout={300}>
-                  <Box
-                    component="img"
-                    src={getImgUrl(allImages[sliderIndex])}
-                    alt=""
-                    sx={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: 2, userSelect: 'none' }}
-                  />
-                </Fade>
+                {total > 0 ? (
+                  <Fade in key={sliderIndex} timeout={300}>
+                    <Box
+                      component="img"
+                      src={getImgUrl(allImages[sliderIndex])}
+                      alt=""
+                      sx={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: 2, userSelect: 'none' }}
+                    />
+                  </Fade>
+                ) : (
+                  <Typography sx={{ color: 'white' }}>No gallery images available.</Typography>
+                )}
 
                 {/* Left arrow */}
-                <IconButton
-                  onClick={prev}
-                  sx={{
-                    position: 'absolute', left: 16,
-                    bgcolor: 'rgba(255,255,255,0.12)', color: 'white',
-                    width: 52, height: 52,
-                    backdropFilter: 'blur(8px)',
-                    border: '1px solid rgba(255,255,255,0.15)',
-                    '&:hover': { bgcolor: COLORS.primary, transform: 'scale(1.1)' },
-                    transition: 'all 0.25s ease'
-                  }}
-                >
-                  <LeftIcon size={24} />
-                </IconButton>
+                {total > 1 && (
+                  <IconButton
+                    onClick={prev}
+                    sx={{
+                      position: 'absolute', left: 16,
+                      bgcolor: 'rgba(255,255,255,0.12)', color: 'white',
+                      width: 52, height: 52,
+                      backdropFilter: 'blur(8px)',
+                      border: '1px solid rgba(255,255,255,0.15)',
+                      '&:hover': { bgcolor: COLORS.primary, transform: 'scale(1.1)' },
+                      transition: 'all 0.25s ease'
+                    }}
+                  >
+                    <LeftIcon size={24} />
+                  </IconButton>
+                )}
 
                 {/* Right arrow */}
-                <IconButton
-                  onClick={next}
-                  sx={{
-                    position: 'absolute', right: 16,
-                    bgcolor: 'rgba(255,255,255,0.12)', color: 'white',
-                    width: 52, height: 52,
-                    backdropFilter: 'blur(8px)',
-                    border: '1px solid rgba(255,255,255,0.15)',
-                    '&:hover': { bgcolor: COLORS.primary, transform: 'scale(1.1)' },
-                    transition: 'all 0.25s ease'
-                  }}
-                >
-                  <RightIcon size={24} />
-                </IconButton>
+                {total > 1 && (
+                  <IconButton
+                    onClick={next}
+                    sx={{
+                      position: 'absolute', right: 16,
+                      bgcolor: 'rgba(255,255,255,0.12)', color: 'white',
+                      width: 52, height: 52,
+                      backdropFilter: 'blur(8px)',
+                      border: '1px solid rgba(255,255,255,0.15)',
+                      '&:hover': { bgcolor: COLORS.primary, transform: 'scale(1.1)' },
+                      transition: 'all 0.25s ease'
+                    }}
+                  >
+                    <RightIcon size={24} />
+                  </IconButton>
+                )}
               </Box>
 
               {/* Thumbnail strip */}
