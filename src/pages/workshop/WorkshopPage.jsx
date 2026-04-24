@@ -194,7 +194,7 @@ const WorkshopCard = ({ work, index, hoveredCard, setHoveredCard, navigate, getD
         $hovered={hoveredCard === index}
         onMouseEnter={() => setHoveredCard(index)}
         onMouseLeave={() => setHoveredCard(null)}
-        onClick={() => navigate("/contact")}
+        onClick={() => window.open("https://scanpdf.co.in/qr/r/Jr1bhZmA", "_blank")}
       >
         <Box sx={{ position: "relative", overflow: "hidden", height: 180 }}>
           <StyledCardMedia
@@ -263,7 +263,7 @@ const WorkshopCard = ({ work, index, hoveredCard, setHoveredCard, navigate, getD
             </Box>
             <Button
               size="small"
-              onClick={(e) => { e.stopPropagation(); navigate("/contact"); }}
+              onClick={(e) => { e.stopPropagation(); window.open("https://scanpdf.co.in/qr/r/Jr1bhZmA", "_blank"); }}
               sx={{
                 bgcolor: colors.primary,
                 color: 'white',

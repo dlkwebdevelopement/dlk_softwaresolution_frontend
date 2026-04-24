@@ -10,7 +10,8 @@ import { styled, keyframes } from "@mui/material/styles";
 import {
   X, Image as ImgIcon, Calendar as CalIcon, Building2 as CollegeIcon,
   ArrowRight as RightIcon, ArrowLeft as LeftIcon,
-  FolderOpen as FolderIcon, ChevronRight as ChevronIcon
+  FolderOpen as FolderIcon, ChevronRight as ChevronIcon,
+  Clock, Share2
 } from "lucide-react";
 import { GetRequest } from "../../api/api";
 import { GET_ALL_OFFICE_GALLERY, GET_ALL_OFFICE_GALLERY_EVENTS } from "../../api/endpoints";
@@ -209,14 +210,25 @@ export default function OfficeGallery() {
     return [...new Set(years)].sort((a, b) => b - a);
   }, [events]);
 
+  const allImages = useMemo(() => {
+    if (!activeEvent) return [];
+    // Only show the gallery images in the carousel (exclude the main image shown on the card)
+    const mainImg = activeEvent.mainImage;
+    return (activeEvent.galleryImages || []).filter(img => img && img !== mainImg);
+  }, [activeEvent]);
+
+  const total = allImages.length;
+
+  useEffect(() => {
+    setSliderIndex(0);
+  }, [activeEvent]);
+
   const openEvent = useCallback((event) => {
     setActiveEvent(event);
-    setSliderIndex(0);
   }, []);
 
   const closeModal = useCallback(() => {
     setActiveEvent(null);
-    setSliderIndex(0);
   }, []);
 
   useEffect(() => {
@@ -400,121 +412,100 @@ export default function OfficeGallery() {
         )}
       </Container>
 
-      {/* Slider Lightbox Modal */}
       <Dialog
         open={Boolean(activeEvent)}
         onClose={closeModal}
-        maxWidth="xl" fullWidth
-        PaperProps={{ sx: { borderRadius: 0, bgcolor: "#0a0a0a", maxHeight: "100vh", m: 0, width: "100vw", height: "100vh" } }}
-        sx={{ '& .MuiDialog-container': { p: 0 } }}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 4,
+            overflow: "hidden",
+            background: "white",
+            boxShadow: "0 24px 60px rgba(0,0,0,0.15)",
+            mt: { xs: 2, sm: 6 },
+            mb: { xs: 2, sm: 6 }
+          }
+        }}
+        sx={{
+          "& .MuiDialog-container": {
+            alignItems: "flex-start"
+          }
+        }}
       >
-        {activeEvent && (() => {
-          const allImages = activeEvent.galleryImages || [];
-          const total = allImages.length;
-          const prev = () => setSliderIndex(i => total > 0 ? (i - 1 + total) % total : 0);
-          const next = () => setSliderIndex(i => total > 0 ? (i + 1) % total : 0);
-          return (
-            <Box sx={{ position: 'relative', width: '100%', height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#0a0a0a' }}>
-              {/* Close button */}
-              <IconButton
-                onClick={closeModal}
-                sx={{ position: 'absolute', top: 16, right: 16, zIndex: 20, bgcolor: 'rgba(255,255,255,0.1)', color: 'white', backdropFilter: 'blur(8px)', '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' } }}
-              >
-                <X size={22} />
-              </IconButton>
-
-              {/* Title bar */}
-              <Box sx={{ px: 3, pt: 2.5, pb: 1.5, display: 'flex', alignItems: 'center', gap: 2, zIndex: 10 }}>
-                <Typography variant="h6" sx={{ color: 'white', fontWeight: 700, flex: 1 }}>{activeEvent.title}</Typography>
-                <Chip label={activeEvent.categoryId?.albumName} size="small" sx={{ bgcolor: COLORS.primary, color: 'white', fontWeight: 700 }} />
-                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.5)', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <CalIcon size={13} /> {dayjs(activeEvent.eventDate).format('DD MMM YYYY')}
-                </Typography>
-                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.4)', minWidth: 60, textAlign: 'right' }}>
-                  {sliderIndex + 1} / {total}
+        {activeEvent && (
+          <Box sx={{ display: "flex", flexDirection: "column", bgcolor: "white" }}>
+            {/* Header: Title & Meta */}
+            <Box sx={{ px: 3, pt: 3, pb: 2, display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 2, borderBottom: "1px solid rgba(0,0,0,0.05)" }}>
+              <Box sx={{ flex: 1 }}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
+                  <Chip
+                    label={activeEvent.categoryId?.albumName || "Office"}
+                    size="small"
+                    sx={{ bgcolor: COLORS.light, color: COLORS.dark, fontWeight: 700, fontSize: "0.65rem", height: 20 }}
+                  />
+                  <Typography variant="caption" sx={{ color: COLORS.textSecondary, fontWeight: 600 }}>
+                    {total} Photos
+                  </Typography>
+                </Box>
+                <Typography variant="h5" sx={{ color: "#0f172a", fontWeight: 800, lineHeight: 1.2 }}>
+                  {activeEvent.title}
                 </Typography>
               </Box>
-
-              {/* Main image area */}
-              <Box sx={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', px: 10 }}>
-                {total > 0 ? (
-                  <Fade in key={sliderIndex} timeout={300}>
-                    <Box
-                      component="img"
-                      src={getImgUrl(allImages[sliderIndex])}
-                      alt=""
-                      sx={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: 2, userSelect: 'none' }}
-                    />
-                  </Fade>
-                ) : (
-                  <Typography sx={{ color: 'white' }}>No office gallery images available.</Typography>
-                )}
-
-                {/* Left arrow */}
-                {total > 1 && (
-                  <IconButton
-                    onClick={prev}
-                    sx={{
-                      position: 'absolute', left: 16,
-                      bgcolor: 'rgba(255,255,255,0.12)', color: 'white',
-                      width: 52, height: 52,
-                      backdropFilter: 'blur(8px)',
-                      border: '1px solid rgba(255,255,255,0.15)',
-                      '&:hover': { bgcolor: COLORS.primary, transform: 'scale(1.1)' },
-                      transition: 'all 0.25s ease'
-                    }}
-                  >
-                    <LeftIcon size={24} />
-                  </IconButton>
-                )}
-
-                {/* Right arrow */}
-                {total > 1 && (
-                  <IconButton
-                    onClick={next}
-                    sx={{
-                      position: 'absolute', right: 16,
-                      bgcolor: 'rgba(255,255,255,0.12)', color: 'white',
-                      width: 52, height: 52,
-                      backdropFilter: 'blur(8px)',
-                      border: '1px solid rgba(255,255,255,0.15)',
-                      '&:hover': { bgcolor: COLORS.primary, transform: 'scale(1.1)' },
-                      transition: 'all 0.25s ease'
-                    }}
-                  >
-                    <RightIcon size={24} />
-                  </IconButton>
-                )}
-              </Box>
-
-              {/* Thumbnail strip */}
-              <Box sx={{
-                display: 'flex', gap: 1, px: 3, py: 2,
-                overflowX: 'auto',
-                '&::-webkit-scrollbar': { height: 4 },
-                '&::-webkit-scrollbar-thumb': { background: 'rgba(255,255,255,0.2)', borderRadius: 2 },
-                justifyContent: total <= 6 ? 'center' : 'flex-start'
-              }}>
-                {allImages.map((img, i) => (
-                  <Box
-                    key={i}
-                    onClick={() => setSliderIndex(i)}
-                    sx={{
-                      width: 72, height: 52, flexShrink: 0, cursor: 'pointer',
-                      borderRadius: 1.5, overflow: 'hidden',
-                      border: sliderIndex === i ? `2.5px solid ${COLORS.primary}` : '2.5px solid transparent',
-                      opacity: sliderIndex === i ? 1 : 0.5,
-                      transition: 'all 0.2s ease',
-                      '&:hover': { opacity: 1 }
-                    }}
-                  >
-                    <Box component="img" src={getImgUrl(img)} alt="" sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  </Box>
-                ))}
-              </Box>
+              <Stack direction="row" spacing={1}>
+                 <IconButton
+                  onClick={() => {
+                    navigator.clipboard.writeText(window.location.href);
+                    alert("Link copied!");
+                  }}
+                  size="small"
+                  sx={{ bgcolor: "#f1f5f9", color: "#64748b", "&:hover": { color: COLORS.primary } }}
+                >
+                  <Share2 size={16} />
+                </IconButton>
+                <IconButton onClick={closeModal} size="small" sx={{ bgcolor: "#f1f5f9", color: "#64748b", "&:hover": { bgcolor: "#fee2e2", color: "#ef4444" } }}>
+                  <X size={18} />
+                </IconButton>
+              </Stack>
             </Box>
-          );
-        })()}
+
+            {/* Main Image Viewport (Minimal Black Background) */}
+            <Box sx={{ position: "relative", width: "100%", height: { xs: 220, sm: 320, md: 380 }, bgcolor: "#000", overflow: "hidden" }}>
+              {total > 0 ? (
+                <Fade in key={sliderIndex} timeout={350}>
+                  <Box
+                    component="img"
+                    src={getImgUrl(allImages[sliderIndex])}
+                    alt=""
+                    sx={{ width: "100%", height: "100%", objectFit: "contain", userSelect: "none" }}
+                  />
+                </Fade>
+              ) : (
+                <Box sx={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}>
+                  <ImgIcon size={48} opacity={0.3} />
+                </Box>
+              )}
+
+              {/* Navigation Arrows */}
+              {total > 1 && (
+                <>
+                  <IconButton
+                    onClick={() => setSliderIndex(i => (i - 1 + total) % total)}
+                    sx={{ position: "absolute", left: 16, top: "50%", transform: "translateY(-50%)", bgcolor: "rgba(255,255,255,0.12)", color: "white", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.1)", "&:hover": { bgcolor: COLORS.primary } }}
+                  >
+                    <LeftIcon size={20} />
+                  </IconButton>
+                  <IconButton
+                    onClick={() => setSliderIndex(i => (i + 1) % total)}
+                    sx={{ position: "absolute", right: 16, top: "50%", transform: "translateY(-50%)", bgcolor: "rgba(255,255,255,0.12)", color: "white", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.1)", "&:hover": { bgcolor: COLORS.primary } }}
+                  >
+                    <RightIcon size={20} />
+                  </IconButton>
+                </>
+              )}
+            </Box>
+          </Box>
+        )}
       </Dialog>
     </Box>
   );
