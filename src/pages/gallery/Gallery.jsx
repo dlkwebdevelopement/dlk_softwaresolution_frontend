@@ -406,9 +406,9 @@ export default function Gallery() {
         {filteredEvents.map((event, i) => (
           <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={event._id || i}>
             <Fade in timeout={400 + i * 100}>
-               <Box sx={{ height: "100%" }}>
-                 <EventCard event={event} onSelect={openEvent} />
-               </Box>
+              <Box sx={{ height: "100%" }}>
+                <EventCard event={event} onSelect={openEvent} />
+              </Box>
             </Fade>
           </Grid>
         ))}
@@ -556,7 +556,7 @@ export default function Gallery() {
                 </Typography>
               </Box>
               <Stack direction="row" spacing={1}>
-                 <IconButton
+                <IconButton
                   onClick={() => {
                     navigator.clipboard.writeText(window.location.href);
                     alert("Link copied!");

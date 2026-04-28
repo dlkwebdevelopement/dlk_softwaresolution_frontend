@@ -169,6 +169,7 @@ export default function Offers() {
           open={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           initialCourse={selectedOffer}
+          inquiryType="Offer"
         />
 
       </Container>

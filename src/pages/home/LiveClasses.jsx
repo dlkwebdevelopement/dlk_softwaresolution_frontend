@@ -32,6 +32,7 @@ import {
   ChevronLeft
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import QuickEnquiryModal from "../../components/QuickEnquiryModal";
 
 // Animations
 const floatAnimation = keyframes`
@@ -200,6 +201,9 @@ export default function LiveClass() {
   const [hoveredCard, setHoveredCard] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isAutoScrolling, setIsAutoScrolling] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState("");
   const sliderRef = useRef(null);
   const theme = useTheme();
 
@@ -210,8 +214,6 @@ export default function LiveClass() {
         setLoading(true);
         const res = await GetRequest(ADMIN_GET_LIVE_CLASSES);
         if (isMounted) {
-          // Backend may return array directly OR { success, data } wrapped
-          // Mirror admin panel logic: accept either shape
           let data = [];
           if (Array.isArray(res)) {
             data = res;
@@ -220,7 +222,9 @@ export default function LiveClass() {
           } else if (res && res.success && Array.isArray(res.data)) {
             data = res.data;
           }
-          setClasses(data);
+          // Ensure we have valid dates and IDs
+          const validClasses = data.filter(c => c.title && c.startDate);
+          setClasses(validClasses);
           setError(null);
         }
       } catch (err) {
@@ -235,8 +239,6 @@ export default function LiveClass() {
     fetchLiveClasses();
     return () => { isMounted = false; };
   }, []);
-
-  const [isAutoScrolling, setIsAutoScrolling] = useState(true);
 
   useEffect(() => {
     let interval;
@@ -409,7 +411,10 @@ export default function LiveClass() {
                     $hovered={hoveredCard === i}
                     onMouseEnter={() => setHoveredCard(i)}
                     onMouseLeave={() => setHoveredCard(null)}
-                    onClick={() => navigate("/contact")}
+                    onClick={() => {
+                      setSelectedCourse(`Live Class: ${cls.title}`);
+                      setIsModalOpen(true);
+                    }}
                   >
                     <Box sx={{ position: "relative", overflow: "hidden", height: 180 }}>
                       <CardMedia
@@ -488,7 +493,11 @@ export default function LiveClass() {
                         <Typography variant="caption" sx={{ color: colors.textSecondary, fontWeight: 600 }}>Limited Seats</Typography>
                         <Button
                           size="small"
-                          onClick={(e) => { e.stopPropagation(); navigate("/contact"); }}
+                          onClick={(e) => { 
+                            e.stopPropagation(); 
+                            setSelectedCourse(`Live Class: ${cls.title}`);
+                            setIsModalOpen(true);
+                          }}
                           sx={{
                             bgcolor: colors.primary,
                             color: 'white',
@@ -575,6 +584,13 @@ export default function LiveClass() {
           ))}
         </Box>
       </Container>
+      
+      <QuickEnquiryModal 
+        open={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        initialCourse={selectedCourse}
+        inquiryType="Live Classes"
+      />
     </Box>
   );
 }

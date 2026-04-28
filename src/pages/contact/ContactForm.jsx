@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   Container,
   Typography,
@@ -27,6 +27,9 @@ import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import { PostRequest } from "../../api/api";
 import { ADMIN_POST_CONTACT } from "../../api/endpoints";
+import { useCaptcha } from "../../context/CaptchaContext";
+import CaptchaWrapper from "../../components/CaptchaWrapper";
+import toast from "react-hot-toast";
 
 // Animations
 const fadeIn = keyframes`
@@ -199,6 +202,8 @@ export default function ContactForm() {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const { isVerified, setVerified, triggerModal } = useCaptcha();
+  const recaptchaRef = useRef(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
 
   const validateForm = () => {
@@ -216,7 +221,7 @@ export default function ContactForm() {
 
   const handleChange = (e) => {
     const { name, value, checked, type } = e.target;
-    
+
     if (name === "phone") {
       const nums = value.replace(/[^0-9]/g, "");
       if (nums.length <= 10) {
@@ -232,18 +237,34 @@ export default function ContactForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
+    if (!isVerified) {
+      triggerModal();
+      return setSnackbar({ open: true, message: "Please complete the security check", severity: "warning" });
+    }
+
     setIsSubmitting(true);
     try {
-      const response = await PostRequest(ADMIN_POST_CONTACT, formData);
-      if (response?.success) {
+      const response = await PostRequest(ADMIN_POST_CONTACT, {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        message: formData.message,
+        acceptTerms: formData.acceptTerms,
+        captchaToken: "SESSION_VERIFIED"
+      });
+
+      if (response?.success || response?.message === "Message submitted successfully") {
         setSubmitSuccess(true);
+
         setFormData({ firstName: "", lastName: "", email: "", phone: "", message: "", acceptTerms: true });
+        if (recaptchaRef.current) recaptchaRef.current.reset();
         setTimeout(() => setSubmitSuccess(false), 8000);
       } else {
-        setSnackbar({ open: true, message: response?.message || "Transmission failed", severity: "error" });
+        setSnackbar({ open: true, message: response?.message || response?.error || "Transmission failed", severity: "error" });
       }
     } catch (error) {
-      setSnackbar({ open: true, message: "Connection lost with server", severity: "error" });
+      setSnackbar({ open: true, message: error.response?.data?.message || error.response?.data?.error || "Connection lost with server", severity: "error" });
     } finally {
       setIsSubmitting(false);
     }
@@ -252,10 +273,10 @@ export default function ContactForm() {
   return (
     <PageWrapper>
       <Container maxWidth="lg" sx={{ animation: `${fadeIn} 1s ease-out` }}>
-        
+
         {/* Unified Luxury Card */}
         <UnifiedCard>
-          
+
           {/* Information Sidebar */}
           <Sidebar>
             <Box>
@@ -271,7 +292,7 @@ export default function ContactForm() {
                   <IconBox><LocationOnIcon /></IconBox>
                   <Box>
                     <Typography variant="subtitle2" sx={{ color: "#3DB843", fontWeight: 600, textTransform: "uppercase", fontSize: "11px", letterSpacing: "2px", mb: 0.5 }}>Headquarters</Typography>
-                    <Typography variant="body1" sx={{ fontWeight: 600, fontSize: "0.95rem" }}>Rahath Plaza, Vadapalani,<br/>Chennai - 600026</Typography>
+                    <Typography variant="body1" sx={{ fontWeight: 600, fontSize: "0.95rem" }}>Rahath Plaza, Vadapalani,<br />Chennai - 600026</Typography>
                   </Box>
                 </InfoItem>
 
@@ -315,7 +336,7 @@ export default function ContactForm() {
             <form onSubmit={handleSubmit}>
               <Stack spacing={2.5}>
                 <Grid container spacing={3}>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <LuxuryTextField
                       fullWidth
                       label="First Name"
@@ -326,7 +347,7 @@ export default function ContactForm() {
                       helperText={errors.firstName}
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <LuxuryTextField
                       fullWidth
                       label="Last Name"
@@ -372,6 +393,8 @@ export default function ContactForm() {
                   helperText={errors.message}
                 />
 
+
+
                 <Box>
                   <FormControlLabel
                     control={
@@ -401,12 +424,12 @@ export default function ContactForm() {
 
                 {/* Fade-in Success Alert */}
                 <Fade in={submitSuccess}>
-                  <Alert 
-                    icon={<CheckCircleIcon fontSize="inherit" />} 
+                  <Alert
+                    icon={<CheckCircleIcon fontSize="inherit" />}
                     severity="success"
-                    sx={{ 
-                      borderRadius: "20px", 
-                      background: "#e8f7e9", 
+                    sx={{
+                      borderRadius: "20px",
+                      background: "#e8f7e9",
                       color: "#1a4718",
                       fontWeight: 600,
                       border: "1px solid rgba(61, 184, 67, 0.2)",
@@ -423,20 +446,20 @@ export default function ContactForm() {
         </UnifiedCard>
 
         {/* Floating Decorative Elements */}
-        <Box sx={{ 
-          position: "absolute", 
-          zIndex: -1, 
-          bottom: "-50px", 
-          left: "5%", 
-          width: "200px", 
-          height: "200px", 
-          border: "40px solid #f2fbf2", 
+        <Box sx={{
+          position: "absolute",
+          zIndex: -1,
+          bottom: "-50px",
+          left: "5%",
+          width: "200px",
+          height: "200px",
+          border: "40px solid #f2fbf2",
           borderRadius: "60px",
           transform: "rotate(25deg)"
         }} />
 
       </Container>
-      
+
       <Snackbar
         open={snackbar.open}
         autoHideDuration={5000}

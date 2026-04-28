@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Box,
   Card,
@@ -27,9 +27,10 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import { PostRequest, GetRequest } from "../../api/api";
 import {
-  ADMIN_POST_REGISTRATIONS,
+  ADMIN_POST_ENQUIRIES,
   ADMIN_GET_CATEGORIES,
 } from "../../api/endpoints";
+import ReCAPTCHA from "react-google-recaptcha";
 import toast from "react-hot-toast";
 
 /* ---------------- DUMMY DATA ---------------- */
@@ -212,6 +213,9 @@ const ServicesCards = () => {
     courseId: "",
   });
 
+  const [captchaToken, setCaptchaToken] = useState(null);
+  const recaptchaRef = useRef(null);
+
   useEffect(() => {
     AOS.init({
       duration: 800,
@@ -242,6 +246,10 @@ const ServicesCards = () => {
   const handleClose = () => {
     setOpen(false);
     setSelectedService(null);
+    setCaptchaToken(null);
+    if (recaptchaRef.current) {
+      recaptchaRef.current.reset();
+    }
   };
 
   const validateEmail = (email) => {
@@ -265,18 +273,26 @@ const ServicesCards = () => {
     if (!formData.fullName.trim()) return toast.error("Full name is required");
     if (!formData.email.trim() || !validateEmail(formData.email)) return toast.error("Valid email is required");
     if (!formData.phone.trim() || formData.phone.length !== 10) return toast.error("Phone number must be 10 digits");
-    if (!formData.courseId) return toast.error("Please select a course");
+    if (!captchaToken) return toast.error("Please verify you are not a robot");
 
     try {
-      const data = await PostRequest(ADMIN_POST_REGISTRATIONS, {
-        ...formData,
-        inquiryType: selectedService.title
+      const selectedCat = cats.find((c) => (c._id || c.id) === formData.courseId);
+      const courseName = selectedCat?.categoryName || selectedCat?.category || "Selected Course";
+
+      const data = await PostRequest(ADMIN_POST_ENQUIRIES, {
+        name: formData.fullName,
+        email: formData.email,
+        mobile: formData.phone,
+        course: courseName,
+        location: "Online",
+        timeslot: "N/A",
+        inquiryType: selectedService.title,
+        captchaToken
       });
 
-      if (data?.message === "Registration successful") {
-        const selectedCat = cats.find((c) => (c._id || c.id) === formData.courseId);
+      if (data?.message === "Enquiry submitted successfully!") {
         toast.success(
-          `Inquiry submitted successfully for ${selectedCat?.categoryName || selectedCat?.category || "Selected Course"}!`,
+          `Inquiry submitted successfully for ${courseName}!`,
         );
       } else {
         toast.error(data.message || "Submission failed");
@@ -449,6 +465,14 @@ const ServicesCards = () => {
                     </MenuItem>
                   ))}
                 </TextField>
+
+                <Box sx={{ display: 'flex', justifyContent: 'center', py: 1 }}>
+                  <ReCAPTCHA
+                    ref={recaptchaRef}
+                    sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
+                    onChange={(val) => setCaptchaToken(val)}
+                  />
+                </Box>
 
                 <Box sx={{ 
                   p: 2.5, 

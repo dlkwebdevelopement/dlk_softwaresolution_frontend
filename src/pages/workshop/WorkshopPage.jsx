@@ -320,7 +320,17 @@ export default function WorkshopPage({ viewMode = "grid" }) {
             data = res.data;
           }
           if (data.length > 0) {
-            setWorkshops(data);
+            // Filter: date expiry not show (Only today onwards)
+            const today = dayjs().startOf('day');
+            const filtered = data.filter(w => {
+              const wDate = dayjs(w.date).startOf('day');
+              return wDate.isSame(today) || wDate.isAfter(today);
+            });
+
+            // Sort: current date and month card 1st show (Ascending order)
+            const sorted = filtered.sort((a, b) => dayjs(a.date).valueOf() - dayjs(b.date).valueOf());
+
+            setWorkshops(sorted);
           } else if (res && !res.success) {
             setError(res.message || "Failed to load workshops");
           }

@@ -55,7 +55,7 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
 const locations = ["Vadapalani", "Porur", "Online"];
 const timeslots = ["Morning", "Afternoon", "Evening"];
 
-export default function QuickEnquiryModal({ open, onClose, initialCourse = "" }) {
+export default function QuickEnquiryModal({ open, onClose, initialCourse = "", inquiryType = "Quick Enquiry" }) {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -97,7 +97,7 @@ export default function QuickEnquiryModal({ open, onClose, initialCourse = "" })
     }
 
     try {
-      await PostRequest(ADMIN_POST_ENQUIRIES, { ...formData, captchaToken });
+      await PostRequest(ADMIN_POST_ENQUIRIES, { ...formData, inquiryType, captchaToken });
       toast.success("Enquiry submitted! We will contact you shortly.");
       setFormData({
         name: "",
@@ -236,7 +236,7 @@ export default function QuickEnquiryModal({ open, onClose, initialCourse = "" })
               <Box sx={{ display: "flex", justifyContent: "center", py: 1 }}>
                 <ReCAPTCHA
                   ref={recaptchaRef}
-                  sitekey="6Lc_DJAsAAAAADKYIf74PvRX5a5dUCy8GTxlxP5D"
+                  sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
                   onChange={(val) => setCaptchaToken(val)}
                 />
               </Box>

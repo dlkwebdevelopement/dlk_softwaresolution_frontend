@@ -65,7 +65,7 @@ const GalleryItem = ({ album, onOpen, height = 300 }) => {
     <Box
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onClick={() => navigate("/gallery")}
+      onClick={() => navigate("/gallery", { state: { album } })}
       sx={{
         position: 'relative',
         height: height,

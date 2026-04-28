@@ -4,7 +4,7 @@ import { styled, keyframes } from "@mui/material/styles";
 import { PostRequest } from "../../api/api";
 import { ADMIN_POST_ENQUIRIES } from "../../api/endpoints";
 import SendIcon from '@mui/icons-material/Send';
-import ReCAPTCHA from "react-google-recaptcha";
+import { useCaptcha } from "../../context/CaptchaContext";
 
 // Animations
 const fadeIn = keyframes`
@@ -61,7 +61,7 @@ export default function EnquiryFormAlone() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
-  const [captchaToken, setCaptchaToken] = useState(null);
+  const { isVerified, triggerModal } = useCaptcha();
   const recaptchaRef = useRef(null);
 
   const validateEmail = (email) => {
@@ -112,14 +112,15 @@ export default function EnquiryFormAlone() {
       setLoading(false);
       return;
     }
-    if (!captchaToken) {
-      setError("Please verify that you are not a robot");
+    if (!isVerified) {
+      triggerModal();
+      setError("Please complete the security check");
       setLoading(false);
       return;
     }
 
     try {
-      await PostRequest(ADMIN_POST_ENQUIRIES, { ...formData, captchaToken });
+      await PostRequest(ADMIN_POST_ENQUIRIES, { ...formData, inquiryType: "Quick Enquiry", captchaToken: "SESSION_VERIFIED" });
       setSuccess("Enquiry submitted successfully!");
       setFormData({
         name: "",
@@ -129,7 +130,6 @@ export default function EnquiryFormAlone() {
         location: "",
         timeslot: "",
       });
-      setCaptchaToken(null);
       if (recaptchaRef.current) {
         recaptchaRef.current.reset();
       }
@@ -225,13 +225,7 @@ export default function EnquiryFormAlone() {
           </Typography>
         )}
 
-        <Box sx={{ display: 'flex', justifyContent: 'center', my: 1 }}>
-          <ReCAPTCHA
-            ref={recaptchaRef}
-            sitekey="6Lc_DJAsAAAAADKYIf74PvRX5a5dUCy8GTxlxP5D"
-            onChange={handleCaptchaChange}
-          />
-        </Box>
+
 
         <Button
           onClick={handleSubmit}

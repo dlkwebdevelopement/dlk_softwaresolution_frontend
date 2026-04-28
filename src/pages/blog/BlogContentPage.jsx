@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
-import ReCAPTCHA from "react-google-recaptcha";
+import { useCaptcha } from "../../context/CaptchaContext";
+import CaptchaWrapper from "../../components/CaptchaWrapper";
 import {
   Box,
   Typography,
@@ -45,7 +46,7 @@ export default function BlogContentPage() {
   const [latestPosts, setLatestPosts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [captchaToken, setCaptchaToken] = useState(null);
+  const { isVerified, setVerified, triggerModal } = useCaptcha();
   const recaptchaRef = useRef(null);
 
   // Auto-scroll logic array
@@ -93,6 +94,13 @@ export default function BlogContentPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [slug]);
 
+  // ✅ Auto-fill course with blog title when loaded
+  useEffect(() => {
+    if (blog?.title) {
+      setFormData(prev => ({ ...prev, course: `Source: ${blog.title}` }));
+    }
+  }, [blog]);
+
   // Fetch latest posts
   useEffect(() => {
     const fetchLatestPosts = async () => {
@@ -132,12 +140,20 @@ export default function BlogContentPage() {
     if (!email.trim() || !validateEmail(email)) return toast.error("Valid email is required");
     if (!mobile.trim() || mobile.length !== 10) return toast.error("Mobile number must be 10 digits");
     if (!course.trim() || !location.trim() || !timeslot.trim()) return toast.error("Please fill all fields");
-    if (!captchaToken) return toast.error("Please verify CAPTCHA");
+    if (!isVerified) {
+      triggerModal();
+      return toast.error("Please complete the security check");
+    }
 
     try {
-      const data = await PostRequest(ADMIN_POST_ENQUIRIES, { ...formData, captchaToken });
+      const data = await PostRequest(ADMIN_POST_ENQUIRIES, { 
+        ...formData, 
+        inquiryType: "Blog",
+        captchaToken: "SESSION_VERIFIED" 
+      });
       if (data?.message === "Enquiry submitted successfully!") {
         toast.success("Quick Enquiry submitted successfully! We will contact you soon.");
+        
         setFormData({
           name: "",
           email: "",
@@ -146,7 +162,6 @@ export default function BlogContentPage() {
           location: "",
           timeslot: "",
         });
-        setCaptchaToken(null);
         if (recaptchaRef.current) {
           recaptchaRef.current.reset();
         }
@@ -170,7 +185,7 @@ export default function BlogContentPage() {
       <Typography variant="h5" fontWeight={600}>Blog not found</Typography>
       <Typography
         onClick={() => navigate('/blogs')}
-        sx={{ mt: 2, color: 'primary.main', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
+        sx={{ mt: 2, color: 'primary.main', cursor: 'pointer', fontWeight: 600, '&:hover': { opacity: 0.8 } }}
       >
         Return to blogs
       </Typography>
@@ -271,6 +286,13 @@ export default function BlogContentPage() {
                 fontSize: { xs: "0.95rem", md: "1.05rem" },
                 overflowWrap: "break-word",
                 wordBreak: "break-word",
+                "& a": {
+                  color: "inherit",
+                  textDecoration: "none",
+                  fontWeight: "inherit",
+                  cursor: "text",
+                  pointerEvents: "none"
+                },
                 "& h2": {
                   fontSize: { xs: "1.5rem", md: "2rem" },
                   fontWeight: 600,
@@ -479,13 +501,7 @@ export default function BlogContentPage() {
                       />
                     </Stack>
 
-                    <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>
-                      <ReCAPTCHA
-                        ref={recaptchaRef}
-                        sitekey="6Lc_DJAsAAAAADKYIf74PvRX5a5dUCy8GTxlxP5D"
-                        onChange={(value) => setCaptchaToken(value)}
-                      />
-                    </Box>
+
 
                     <Button
                       type="submit"
@@ -611,8 +627,14 @@ export default function BlogContentPage() {
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5, flexWrap: 'wrap' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                           <Calendar size={13} color="#4CAF50" />
-                          <Typography sx={{ fontSize: '0.72rem', fontWeight: 500, color: '#718096' }}>
+                          <Typography sx={{ fontSize: '0.72rem', fontWeight: 600, color: '#718096' }}>
                             {getFormattedDate(post.createdAt)}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, bgcolor: 'rgba(59,130,246,0.05)', px: 1, py: 0.3, borderRadius: '4px' }}>
+                          <Box component="span" sx={{ width: 6, height: 6, bgcolor: '#3b82f6', borderRadius: '50%' }} />
+                          <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: '#3b82f6' }}>
+                            {post.views || 0} Views
                           </Typography>
                         </Box>
                       </Box>

@@ -3,6 +3,8 @@ import { Link as RouterLink } from "react-router-dom";
 import { GetRequest, PostRequest } from "../api/api";
 import { ADMIN_GET_CATEGORIES, ADMIN_POST_CONTACT } from "../api/endpoints";
 import toast from "react-hot-toast";
+import { useCaptcha } from "../context/CaptchaContext";
+import CaptchaWrapper from "./CaptchaWrapper";
 import {
   Box,
   Typography,
@@ -17,6 +19,7 @@ import {
   alpha,
   Fade,
   Grow,
+  CircularProgress,
 } from "@mui/material";
 import { styled, keyframes } from "@mui/material/styles";
 import SendIcon from "@mui/icons-material/Send";
@@ -129,38 +132,18 @@ const NewsletterInput = styled(TextField)({
   },
 });
 
-const NewsletterButton = styled(Button)({
-  borderRadius: '50px',
-  padding: '12px 28px',
-  fontWeight: 700,
-  textTransform: 'none',
-  fontSize: '0.95rem',
-  background: `linear-gradient(135deg, ${colors.dark}, ${colors.primary})`,
+const SubscribeButton = styled(IconButton)(({ theme }) => ({
+  background: `linear-gradient(135deg, ${colors.primary}, ${colors.dark})`,
   color: colors.light,
+  padding: '10px',
   transition: 'all 0.3s ease',
-  position: 'relative',
-  overflow: 'hidden',
-  '&::before': {
-    content: '""',
-    position: 'absolute',
-    top: 0,
-    left: '-100%',
-    width: '100%',
-    height: '100%',
-    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
-    transition: 'left 0.5s ease',
-  },
+  boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
   '&:hover': {
-    transform: 'translateY(-3px)',
-    boxShadow: `0 15px 30px ${alpha(colors.dark, 0.3)}`,
-    '&::before': {
-      left: '100%',
-    },
-  },
-  '&:active': {
-    transform: 'translateY(0)',
-  },
-});
+    background: colors.dark,
+    transform: 'scale(1.1) rotate(5deg)',
+    boxShadow: `0 8px 20px ${alpha(colors.primary, 0.4)}`,
+  }
+}));
 
 const SocialIconButton = styled(IconButton, {
   shouldForwardProp: (prop) => prop !== 'brandcolor',
@@ -297,6 +280,7 @@ const ContactInfo = ({ icon: Icon, text, subtext }) => (
 const Footer = () => {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { isVerified, setVerified, triggerModal } = useCaptcha();
   const [topCourses, setTopCourses] = useState([
     { name: "AI & Machine Learning", path: "#" },
     { name: "Web Development", path: "#" },
@@ -336,6 +320,12 @@ const Footer = () => {
       return;
     }
 
+    if (!isVerified) {
+      triggerModal();
+      toast.error("Please complete the security check");
+      return;
+    }
+
     setIsLoading(true);
     try {
       const payload = {
@@ -344,11 +334,13 @@ const Footer = () => {
         email: email,
         phone: "N/A",
         message: "Newsletter Subscription Request",
-        acceptTerms: true
+        acceptTerms: true,
+        captchaToken: isVerified ? "SESSION_VERIFIED" : localToken
       };
 
       await PostRequest(ADMIN_POST_CONTACT, payload);
       toast.success("Subscribed successfully! Thank you for staying updated.");
+      
       setEmail("");
     } catch (err) {
       console.error("Newsletter Subscription Error:", err);
@@ -462,27 +454,24 @@ const Footer = () => {
                   gap: 2,
                 }}
               >
-                <NewsletterInput
+                 <NewsletterInput
                   type="email"
-                  placeholder="Enter your email address"
+                  placeholder="Your email address"
                   variant="outlined"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  InputProps={{
+                    endAdornment: (
+                      <SubscribeButton onClick={handleSubscribe} disabled={isLoading}>
+                        {isLoading ? <CircularProgress size={20} color="inherit" /> : <SendIcon sx={{ fontSize: 20 }} />}
+                      </SubscribeButton>
+                    ),
+                  }}
                   sx={{
-                    width: { xs: "100%", sm: "300px" },
+                    width: { xs: "100%", sm: "340px" },
+                    '& .MuiOutlinedInput-root': { pr: 0.5 }
                   }}
                 />
-                <NewsletterButton
-                  variant="contained"
-                  endIcon={<SendIcon />}
-                  onClick={handleSubscribe}
-                  disabled={isLoading}
-                  sx={{
-                    width: { xs: "100%", sm: "auto" },
-                  }}
-                >
-                  {isLoading ? "Subscribing..." : "Subscribe"}
-                </NewsletterButton>
               </Box>
             </Box>
           </GlassSection>
