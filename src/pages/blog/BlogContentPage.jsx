@@ -12,7 +12,8 @@ import {
   alpha,
   Card,
   CardContent,
-  Chip
+  Chip,
+  Avatar
 } from "@mui/material";
 import {
   Calendar,
@@ -263,6 +264,19 @@ export default function BlogContentPage() {
                 <Typography sx={{ fontWeight: 600, fontSize: "15px", color: "#0f172a" }}>5 Min Read</Typography>
               </Box>
             </Stack>
+
+            {blog?.authorType === "Student" && (
+              <Stack direction="row" spacing={1.5} alignItems="center">
+                <Avatar 
+                  src={getImgUrl(blog.studentProfilePic)} 
+                  sx={{ width: 44, height: 44, border: "2px solid #10b981" }}
+                />
+                <Box>
+                  <Typography sx={{ fontSize: "11px", fontWeight: 700, color: "#10b981", textTransform: "uppercase", letterSpacing: 0.5 }}>STUDENT</Typography>
+                  <Typography sx={{ fontWeight: 600, fontSize: "15px", color: "#0f172a" }}>{blog.studentName}</Typography>
+                </Box>
+              </Stack>
+            )}
           </Box>
         </Box>
 
@@ -612,6 +626,24 @@ export default function BlogContentPage() {
                     <Box sx={{ position: 'relative', paddingTop: '56.25%', overflow: 'hidden', bgcolor: '#f5f5f5', flexShrink: 0,
                       '&::after': { content: '""', position: 'absolute', inset: 0, background: 'linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.3) 100%)', pointerEvents: 'none' }
                     }}>
+                      {post.authorType === "Student" && (
+                        <Chip
+                          label="STUDENT"
+                          size="small"
+                          sx={{
+                            position: "absolute",
+                            top: 12,
+                            left: 12,
+                            zIndex: 2,
+                            bgcolor: "#4CAF50",
+                            color: "white",
+                            fontWeight: 900,
+                            fontSize: "0.6rem",
+                            height: "20px",
+                            boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
+                          }}
+                        />
+                      )}
                       <Box
                         component="img"
                         className="post-image"

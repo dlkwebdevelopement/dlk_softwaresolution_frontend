@@ -16,6 +16,12 @@ import {
   TextField,
   InputAdornment,
   Skeleton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Avatar,
+  IconButton,
 } from "@mui/material";
 import { styled, keyframes } from "@mui/material/styles";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
@@ -26,8 +32,11 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import SearchIcon from "@mui/icons-material/Search";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
-import { getImgUrl, GetRequest } from "../../api/api";
-import { GET_ALL_BLOGS } from "../../api/endpoints";
+import CloseIcon from "@mui/icons-material/Close";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import AddIcon from "@mui/icons-material/Add";
+import { getImgUrl, GetRequest, PostRequest } from "../../api/api";
+import { GET_ALL_BLOGS, POST_STUDENT_BLOG } from "../../api/endpoints";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import BottomInfo from "../../components/BottomInfo";
@@ -59,15 +68,15 @@ const colors = {
 
 // Styled Components
 const BlogCard = styled(Paper, {
-  shouldForwardProp: (prop) => prop !== "$hovered",
-})(({ theme, $hovered }) => ({
-  background: colors.background.card,
+  shouldForwardProp: (prop) => prop !== "$hovered" && prop !== "$isStudent",
+})(({ theme, $hovered, $isStudent }) => ({
+  background: $isStudent ? alpha(colors.primary, 0.03) : colors.background.card,
   borderRadius: "24px",
   overflow: "hidden",
   position: "relative",
   transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
   transform: $hovered ? "translateY(-12px)" : "translateY(0)",
-  border: `1px solid ${$hovered ? colors.primary : alpha(colors.primary, 0.2)}`,
+  border: `1px solid ${$hovered ? colors.primary : $isStudent ? alpha(colors.primary, 0.4) : alpha(colors.primary, 0.2)}`,
   boxShadow: $hovered
     ? `0 25px 50px -12px rgba(61, 184, 67, 0.15)`
     : `0 4px 6px -1px rgba(0, 0, 0, 0.05)`,
@@ -229,11 +238,67 @@ const BlogList = () => {
   const [page, setPage] = useState(1);
   const blogsPerPage = 12;
 
+  // Student Blog Modal States
+  const [openModal, setOpenModal] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    studentName: "",
+    code: "",
+    title: "",
+    short_description: "",
+    description: "",
+    category: "Student Life",
+  });
+  const [studentProfilePic, setStudentProfilePic] = useState(null);
+  const [blogImage, setBlogImage] = useState(null);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleFileChange = (e, type) => {
+    const file = e.target.files[0];
+    if (type === "profile") setStudentProfilePic(file);
+    else setBlogImage(file);
+  };
+
+  const handleStudentSubmit = async () => {
+    if (!formData.studentName || !formData.code || !formData.title || !formData.short_description || !formData.description || !studentProfilePic || !blogImage) {
+      alert("Please fill all fields and upload required images.");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      const data = new FormData();
+      Object.keys(formData).forEach((key) => data.append(key, formData[key]));
+      data.append("studentProfilePic", studentProfilePic);
+      data.append("image", blogImage);
+
+      const res = await PostRequest(POST_STUDENT_BLOG, data);
+      if (res?.success) {
+        alert("Blog posted successfully! It will appear on the site once approved by the admin.");
+        setOpenModal(false);
+        // Refresh blogs
+        const fetchRes = await GetRequest(`${GET_ALL_BLOGS}?limit=1000&approved=true`);
+        setBlogs(fetchRes?.data?.data || []);
+      } else {
+        alert(res?.message || "Failed to post blog. Please check your code.");
+      }
+    } catch (error) {
+      console.error("Error posting blog:", error);
+      alert("An error occurred. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
         setLoading(true);
-        const res = await GetRequest(`${GET_ALL_BLOGS}?limit=1000`);
+        const res = await GetRequest(`${GET_ALL_BLOGS}?limit=1000&approved=true`);
         setBlogs(res?.data?.data || []);
       } catch (error) {
         console.error("Error fetching blogs:", error);
@@ -267,17 +332,17 @@ const BlogList = () => {
     <Box sx={{ bgcolor: colors.background.main, minHeight: "100vh" }}>
       <Navbar />
 
-      <Box sx={{ pt: { xs: 12, md: 16 }, pb: 10 }}>
+      <Box sx={{ pt: { xs: 4, md: 6 }, pb: 10 }}>
         <Container maxWidth="xl">
           {/* Header Section */}
           <Box
             sx={{
               textAlign: "center",
-              mb: { xs: 6, md: 8 },
+              mb: { xs: 4, md: 6 },
               animation: `${slideInUp} 0.6s ease-out`,
             }}
           >
-            <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", mb: 2, position: "relative" }}>
               <Chip
                 icon={<MenuBookIcon sx={{ fontSize: "16px !important", color: "inherit !important" }} />}
                 label="KNOWLEDGE HUB"
@@ -289,6 +354,27 @@ const BlogList = () => {
                   "& .MuiChip-label": { paddingLeft: "8px" },
                 }}
               />
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={() => setOpenModal(true)}
+                sx={{
+                  position: "absolute",
+                  right: 0,
+                  bgcolor: colors.primary,
+                  color: "white",
+                  fontWeight: 700,
+                  px: 3,
+                  py: 1,
+                  borderRadius: "30px",
+                  boxShadow: `0 10px 20px ${alpha(colors.primary, 0.3)}`,
+                  "&:hover": {
+                    bgcolor: colors.primaryDark,
+                  }
+                }}
+              >
+                Post Your Blog
+              </Button>
             </Box>
 
             <Typography
@@ -321,8 +407,11 @@ const BlogList = () => {
             </Typography>
 
             {/* Breadcrumbs */}
-            <Box sx={{ display: "flex", justifyContent: "center", mb: 6 }}>
-              <Breadcrumbs separator={<ChevronRightIcon sx={{ fontSize: 14 }} />}>
+            <Box sx={{ display: "flex", justifyContent: "center", mb: 3 }}>
+              <Breadcrumbs
+                separator={<ChevronRightIcon sx={{ fontSize: "1rem", color: colors.textSecondary }} />}
+                sx={{ bgcolor: alpha(colors.primary, 0.05), px: 3, py: 1, borderRadius: "30px" }}
+              >
                 <Link
                   component="button"
                   onClick={() => navigate("/")}
@@ -360,7 +449,7 @@ const BlogList = () => {
             </SearchWrapper>
 
             {/* Category Filters */}
-            <Box sx={{ display: "flex", justifyContent: "center", gap: "12px", flexWrap: "wrap" }}>
+            <Box sx={{ display: "flex", justifyContent: "center", gap: "12px", flexWrap: "wrap", mb: 4 }}>
               {categories.map((cat) => (
                 <CategoryChip
                   key={cat}
@@ -371,6 +460,126 @@ const BlogList = () => {
               ))}
             </Box>
           </Box>
+
+          {/* Student Blog Modal */}
+          <Dialog
+            open={openModal}
+            onClose={() => setOpenModal(false)}
+            maxWidth="md"
+            fullWidth
+            PaperProps={{
+              sx: { borderRadius: "24px", p: 1 }
+            }}
+          >
+            <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontWeight: 800, fontSize: "1.5rem" }}>
+              Share Your Story
+              <IconButton onClick={() => setOpenModal(false)}>
+                <CloseIcon />
+              </IconButton>
+            </DialogTitle>
+            <DialogContent dividers>
+              <Grid container spacing={3}>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Your Name"
+                    name="studentName"
+                    value={formData.studentName}
+                    onChange={handleInputChange}
+                    margin="normal"
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="4-Digit Code"
+                    name="code"
+                    value={formData.code}
+                    onChange={handleInputChange}
+                    margin="normal"
+                    helperText="One-time use code from admin"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Blog Title"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleInputChange}
+                    margin="normal"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Short Description"
+                    name="short_description"
+                    multiline
+                    rows={2}
+                    value={formData.short_description}
+                    onChange={handleInputChange}
+                    margin="normal"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Full Content"
+                    name="description"
+                    multiline
+                    rows={6}
+                    value={formData.description}
+                    onChange={handleInputChange}
+                    margin="normal"
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 700 }}>Your Profile Picture</Typography>
+                  <Button
+                    component="label"
+                    variant="outlined"
+                    startIcon={<CloudUploadIcon />}
+                    fullWidth
+                    sx={{ height: "56px", borderRadius: "12px", borderStyle: "dashed" }}
+                  >
+                    {studentProfilePic ? studentProfilePic.name : "Upload Profile Pic"}
+                    <input type="file" hidden accept="image/*" onChange={(e) => handleFileChange(e, "profile")} />
+                  </Button>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 700 }}>Blog Featured Image</Typography>
+                  <Button
+                    component="label"
+                    variant="outlined"
+                    startIcon={<CloudUploadIcon />}
+                    fullWidth
+                    sx={{ height: "56px", borderRadius: "12px", borderStyle: "dashed" }}
+                  >
+                    {blogImage ? blogImage.name : "Upload Blog Image"}
+                    <input type="file" hidden accept="image/*" onChange={(e) => handleFileChange(e, "blog")} />
+                  </Button>
+                </Grid>
+              </Grid>
+            </DialogContent>
+            <DialogActions sx={{ p: 3 }}>
+              <Button onClick={() => setOpenModal(false)} sx={{ fontWeight: 700, color: colors.textSecondary }}>Cancel</Button>
+              <Button
+                onClick={handleStudentSubmit}
+                variant="contained"
+                disabled={submitting}
+                sx={{
+                  bgcolor: colors.primary,
+                  fontWeight: 700,
+                  px: 4,
+                  borderRadius: "12px",
+                  "&:hover": { bgcolor: colors.primaryDark }
+                }}
+              >
+                {submitting ? "Posting..." : "Publish Blog"}
+              </Button>
+            </DialogActions>
+          </Dialog>
 
           {/* Blog Grid */}
           <Box
@@ -400,12 +609,31 @@ const BlogList = () => {
                 <Box key={blog.id || idx} sx={{ height: "480px" }}>
                   <BlogCard
                     $hovered={hoveredCard === idx}
+                    $isStudent={blog.authorType === "Student"}
                     onMouseEnter={() => setHoveredCard(idx)}
                     onMouseLeave={() => setHoveredCard(null)}
                     onClick={() => navigate(`/blogs/${blog.slug || blog.id}`)}
                     elevation={0}
                   >
                     <ImageContainer>
+                      {blog.authorType === "Student" && (
+                        <Chip
+                          label="STUDENT"
+                          size="small"
+                          sx={{
+                            position: "absolute",
+                            top: 16,
+                            left: 16,
+                            zIndex: 2,
+                            bgcolor: colors.primary,
+                            color: "white",
+                            fontWeight: 900,
+                            fontSize: "0.65rem",
+                            height: "22px",
+                            boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+                          }}
+                        />
+                      )}
                       <StyledCardMedia
                         component="img"
                         image={getImgUrl(blog.image)}
@@ -415,24 +643,38 @@ const BlogList = () => {
                     </ImageContainer>
 
                     <Box sx={{ p: 3, flexGrow: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-                      <MetaInfo>
-                        <div className="meta-item">
-                          <CalendarMonthIcon />
-                          <span>
-                            {blog.createdAt
-                              ? new Date(blog.createdAt).toLocaleDateString("en-US", {
-                                month: "short",
-                                day: "numeric",
-                                year: "numeric",
-                              })
-                              : "Recent"}
-                          </span>
-                        </div>
-                        <div className="meta-item">
-                          <VisibilityIcon />
-                          <span>{blog.views?.toLocaleString() || 0}</span>
-                        </div>
-                      </MetaInfo>
+                      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 1.5 }}>
+                        <MetaInfo sx={{ mb: 0 }}>
+                          <div className="meta-item">
+                            <CalendarMonthIcon />
+                            <span>
+                              {blog.createdAt
+                                ? new Date(blog.createdAt).toLocaleDateString("en-US", {
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                  })
+                                : "Recent"}
+                            </span>
+                          </div>
+                          <div className="meta-item">
+                            <VisibilityIcon />
+                            <span>{blog.views?.toLocaleString() || 0}</span>
+                          </div>
+                        </MetaInfo>
+
+                        {blog.authorType === "Student" && (
+                          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                            <Avatar
+                              src={getImgUrl(blog.studentProfilePic)}
+                              sx={{ width: 24, height: 24, border: `1px solid ${colors.primary}` }}
+                            />
+                            <Typography variant="caption" sx={{ fontWeight: 700, color: colors.textPrimary }}>
+                              {blog.studentName}
+                            </Typography>
+                          </Box>
+                        )}
+                      </Box>
 
                       <BlogTitle variant="h6">{blog.title}</BlogTitle>
 

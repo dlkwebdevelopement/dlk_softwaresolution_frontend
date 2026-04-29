@@ -30,6 +30,7 @@ export const ADMIN_GET_LIVE_CLASSES = "/admin/liveclass";
 //Blogs
 export const GET_ALL_BLOGS = "/admin/blogs";
 export const ADMIN_GET_BLOGS_SLUG = (slug) => `/admin/blogs/${slug}`;
+export const POST_STUDENT_BLOG = "/admin/blogs/student";
 
 // Student Projects
 export const GET_ALL_STUDENT_PROJECTS = "/admin/student-projects";
