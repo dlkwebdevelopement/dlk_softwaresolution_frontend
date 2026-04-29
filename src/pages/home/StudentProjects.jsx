@@ -13,7 +13,8 @@ import {
   Stack,
   useTheme,
   useMediaQuery,
-  Paper
+  Paper,
+  Avatar
 } from "@mui/material";
 import { styled, keyframes } from "@mui/material/styles";
 import {
@@ -28,9 +29,8 @@ import {
   GraduationCap as SchoolIcon
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { GetRequest } from "../../api/config";
+import { GetRequest, getImgUrl } from "../../api/api";
 import { GET_ALL_STUDENT_PROJECTS } from "../../api/endpoints";
-import { getImgUrl } from "../../api/api";
 
 // Animations
 const floatAnimation = keyframes`
@@ -48,12 +48,6 @@ const shimmer = keyframes`
 const slideInUp = keyframes`
   from { opacity: 0; transform: translateY(40px); }
   to   { opacity: 1; transform: translateY(0); }
-`;
-
-const gradientShift = keyframes`
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
 `;
 
 // Color Palette — Brand Green
@@ -77,16 +71,16 @@ const colors = {
 
 // Styled Components
 const GlassCard = styled(Paper, {
-  shouldForwardProp: (prop) => prop !== "$hovered",
-})(({ $hovered }) => ({
-  background: colors.background.card,
+  shouldForwardProp: (prop) => prop !== "$hovered" && prop !== "$isStudent",
+})(({ $hovered, $isStudent }) => ({
+  background: $isStudent ? alpha(colors.primary, 0.03) : colors.background.card,
   backdropFilter: "blur(10px)",
   borderRadius: "24px",
   overflow: "hidden",
   position: "relative",
   transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
   transform: $hovered ? "translateY(-10px)" : "translateY(0)",
-  border: `1px solid ${$hovered ? alpha(colors.primary, 0.5) : alpha(colors.primary, 0.1)}`,
+  border: `1px solid ${$hovered ? alpha(colors.primary, 0.5) : $isStudent ? alpha(colors.primary, 0.4) : alpha(colors.primary, 0.1)}`,
   boxShadow: $hovered
     ? `0 20px 40px rgba(61, 184, 67, 0.15)`
     : "0 10px 30px rgba(0,0,0,0.05)",
@@ -95,13 +89,6 @@ const GlassCard = styled(Paper, {
   flexDirection: "column",
   cursor: "pointer",
 }));
-
-const ImageContainer = styled(Box)({
-  position: "relative",
-  height: 180,
-  width: "100%",
-  overflow: "hidden",
-});
 
 const StyledCardMedia = styled(CardMedia)({
   width: "100%",
@@ -117,11 +104,11 @@ const ScrollTrack = styled(Box)(({ theme }) => ({
   scrollBehavior: 'smooth',
   msOverflowStyle: 'none',
   scrollbarWidth: 'none',
-  padding: '10px 4px 30px 4px', // Reduced top padding
+  padding: '10px 4px 5px 4px',
   '&::-webkit-scrollbar': { display: 'none' },
   [theme.breakpoints.down('sm')]: {
     gap: '12px',
-    padding: '5px 20px 20px 20px',
+    padding: '5px 20px 5px 20px',
   },
 }));
 
@@ -164,13 +151,13 @@ const StudentProjects = () => {
   const [hoveredCard, setHoveredCard] = useState(null);
   const scrollRef = useRef(null);
   const navigate = useNavigate();
-  const theme = useTheme();
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         setLoading(true);
-        const res = await GetRequest(GET_ALL_STUDENT_PROJECTS);
+        // Only fetch approved projects
+        const res = await GetRequest(`${GET_ALL_STUDENT_PROJECTS}?approved=true&limit=1000`);
         setProjects(res?.data?.data || []);
       } catch (error) {
         console.error("Error fetching projects:", error);
@@ -217,7 +204,7 @@ const StudentProjects = () => {
         <Container maxWidth="lg">
           <Grid container spacing={2} justifyContent="center">
             {[1, 2, 3, 4].map((i) => (
-              <Grid key={i} size={{ xs: 12, sm: 6, md: 3 }}>
+              <Grid key={i} item xs={12} sm={6} md={3}>
                 <Box
                   sx={{
                     height: 400,
@@ -239,8 +226,8 @@ const StudentProjects = () => {
   return (
     <Box
       sx={{
-        pt: 1, // Removed top padding
-        pb: { xs: 6, md: 10 },
+        pt: 1,
+        pb: { xs: 2, md: 2 },
         background: colors.background.gradient,
         position: "relative",
         overflow: "hidden",
@@ -309,48 +296,76 @@ const StudentProjects = () => {
               <Box
                 key={project.id || idx}
                 sx={{
-                  width: { xs: "280px", sm: "300px", md: "calc((100% - 48px) / 4)" }, // Adjusted for 16px gap
+                  width: { xs: "280px", sm: "300px", md: "calc((100% - 48px) / 4)" },
                   flexShrink: 0,
                 }}
               >
                 <GlassCard
                   $hovered={hoveredCard === idx}
+                  $isStudent={project.authorType === "Student"}
                   onMouseEnter={() => setHoveredCard(idx)}
                   onMouseLeave={() => setHoveredCard(null)}
                   onClick={() => navigate(`/student-projects/${project.slug}`)}
                   elevation={0}
                 >
-                  <Box sx={{ position: "relative", overflow: "hidden", height: 180 }}>
-                    <StyledCardMedia
-                      component="img"
-                      image={getImgUrl(project.image)}
-                      alt={project.title}
-                      sx={{ transform: hoveredCard === idx ? "scale(1.1)" : "scale(1)" }}
-                    />
-                    <Box sx={{ position: "absolute", top: 12, left: 12 }}>
-                      <Chip
-                        label={project.category || "Innovation"}
-                        size="small"
-                        sx={{ bgcolor: alpha(colors.primary, 0.9), color: 'white', fontWeight: 700, fontSize: '0.65rem', backdropFilter: 'blur(4px)', border: `1px solid ${alpha('#ffffff', 0.2)}` }}
-                      />
-                    </Box>
-                  </Box>
+                    {project.image && (
+                      <Box sx={{ position: "relative", overflow: "hidden", height: 180 }}>
+                        {project.authorType === "Student" && (
+                          <Chip
+                            label="STUDENT"
+                            size="small"
+                            sx={{
+                              position: "absolute",
+                              top: 12,
+                              left: 12,
+                              zIndex: 2,
+                              bgcolor: colors.primary,
+                              color: "white",
+                              fontWeight: 900,
+                              fontSize: "0.6rem",
+                              height: "20px",
+                              boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+                            }}
+                          />
+                        )}
+                        <StyledCardMedia
+                          component="img"
+                          image={getImgUrl(project.image)}
+                          alt={project.title}
+                          sx={{ transform: hoveredCard === idx ? "scale(1.1)" : "scale(1)" }}
+                        />
+                      </Box>
+                    )}
 
                   <Box sx={{ p: 2.5, flexGrow: 1, display: "flex", flexDirection: "column" }}>
-                    <Stack direction="row" spacing={1.5} sx={{ mb: 1.5 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: colors.textPrimary }}>
-                        <CalendarMonthIcon size={12} />
-                        <Typography variant="caption" sx={{ fontWeight: 500 }}>
-                          {project.createdAt ? new Date(project.createdAt).toLocaleDateString("en-US", { month: "short", year: "numeric" }) : "Recent"}
-                        </Typography>
-                      </Box>
-                    </Stack>
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1.5 }}>
+                      <Stack direction="row" spacing={1}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: colors.textPrimary }}>
+                          <CalendarMonthIcon size={12} />
+                          <Typography variant="caption" sx={{ fontWeight: 500 }}>
+                            {project.createdAt ? new Date(project.createdAt).toLocaleDateString("en-US", { month: "short", year: "numeric" }) : "Recent"}
+                          </Typography>
+                        </Box>
+                      </Stack>
+
+                      {project.authorType === "Student" && (
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                          <Avatar
+                            src={getImgUrl(project.studentProfilePic)}
+                            sx={{ width: 20, height: 20, border: `1px solid ${colors.primary}` }}
+                          />
+                          <Typography variant="caption" sx={{ fontWeight: 700, color: colors.textPrimary, fontSize: '0.65rem' }}>
+                            {project.studentName?.split(" ")[0]}
+                          </Typography>
+                        </Box>
+                      )}
+                    </Box>
 
                     <Typography
                       variant="h6"
                       sx={{
                         fontWeight: 700, fontSize: "1rem", mb: 2, color: colors.textPrimary,
-                        lineHeight: 1.4, height: "2.8em", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
+                        lineHeight: 1.4, maxHeight: "2.8em", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
                       }}
                     >
                       {project.title}
@@ -359,13 +374,13 @@ const StudentProjects = () => {
                     <Typography
                       variant="body2"
                       sx={{
-                        color: colors.textSecondary, mb: 3, fontSize: "0.85rem", lineHeight: 1.6, height: "3.2em", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
+                        color: colors.textSecondary, mb: 1.5, fontSize: "0.85rem", lineHeight: 1.6, maxHeight: "3.2em", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
                       }}
                     >
                       {project.short_description}
                     </Typography>
 
-                    <Box sx={{ mt: "auto", pt: 2, borderTop: `1px solid ${alpha(colors.primary, 0.1)}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <Box sx={{ mt: 1, pt: 1.5, borderTop: `1px solid ${alpha(colors.primary, 0.1)}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                       <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, color: colors.textPrimary }}>
                         <VisibilityIcon size={14} />
                         <Typography variant="caption" sx={{ fontWeight: 500 }}>{project.views || 0}</Typography>

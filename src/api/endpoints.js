@@ -32,9 +32,9 @@ export const GET_ALL_BLOGS = "/admin/blogs";
 export const ADMIN_GET_BLOGS_SLUG = (slug) => `/admin/blogs/${slug}`;
 export const POST_STUDENT_BLOG = "/admin/blogs/student";
 
-// Student Projects
 export const GET_ALL_STUDENT_PROJECTS = "/admin/student-projects";
 export const ADMIN_GET_STUDENT_PROJECTS_SLUG = (slug) => `/admin/student-projects/${slug}`;
+export const POST_STUDENT_PROJECT = "/admin/student-projects/student";
 
 
 //course

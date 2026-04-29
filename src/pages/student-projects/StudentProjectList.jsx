@@ -17,6 +17,13 @@ import {
   Skeleton,
   Stack,
   Paper,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  IconButton,
+  Avatar,
 } from "@mui/material";
 import { styled, keyframes } from "@mui/material/styles";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
@@ -24,8 +31,11 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
-import { getImgUrl, GetRequest } from "../../api/api";
-import { GET_ALL_STUDENT_PROJECTS } from "../../api/endpoints";
+import CloseIcon from "@mui/icons-material/Close";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import AddIcon from "@mui/icons-material/Add";
+import { getImgUrl, GetRequest, PostRequest } from "../../api/api";
+import { GET_ALL_STUDENT_PROJECTS, POST_STUDENT_PROJECT } from "../../api/endpoints";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import BottomInfo from "../../components/BottomInfo";
@@ -57,15 +67,15 @@ const colors = {
 
 // Styled Components
 const ProjectCard = styled(Paper, {
-  shouldForwardProp: (prop) => prop !== "$hovered",
-})(({ theme, $hovered }) => ({
-  background: colors.background.card,
+  shouldForwardProp: (prop) => prop !== "$hovered" && prop !== "$isStudent",
+})(({ theme, $hovered, $isStudent }) => ({
+  background: $isStudent ? alpha(colors.primary, 0.03) : colors.background.card,
   borderRadius: "24px",
   overflow: "hidden",
   position: "relative",
   transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
   transform: $hovered ? "translateY(-12px)" : "translateY(0)",
-  border: `1px solid ${$hovered ? colors.primary : alpha(colors.primary, 0.1)}`,
+  border: `1px solid ${$hovered ? colors.primary : $isStudent ? alpha(colors.primary, 0.4) : alpha(colors.primary, 0.1)}`,
   boxShadow: $hovered
     ? `0 25px 50px -12px rgba(61, 184, 67, 0.15)`
     : `0 4px 6px -1px rgba(0, 0, 0, 0.05)`,
@@ -135,7 +145,7 @@ const ProjectTitle = styled(Typography)(({ theme }) => ({
   WebkitBoxOrient: "vertical",
   overflow: "hidden",
   textOverflow: "ellipsis",
-  height: "3.22em",
+  maxHeight: "3.22em",
   transition: "all 0.3s ease",
   "&:hover": { color: colors.primary },
 }));
@@ -149,8 +159,8 @@ const ProjectDescription = styled(Typography)(({ theme }) => ({
   WebkitBoxOrient: "vertical",
   overflow: "hidden",
   textOverflow: "ellipsis",
-  height: "4.08em",
-  marginBottom: 16,
+  maxHeight: "4.08em",
+  marginBottom: 10,
 }));
 
 const ActionButton = styled(Button)(({ theme }) => ({
@@ -179,23 +189,87 @@ export default function StudentProjectList() {
   const [loading, setLoading] = useState(true);
   const [hoveredCard, setHoveredCard] = useState(null);
   const navigate = useNavigate();
-  const theme = useTheme();
+
+  // Student Project Modal States
+  const [openModal, setOpenModal] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    studentName: "",
+    code: "",
+    title: "",
+    short_description: "",
+    description: "",
+  });
+  const [studentProfilePic, setStudentProfilePic] = useState(null);
+  const [projectImage, setProjectImage] = useState(null);
+
+  const fetchProjects = async () => {
+    try {
+      setLoading(true);
+      // Fetch with approved=true filter
+      const res = await GetRequest(`${GET_ALL_STUDENT_PROJECTS}?approved=true&limit=1000`);
+      setProjects(res?.data?.data || []);
+    } catch (err) {
+      console.error("Failed to fetch projects:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        setLoading(true);
-        const res = await GetRequest(GET_ALL_STUDENT_PROJECTS);
-        setProjects(res?.data?.data || []);
-      } catch (err) {
-        console.error("Failed to fetch projects:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchProjects();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleFileChange = (e, type) => {
+    const file = e.target.files[0];
+    if (type === "profile") setStudentProfilePic(file);
+    else setProjectImage(file);
+  };
+
+  const handleStudentSubmit = async () => {
+    if (!formData.studentName || !formData.code || !formData.title || !formData.short_description || !formData.description || !studentProfilePic || !projectImage) {
+      alert("Please fill all fields and upload required images.");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      const data = new FormData();
+      Object.keys(formData).forEach((key) => data.append(key, formData[key]));
+      data.append("studentProfilePic", studentProfilePic);
+      data.append("image", projectImage);
+
+      const res = await PostRequest(POST_STUDENT_PROJECT, data);
+      if (res?.success) {
+        alert("Project submitted successfully! It will appear on the site once approved by the admin.");
+        setOpenModal(false);
+        // Clear form
+        setFormData({
+          studentName: "",
+          code: "",
+          title: "",
+          short_description: "",
+          description: "",
+        });
+        setStudentProfilePic(null);
+        setProjectImage(null);
+        fetchProjects();
+      } else {
+        alert(res?.message || "Failed to submit project. Please check your code.");
+      }
+    } catch (error) {
+      console.error("Error submitting project:", error);
+      alert("An error occurred. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const formatDate = (dateString) => {
     if (!dateString) return "Recent";
@@ -211,19 +285,17 @@ export default function StudentProjectList() {
       <Navbar />
 
       <Box sx={{ bgcolor: colors.background.main, minHeight: "100vh" }}>
-        <Navbar />
-
-        <Box sx={{ pt: { xs: 12, md: 16 }, pb: 10 }}>
+        <Box sx={{ pt: { xs: 2, md: 4 }, pb: 4 }}>
           <Container maxWidth="xl">
             {/* Header Section */}
             <Box
               sx={{
                 textAlign: "center",
-                mb: { xs: 6, md: 8 },
+                mb: { xs: 3, md: 4 },
                 animation: `${slideInUp} 0.6s ease-out`,
               }}
             >
-              <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+              <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", mb: 2, position: "relative" }}>
                 <Chip
                   icon={<MenuBookIcon sx={{ fontSize: "16px !important", color: "inherit !important" }} />}
                   label="SUCCESS STORIES"
@@ -232,10 +304,31 @@ export default function StudentProjectList() {
                     color: colors.textPrimary,
                     fontWeight: 800,
                     px: 1,
-
                     "& .MuiChip-label": { paddingLeft: "8px" },
                   }}
                 />
+                
+                <Button
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  onClick={() => setOpenModal(true)}
+                  sx={{
+                    position: "absolute",
+                    right: 0,
+                    bgcolor: colors.primary,
+                    color: "white",
+                    fontWeight: 700,
+                    px: { xs: 2, md: 3 },
+                    py: 1,
+                    borderRadius: "30px",
+                    boxShadow: `0 10px 20px ${alpha(colors.primary, 0.3)}`,
+                    "&:hover": {
+                      bgcolor: colors.primaryDark,
+                    }
+                  }}
+                >
+                  Post Your Project
+                </Button>
               </Box>
 
               <Typography
@@ -285,6 +378,126 @@ export default function StudentProjectList() {
               </Box>
             </Box>
 
+            {/* Student Project Modal */}
+            <Dialog
+              open={openModal}
+              onClose={() => setOpenModal(false)}
+              maxWidth="md"
+              fullWidth
+              PaperProps={{
+                sx: { borderRadius: "24px", p: 1 }
+              }}
+            >
+              <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontWeight: 800, fontSize: "1.5rem" }}>
+                Share Your Project
+                <IconButton onClick={() => setOpenModal(false)}>
+                  <CloseIcon />
+                </IconButton>
+              </DialogTitle>
+              <DialogContent dividers>
+                <Grid container spacing={3}>
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label="Student Name"
+                      name="studentName"
+                      value={formData.studentName}
+                      onChange={handleInputChange}
+                      margin="normal"
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label="4-Digit Project Code"
+                      name="code"
+                      value={formData.code}
+                      onChange={handleInputChange}
+                      margin="normal"
+                      helperText="One-time use project code from admin"
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="Project Title"
+                      name="title"
+                      value={formData.title}
+                      onChange={handleInputChange}
+                      margin="normal"
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="Short Summary"
+                      name="short_description"
+                      multiline
+                      rows={2}
+                      value={formData.short_description}
+                      onChange={handleInputChange}
+                      margin="normal"
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="Detailed Description"
+                      name="description"
+                      multiline
+                      rows={6}
+                      value={formData.description}
+                      onChange={handleInputChange}
+                      margin="normal"
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 700 }}>Profile Picture</Typography>
+                    <Button
+                      component="label"
+                      variant="outlined"
+                      startIcon={<CloudUploadIcon />}
+                      fullWidth
+                      sx={{ height: "56px", borderRadius: "12px", borderStyle: "dashed" }}
+                    >
+                      {studentProfilePic ? studentProfilePic.name : "Upload Profile Pic"}
+                      <input type="file" hidden accept="image/*" onChange={(e) => handleFileChange(e, "profile")} />
+                    </Button>
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 700 }}>Project Image</Typography>
+                    <Button
+                      component="label"
+                      variant="outlined"
+                      startIcon={<CloudUploadIcon />}
+                      fullWidth
+                      sx={{ height: "56px", borderRadius: "12px", borderStyle: "dashed" }}
+                    >
+                      {projectImage ? projectImage.name : "Upload Project Image"}
+                      <input type="file" hidden accept="image/*" onChange={(e) => handleFileChange(e, "project")} />
+                    </Button>
+                  </Grid>
+                </Grid>
+              </DialogContent>
+              <DialogActions sx={{ p: 3 }}>
+                <Button onClick={() => setOpenModal(false)} sx={{ fontWeight: 700, color: colors.textSecondary }}>Cancel</Button>
+                <Button
+                  onClick={handleStudentSubmit}
+                  variant="contained"
+                  disabled={submitting}
+                  sx={{
+                    bgcolor: colors.primary,
+                    fontWeight: 700,
+                    px: 4,
+                    borderRadius: "12px",
+                    "&:hover": { bgcolor: colors.primaryDark }
+                  }}
+                >
+                  {submitting ? "Submitting..." : "Submit Project"}
+                </Button>
+              </DialogActions>
+            </Dialog>
+
             {/* Project Grid */}
             <Box
               sx={{
@@ -310,50 +523,73 @@ export default function StudentProjectList() {
                 ))
               ) : projects.length > 0 ? (
                 projects.map((project, idx) => (
-                  <Box key={project.id || idx} sx={{ height: "480px" }}>
+                  <Box key={project.id || idx}>
                     <ProjectCard
                       $hovered={hoveredCard === idx}
+                      $isStudent={project.authorType === "Student"}
                       onMouseEnter={() => setHoveredCard(idx)}
                       onMouseLeave={() => setHoveredCard(null)}
                       onClick={() => navigate(`/student-projects/${project.slug || project.id}`)}
                       elevation={0}
                     >
-                      <ImageContainer>
-                        <StyledCardMedia
-                          component="img"
-                          image={getImgUrl(project.image)}
-                          alt={project.title}
-                          loading="lazy"
-                        />
-                        <Box sx={{ position: "absolute", top: 16, left: 16, zIndex: 2 }}>
-                          <Chip
-                            label={project.short_description?.split(',')[0] || "Innovation"}
-                            sx={{
-                              bgcolor: "rgba(255,255,255,0.9)",
-                              backdropFilter: "blur(4px)",
-                              fontWeight: 700,
-                              color: "#1a4718",
-                              fontSize: "0.72rem"
-                            }}
+                      {project.image && (
+                        <ImageContainer>
+                          {project.authorType === "Student" && (
+                            <Chip
+                              label="STUDENT"
+                              size="small"
+                              sx={{
+                                position: "absolute",
+                                top: 16,
+                                left: 16,
+                                zIndex: 2,
+                                bgcolor: colors.primary,
+                                color: "white",
+                                fontWeight: 900,
+                                fontSize: "0.65rem",
+                                height: "22px",
+                                boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+                              }}
+                            />
+                          )}
+                          <StyledCardMedia
+                            component="img"
+                            image={getImgUrl(project.image)}
+                            alt={project.title}
+                            loading="lazy"
                           />
-                        </Box>
-                      </ImageContainer>
+                        </ImageContainer>
+                      )}
 
                       <Box sx={{ p: 3, flexGrow: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-                        <MetaInfo>
-                          <div className="meta-item">
-                            <CalendarMonthIcon />
-                            <span>
-                              {project.createdAt
-                                ? formatDate(project.createdAt)
-                                : "Recent"}
-                            </span>
-                          </div>
-                          <div className="meta-item">
-                            <VisibilityIcon />
-                            <span>{project.views?.toLocaleString() || 0} views</span>
-                          </div>
-                        </MetaInfo>
+                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 1.5 }}>
+                          <MetaInfo sx={{ mb: 0 }}>
+                            <div className="meta-item">
+                              <CalendarMonthIcon />
+                              <span>
+                                {project.createdAt
+                                  ? formatDate(project.createdAt)
+                                  : "Recent"}
+                              </span>
+                            </div>
+                            <div className="meta-item">
+                              <VisibilityIcon />
+                              <span>{project.views?.toLocaleString() || 0}</span>
+                            </div>
+                          </MetaInfo>
+
+                          {project.authorType === "Student" && (
+                            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                              <Avatar
+                                src={getImgUrl(project.studentProfilePic)}
+                                sx={{ width: 24, height: 24, border: `1px solid ${colors.primary}` }}
+                              />
+                              <Typography variant="caption" sx={{ fontWeight: 700, color: colors.textPrimary }}>
+                                {project.studentName?.split(" ")[0]}
+                              </Typography>
+                            </Box>
+                          )}
+                        </Box>
 
                         <ProjectTitle variant="h6">{project.title}</ProjectTitle>
 
@@ -361,7 +597,7 @@ export default function StudentProjectList() {
                           {project.short_description}
                         </ProjectDescription>
 
-                        <Box sx={{ mt: "auto", pt: 1 }}>
+                        <Box sx={{ mt: 1, pt: 1 }}>
                           <ActionButton
                             onClick={(e) => {
                               e.stopPropagation();

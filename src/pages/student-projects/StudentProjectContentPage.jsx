@@ -271,6 +271,19 @@ export default function StudentProjectContentPage() {
                 <Typography sx={{ fontWeight: 600, fontSize: "15px", color: "#0f172a" }}>5 Min Read</Typography>
               </Box>
             </Stack>
+
+            {project?.authorType === "Student" && (
+              <Stack direction="row" spacing={1.5} alignItems="center">
+                <Avatar 
+                  src={getImgUrl(project.studentProfilePic)} 
+                  sx={{ width: 44, height: 44, border: "2px solid #10b981", boxShadow: "0 4px 10px rgba(16, 185, 129, 0.2)" }} 
+                />
+                <Box>
+                  <Typography sx={{ fontSize: "11px", fontWeight: 700, color: "text.secondary", textTransform: "uppercase", letterSpacing: 0.5 }}>Innovator</Typography>
+                  <Typography sx={{ fontWeight: 600, fontSize: "15px", color: "#0f172a" }}>{project.studentName}</Typography>
+                </Box>
+              </Stack>
+            )}
           </Box>
         </Box>
 

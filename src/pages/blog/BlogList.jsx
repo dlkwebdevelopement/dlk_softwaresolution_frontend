@@ -146,7 +146,7 @@ const BlogTitle = styled(Typography)(({ theme }) => ({
   WebkitBoxOrient: "vertical",
   overflow: "hidden",
   textOverflow: "ellipsis",
-  height: "3.22em",
+  maxHeight: "3.22em",
   transition: "all 0.3s ease",
   "&:hover": { color: colors.primary },
 }));
@@ -160,8 +160,8 @@ const BlogDescription = styled(Typography)(({ theme }) => ({
   WebkitBoxOrient: "vertical",
   overflow: "hidden",
   textOverflow: "ellipsis",
-  height: "4.08em",   // FIXED: exactly 3 lines — no card size variation
-  marginBottom: 16,
+  maxHeight: "4.08em",   // FIXED: exactly 3 lines — no card size variation
+  marginBottom: 10,
 }));
 
 const ActionButton = styled(Button)(({ theme }) => ({
@@ -332,7 +332,7 @@ const BlogList = () => {
     <Box sx={{ bgcolor: colors.background.main, minHeight: "100vh" }}>
       <Navbar />
 
-      <Box sx={{ pt: { xs: 4, md: 6 }, pb: 10 }}>
+      <Box sx={{ pt: { xs: 2, md: 3 }, pb: 4 }}>
         <Container maxWidth="xl">
           {/* Header Section */}
           <Box
@@ -606,7 +606,7 @@ const BlogList = () => {
               ))
             ) : currentBlogs.length > 0 ? (
               currentBlogs.map((blog, idx) => (
-                <Box key={blog.id || idx} sx={{ height: "480px" }}>
+                <Box key={blog.id || idx}>
                   <BlogCard
                     $hovered={hoveredCard === idx}
                     $isStudent={blog.authorType === "Student"}
@@ -615,32 +615,34 @@ const BlogList = () => {
                     onClick={() => navigate(`/blogs/${blog.slug || blog.id}`)}
                     elevation={0}
                   >
-                    <ImageContainer>
-                      {blog.authorType === "Student" && (
-                        <Chip
-                          label="STUDENT"
-                          size="small"
-                          sx={{
-                            position: "absolute",
-                            top: 16,
-                            left: 16,
-                            zIndex: 2,
-                            bgcolor: colors.primary,
-                            color: "white",
-                            fontWeight: 900,
-                            fontSize: "0.65rem",
-                            height: "22px",
-                            boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
-                          }}
+                    {blog.image && (
+                      <ImageContainer>
+                        {blog.authorType === "Student" && (
+                          <Chip
+                            label="STUDENT"
+                            size="small"
+                            sx={{
+                              position: "absolute",
+                              top: 16,
+                              left: 16,
+                              zIndex: 2,
+                              bgcolor: colors.primary,
+                              color: "white",
+                              fontWeight: 900,
+                              fontSize: "0.65rem",
+                              height: "22px",
+                              boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+                            }}
+                          />
+                        )}
+                        <StyledCardMedia
+                          component="img"
+                          image={getImgUrl(blog.image)}
+                          alt={blog.title}
+                          loading="lazy"
                         />
-                      )}
-                      <StyledCardMedia
-                        component="img"
-                        image={getImgUrl(blog.image)}
-                        alt={blog.title}
-                        loading="lazy"
-                      />
-                    </ImageContainer>
+                      </ImageContainer>
+                    )}
 
                     <Box sx={{ p: 3, flexGrow: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
                       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 1.5 }}>
@@ -682,7 +684,7 @@ const BlogList = () => {
                         {blog.short_description || blog.content?.substring(0, 150)}...
                       </BlogDescription>
 
-                      <Box sx={{ mt: "auto", pt: 1 }}>
+                      <Box sx={{ mt: 1, pt: 1 }}>
                         <ActionButton
                           onClick={(e) => {
                             e.stopPropagation();

@@ -56,18 +56,16 @@ const colors = {
 const GlassCard = styled(Paper, {
   shouldForwardProp: (prop) => prop !== "$hovered",
 })(({ theme, $hovered }) => ({
-  background: colors.background.card,
-  backdropFilter: "blur(10px)",
-  WebkitBackdropFilter: "blur(10px)",
-  borderRadius: "24px",
+  background: "transparent",
+  backdropFilter: "none",
+  WebkitBackdropFilter: "none",
+  borderRadius: "0px",
   overflow: "hidden",
   position: "relative",
   transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
   transform: $hovered ? "translateY(-10px)" : "translateY(0)",
-  border: `1px solid ${$hovered ? alpha(colors.primary, 0.5) : alpha(colors.primary, 0.1)}`,
-  boxShadow: $hovered
-    ? `0 20px 40px rgba(61, 184, 67, 0.15)`
-    : "0 10px 30px rgba(0,0,0,0.05)",
+  border: "none",
+  boxShadow: "none",
   height: "100%",
   display: "flex",
   flexDirection: "column",
@@ -101,16 +99,16 @@ const StyledCardMedia = styled(CardMedia)({
 
 const ScrollTrack = styled(Box)(({ theme }) => ({
   display: 'flex',
-  gap: '16px', // Reduced gap for "no space gaps"
+  gap: '0px',
   overflowX: 'auto',
   scrollBehavior: 'smooth',
   msOverflowStyle: 'none',
   scrollbarWidth: 'none',
-  padding: '10px 4px 30px 4px', // Reduced top padding
+  padding: '10px 4px 5px 4px',
   '&::-webkit-scrollbar': { display: 'none' },
   [theme.breakpoints.down('sm')]: {
     gap: '12px',
-    padding: '5px 20px 20px 20px',
+    padding: '5px 20px 5px 20px',
   },
 }));
 
@@ -171,7 +169,7 @@ const BlogTitle = styled(Typography)({
   WebkitLineClamp: 2,
   WebkitBoxOrient: "vertical",
   overflow: "hidden",
-  height: "2.8em",
+  maxHeight: "2.8em",
 });
 
 const BlogDescription = styled(Typography)({
@@ -182,8 +180,8 @@ const BlogDescription = styled(Typography)({
   WebkitLineClamp: 3,
   WebkitBoxOrient: "vertical",
   overflow: "hidden",
-  height: "4.8em",
-  marginBottom: 20,
+  maxHeight: "4.8em",
+  marginBottom: 10,
 });
 
 const Blog = () => {
@@ -275,7 +273,7 @@ const Blog = () => {
     <Box
       sx={{
         pt: 1,
-        pb: { xs: 6, md: 8 },
+        pb: { xs: 2, md: 2 },
         background: colors.background.gradient,
         position: "relative",
         overflow: "hidden",
@@ -369,8 +367,7 @@ const Blog = () => {
               <Box
                 key={blog.id || idx}
                 sx={{
-                  width: { xs: "280px", sm: "300px", md: "calc((100% - 48px) / 4)" }, // Adjusted for 16px gap
-                  height: "480px",
+                  width: { xs: "280px", sm: "300px", md: "25%" },
                   flexShrink: 0,
                 }}
               >
@@ -381,23 +378,25 @@ const Blog = () => {
                   onClick={() => navigate(`/blogs/${blog.slug || blog.id}`)}
                   elevation={0}
                 >
-                  <ImageContainer>
-                    <StyledCardMedia
-                      component="img"
-                      image={getImgUrl(blog.image)}
-                      alt={blog.title}
-                      sx={{ transform: hoveredCard === idx ? "scale(1.1)" : "scale(1)" }}
-                    />
-                    <Box sx={{ position: "absolute", top: 12, left: 12 }}>
-                      <Chip
-                        label="Technology"
-                        size="small"
-                        sx={{ bgcolor: alpha(colors.primary, 0.9), color: 'white', fontWeight: 700, fontSize: '0.65rem', backdropFilter: 'blur(4px)', border: `1px solid ${alpha('#ffffff', 0.2)}` }}
+                  {blog.image && (
+                    <ImageContainer>
+                      <StyledCardMedia
+                        component="img"
+                        image={getImgUrl(blog.image)}
+                        alt={blog.title}
+                        sx={{ transform: hoveredCard === idx ? "scale(1.1)" : "scale(1)" }}
                       />
-                    </Box>
-                  </ImageContainer>
+                      <Box sx={{ position: "absolute", top: 12, left: 12 }}>
+                        <Chip
+                          label="Technology"
+                          size="small"
+                          sx={{ bgcolor: alpha(colors.primary, 0.9), color: 'white', fontWeight: 700, fontSize: '0.65rem', backdropFilter: 'blur(4px)', border: `1px solid ${alpha('#ffffff', 0.2)}` }}
+                        />
+                      </Box>
+                    </ImageContainer>
+                  )}
 
-                  <Box sx={{ p: 3, flexGrow: 1, display: "flex", flexDirection: "column" }}>
+                  <Box sx={{ p: 2, flexGrow: 1, display: "flex", flexDirection: "column" }}>
                     <Stack direction="row" spacing={1.5} sx={{ mb: 1.5 }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: colors.textPrimary }}>
                         <CalendarMonthIcon size={12} />
@@ -419,7 +418,7 @@ const Blog = () => {
                       {blog.short_description || blog.content?.substring(0, 150)}...
                     </BlogDescription>
 
-                    <Box sx={{ mt: "auto", pt: 2, borderTop: `1px solid ${alpha(colors.primary, 0.1)}` }}>
+                    <Box sx={{ mt: 1, pt: 1.5, borderTop: `1px solid ${alpha(colors.primary, 0.1)}` }}>
                       <ActionButton>
                         Read Article <ArrowForwardIcon size={14} style={{ marginLeft: 6 }} />
                       </ActionButton>
