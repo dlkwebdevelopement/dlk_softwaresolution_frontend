@@ -187,7 +187,7 @@ export default function FloatingEnquiry() {
       <Box
         sx={{
           position: "fixed",
-          bottom: { xs: 80, sm: 90, md: 60 },
+          bottom: { xs: 100, sm: 120, md: 140 },
           left: { xs: 15, sm: 20 },
           zIndex: 1300
         }}

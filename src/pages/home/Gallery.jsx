@@ -87,7 +87,7 @@ const GalleryItem = ({ album, onOpen, height = 300 }) => {
     >
       <Box
         component="img"
-        src={album.images?.length > 0 ? getImgUrl(album.images[0]) : ""}
+        src={album.thumbnail || (album.batches?.[0]?.images?.length > 0 ? getImgUrl(album.batches[0].images[0]) : "")}
         sx={{
           width: '100%',
           height: '100%',
@@ -98,7 +98,7 @@ const GalleryItem = ({ album, onOpen, height = 300 }) => {
       />
 
       {/* Fallback for missing image */}
-      {!album.images?.length && (
+      {(!album.thumbnail && !album.batches?.[0]?.images?.length) && (
         <Box sx={{
           position: 'absolute', inset: 0,
           background: `linear-gradient(135deg, ${colors.primaryLight} 0%, ${colors.white} 100%)`,
@@ -136,6 +136,22 @@ const GalleryItem = ({ album, onOpen, height = 300 }) => {
           />
         </Stack>
 
+        {album.batch && (
+          <Chip
+            label={album.batch}
+            size="small"
+            sx={{
+              bgcolor: alpha(colors.primary, 0.9),
+              color: 'white',
+              fontSize: '0.6rem',
+              height: '20px',
+              fontWeight: 800,
+              mb: 1,
+              borderRadius: '4px',
+              border: '1px solid rgba(255,255,255,0.2)'
+            }}
+          />
+        )}
         <Typography variant="h6" sx={{
           fontWeight: 900,
           fontSize: '1.15rem',
@@ -246,7 +262,7 @@ const Lightbox = ({ open, images, currentIndex, onClose, onNext, onPrev, isPlayi
 
       <Box
         component="img"
-        src={getImgUrl(images[currentIndex])}
+        src={getImgUrl(typeof images[currentIndex] === 'string' ? images[currentIndex] : images[currentIndex].url)}
         sx={{
           maxHeight: '80vh', maxWidth: '90vw', objectFit: 'contain',
           boxShadow: '0 0 50px rgba(0,0,0,0.5)', borderRadius: '8px',
@@ -284,7 +300,9 @@ const Gallery = () => {
         setLoading(true);
         const response = await axios.get(`${BASE_URL}/admin/gallery`);
         if (isMounted) {
-          setAlbums(Array.isArray(response.data) ? response.data : []);
+          const result = response.data;
+          const albumsData = result.success ? result.data : result;
+          setAlbums(Array.isArray(albumsData) ? albumsData : []);
         }
       } catch (err) {
         console.error("Error fetching gallery albums:", err);

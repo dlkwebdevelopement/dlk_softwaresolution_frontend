@@ -402,8 +402,8 @@ const Ads = () => {
               fontWeight: 400,
               maxWidth: 700,
               mx: "auto",
-              mb: 4,
-              fontSize: '1rem',
+              mb: { xs: 2.5, sm: 4 },
+              fontSize: { xs: '0.9rem', sm: '1rem' },
             }}
           >
             Unlock your potential with our expert-led courses and transform your career
@@ -427,8 +427,8 @@ const Ads = () => {
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
               sx={{
-                px: 2,
-                py: 1,
+                px: { xs: 2.5, sm: 2 },
+                py: { xs: 0.8, sm: 1 },
                 mr: 1,
                 cursor: 'pointer',
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -436,7 +436,7 @@ const Ads = () => {
                 whiteSpace: 'nowrap',
                 color: activeCategory === cat.id ? 'var(--green-dark)' : '#64748b',
                 fontWeight: 700,
-                fontSize: '0.9rem',
+                fontSize: { xs: '0.8rem', sm: '0.9rem' },
                 borderRadius: '50px',
                 bgcolor: activeCategory === cat.id ? 'var(--green-light)' : 'transparent',
                 border: activeCategory === cat.id ? '1px solid var(--green-mid)' : '1px solid transparent',
@@ -498,8 +498,8 @@ const Ads = () => {
               <Box
                 sx={{
                   minWidth: {
-                    xs: `calc((100vw - ${GAP_MOBILE * 2}px - 48px) / 2)`,
-                    sm: `calc((100vw - ${GAP_TABLET * 2}px - 64px) / 3)`,
+                    xs: `calc(100vw - 64px)`, // One card visible with significant peek of next
+                    sm: `calc((100vw - ${GAP_TABLET * 2}px - 64px) / 2.5)`,
                     md: `calc((100vw - ${GAP_DESKTOP * 3}px - 144px) / 4)`,
                   },
                   maxWidth: {
@@ -621,13 +621,14 @@ const Ads = () => {
                           variant="h6"
                           sx={{
                             fontWeight: 700,
-                            fontSize: "1.1rem",
+                            fontSize: { xs: "1rem", sm: "1.1rem" },
                             color: 'black',
                             lineHeight: 1.3,
                             display: '-webkit-box',
                             WebkitLineClamp: 2,
                             WebkitBoxOrient: 'vertical',
                             overflow: 'hidden',
+                            minHeight: { xs: '2.6em', sm: 'auto' }
                           }}
                         >
                           {course?.title || "N/A"}
@@ -713,7 +714,7 @@ const Ads = () => {
                         borderTop: '1px solid var(--green-light)',
                       }}
                     >                        <Box>
-                          <Typography variant="h6" sx={{ color: 'var(--green)', fontWeight: 800 }}>
+                          <Typography variant="h6" sx={{ color: 'var(--green)', fontWeight: 800, fontSize: { xs: '1rem', sm: '1.25rem' } }}>
                             {course.price ? `₹${course.price}` : "Free"}
                           </Typography>
                           {course.original_price && (
@@ -726,6 +727,10 @@ const Ads = () => {
                         <AnimatedButton
                           onClick={() => handleOpen(course)}
                           size="small"
+                          sx={{ 
+                            fontSize: { xs: '0.7rem', sm: '0.8rem' },
+                            px: { xs: 1.5, sm: 2 }
+                          }}
                         >
                           Enroll Now
                         </AnimatedButton>

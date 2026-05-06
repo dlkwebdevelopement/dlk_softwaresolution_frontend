@@ -17,7 +17,9 @@ api.interceptors.request.use((config) => {
 export default api;
 
 // ✅ Helper to get full image URL
-export const getImgUrl = (path) => {
+export const getImgUrl = (pathData) => {
+  if (!pathData) return "";
+  const path = typeof pathData === 'string' ? pathData : pathData.url;
   if (!path) return "";
   if (path.startsWith("http")) return path;
   // Handle double slashes if any

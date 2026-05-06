@@ -15,7 +15,7 @@ const slideIn = keyframes`
 
 const StyledFloatingBtn = styled("a")(({ theme }) => ({
   position: "fixed",
-  bottom: "130px",
+  bottom: "70px",
   left: "20px",
   backgroundColor: "#ffffff",
   padding: "12px 20px",
@@ -52,18 +52,18 @@ export default function GoogleReviewFloatingButton() {
       target="_blank"
       rel="noopener noreferrer"
     >
-      <Box 
-        component="img" 
-        src='https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_"G"_logo.svg' 
-        sx={{ width: 20, height: 20 }} 
+      <Box
+        component="img"
+        src='https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_"G"_logo.svg'
+        sx={{ width: 20, height: 20 }}
         alt="Google"
       />
       <Box>
         <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-          <Typography 
-            sx={{ 
-              fontWeight: 800, 
-              fontSize: isMobile ? "0.85rem" : "1rem", 
+          <Typography
+            sx={{
+              fontWeight: 800,
+              fontSize: isMobile ? "0.85rem" : "1rem",
               color: "#111c12",
               lineHeight: 1
             }}
@@ -73,10 +73,10 @@ export default function GoogleReviewFloatingButton() {
           <Rating value={4.9} precision={0.1} readOnly size="small" sx={{ fontSize: isMobile ? "0.9rem" : "1.1rem" }} />
         </Box>
         {!isMobile && (
-          <Typography 
-            sx={{ 
-              fontSize: "0.7rem", 
-              fontWeight: 700, 
+          <Typography
+            sx={{
+              fontSize: "0.7rem",
+              fontWeight: 700,
               color: "#4285F4",
               textTransform: "uppercase",
               letterSpacing: 0.5,

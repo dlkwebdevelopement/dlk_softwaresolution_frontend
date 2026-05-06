@@ -4,7 +4,8 @@ import {
   Box, Typography, Container, Grid, Card, CardMedia, CardContent,
   IconButton, Dialog, Chip, Stack, Fade, CircularProgress,
   Paper, Breadcrumbs, Link, Button, alpha,
-  MenuItem, Select, FormControl, InputLabel, InputAdornment
+  MenuItem, Select, FormControl, InputLabel, InputAdornment,
+  useTheme, useMediaQuery
 } from "@mui/material";
 import { styled, keyframes } from "@mui/material/styles";
 import {
@@ -110,10 +111,10 @@ function AlbumCard({ album, onSelect }) {
       sx={{ cursor: "pointer" }}
     >
       <Box sx={{ position: "relative", overflow: "hidden", height: 280 }}>
-        {album.thumbnail ? (
+        {(album.thumbnail || (album.batches?.[0]?.images?.length > 0)) ? (
           <CardMedia
             component="img"
-            image={getImgUrl(album.thumbnail)}
+            image={album.thumbnail ? getImgUrl(album.thumbnail) : getImgUrl(album.batches[0].images[0])}
             alt={album.albumName}
             sx={{
               width: "100%", height: "100%", objectFit: "cover",
@@ -137,6 +138,21 @@ function AlbumCard({ album, onSelect }) {
           opacity: hovered ? 1 : 0.75, transition: "opacity 0.4s ease",
         }} />
         <Box sx={{ position: "absolute", bottom: 24, left: 24, right: 24 }}>
+          {album.batches?.length > 0 && (
+            <Chip
+              label={`${album.batches.length} Batches`}
+              size="small"
+              sx={{
+                bgcolor: alpha(COLORS.primary, 0.9),
+                color: "white",
+                fontWeight: 800,
+                fontSize: "0.65rem",
+                height: 20,
+                mb: 1,
+                borderRadius: 1,
+              }}
+            />
+          )}
           <Typography variant="h5" sx={{ color: "white", fontWeight: 800, mb: 0.5, letterSpacing: "-0.5px" }}>
             {album.albumName}
           </Typography>
@@ -193,7 +209,7 @@ function EventCard({ event, onSelect }) {
               <Chip
                 label={`${(event.galleryImages?.length || 0) + (event.mainImage ? 1 : 0)} Photos`}
                 size="small"
-                sx={{ bgcolor: "rgba(0,0,0,0.6)", color: "white", backdropFilter: "blur(4px)", fontWeight: 600, fontSize: "0.65rem" }}
+                sx={{ bgcolor: "rgba(0,0,0,0.7)", color: "white", backdropFilter: "blur(8px)", fontWeight: 700, fontSize: "0.65rem", border: "1px solid rgba(255,255,255,0.1)" }}
               />
             </Box>
           </Box>
@@ -237,6 +253,9 @@ function EventCard({ event, onSelect }) {
 
 // ─── Main Gallery Page ─────────────────────────────────────────────────────────
 export default function Gallery() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
   const location = useLocation();
   const [albums, setAlbums] = useState([]);
   const [events, setEvents] = useState([]);
@@ -262,11 +281,28 @@ export default function Gallery() {
     return [...new Set(years)].sort((a, b) => b - a);
   }, [events]);
 
+  const getImgUrl = (urlData) => {
+  if (!urlData) return "";
+  const url = typeof urlData === 'string' ? urlData : urlData.url;
+  if (!url) return "";
+  if (url.startsWith("http")) return url;
+  return `${BASE_URL}/${url}`;
+};
+
   const allImages = useMemo(() => {
     if (!activeEvent) return [];
-    // Only show the gallery images in the carousel (exclude the main image shown on the card)
-    const mainImg = activeEvent.mainImage;
-    return (activeEvent.galleryImages || []).filter(img => img && img !== mainImg);
+    const images = [];
+    if (activeEvent.mainImage) images.push(activeEvent.mainImage);
+    if (activeEvent.galleryImages) {
+      activeEvent.galleryImages.forEach(img => {
+        const imgUrl = typeof img === 'string' ? img : img.url;
+        const mainUrl = typeof activeEvent.mainImage === 'string' ? activeEvent.mainImage : activeEvent.mainImage?.url;
+        if (imgUrl && imgUrl !== mainUrl) {
+          images.push(img);
+        }
+      });
+    }
+    return images;
   }, [activeEvent]);
 
   const total = allImages.length;
@@ -317,14 +353,16 @@ export default function Gallery() {
           GetRequest(GET_ALL_GALLERY),
           GetRequest(GET_ALL_GALLERY_EVENTS),
         ]);
-        setAlbums(albumRes || []);
-        const eventData = eventRes?.data || [];
-        setEvents(eventData);
+        const albumData = albumRes.success ? albumRes.data : albumRes;
+        setAlbums(Array.isArray(albumData) ? albumData : []);
+        
+        const eventData = eventRes?.data || (eventRes?.success ? eventRes.data : eventRes) || [];
+        setEvents(Array.isArray(eventData) ? eventData : []);
 
         // Auto-select album if passed from navigation state
         if (location.state?.album) {
           const albumFromState = location.state.album;
-          const matchingAlbum = (albumRes || []).find(a => a.id === albumFromState.id);
+          const matchingAlbum = (Array.isArray(albumData) ? albumData : []).find(a => a.id === albumFromState.id);
           setSelectedAlbum(matchingAlbum || albumFromState);
         }
       } catch (err) {
@@ -343,6 +381,21 @@ export default function Gallery() {
         e.categoryId?._id === selectedAlbum.id ||
         e.categoryId?.albumName === selectedAlbum.albumName
       );
+
+      // Add batches as virtual events
+      if (selectedAlbum.batches && selectedAlbum.batches.length > 0) {
+        const batchEvents = selectedAlbum.batches.map(batch => ({
+          _id: `batch-${batch._id}`,
+          title: batch.batchName,
+          mainImage: batch.images?.[0],
+          galleryImages: batch.images?.slice(1) || [],
+          eventDate: selectedAlbum.updatedAt || new Date(),
+          collegeName: "DLK Solutions",
+          isBatch: true,
+          categoryId: { albumName: selectedAlbum.albumName }
+        }));
+        result = [...batchEvents, ...result];
+      }
     }
     if (selectedYear && selectedYear !== "All") {
       result = result.filter(e => dayjs(e.eventDate).year().toString() === selectedYear.toString());
@@ -351,13 +404,14 @@ export default function Gallery() {
   }, [events, selectedAlbum, selectedYear]);
 
   const filteredAlbums = useMemo(() => {
-    if (!selectedYear || selectedYear === "All") return albums;
+    const albumsArray = Array.isArray(albums) ? albums : [];
+    if (!selectedYear || selectedYear === "All") return albumsArray;
     const albumsWithEventsInYear = new Set(
-      events
+      (events || [])
         .filter(e => dayjs(e.eventDate).year().toString() === selectedYear.toString())
         .map(e => e.categoryId?._id || e.categoryId?.albumName)
     );
-    return albums.filter(a => albumsWithEventsInYear.has(a.id) || albumsWithEventsInYear.has(a.albumName));
+    return albumsArray.filter(a => albumsWithEventsInYear.has(a.id) || albumsWithEventsInYear.has(a.albumName));
   }, [albums, events, selectedYear]);
 
   // ─── Render Helpers ──────────────────────────────────────────────────────────
@@ -518,94 +572,263 @@ export default function Gallery() {
       <Dialog
         open={showLightbox}
         onClose={closeModal}
-        maxWidth="md"
+        maxWidth="lg"
         fullWidth
+        fullScreen={isMobile}
+        sx={{
+          zIndex: isMobile ? 9999 : 1300
+        }}
         PaperProps={{
           sx: {
-            borderRadius: 4,
+            borderRadius: isMobile ? 0 : 4,
             overflow: "hidden",
             background: "white",
             boxShadow: "0 24px 60px rgba(0,0,0,0.15)",
-            mt: { xs: 2, sm: 6 },
-            mb: { xs: 2, sm: 6 }
-          }
-        }}
-        sx={{
-          "& .MuiDialog-container": {
-            alignItems: "flex-start"
+            maxHeight: isMobile ? "100%" : "85vh"
           }
         }}
       >
         {activeEvent && (
-          <Box sx={{ display: "flex", flexDirection: "column", bgcolor: "white" }}>
-            {/* Header: Title & Meta */}
-            <Box sx={{ px: 3, pt: 3, pb: 2, display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 2, borderBottom: "1px solid rgba(0,0,0,0.05)" }}>
-              <Box sx={{ flex: 1 }}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
+          <Box sx={{ 
+            display: "flex", 
+            flexDirection: { xs: "column-reverse", md: "row" }, 
+            minHeight: { md: 400 },
+            height: isMobile ? "100%" : "auto"
+          }}>
+            {/* Left Section: Information & Highlights */}
+            <Box sx={{ 
+              width: { xs: "100%", md: "340px" }, 
+              p: { xs: 2.5, md: 3.5 }, 
+              borderRight: { md: "1px solid rgba(0,0,0,0.06)" },
+              bgcolor: "white",
+              display: "flex",
+              flexDirection: "column",
+              maxHeight: { md: "85vh" },
+              overflowY: "auto",
+              flexShrink: 0
+            }}>
+              <Box sx={{ mb: 3 }}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}>
                   <Chip
                     label={activeEvent.categoryId?.albumName || "Gallery"}
                     size="small"
-                    sx={{ bgcolor: COLORS.light, color: COLORS.dark, fontWeight: 700, fontSize: "0.65rem", height: 20 }}
+                    sx={{ 
+                      bgcolor: alpha(COLORS.primary, 0.08), 
+                      color: COLORS.primary, 
+                      fontWeight: 800, 
+                      fontSize: "0.7rem", 
+                      height: 22,
+                      px: 0.5,
+                      borderRadius: '6px'
+                    }}
                   />
-                  <Typography variant="caption" sx={{ color: COLORS.textSecondary, fontWeight: 600 }}>
-                    {total} Photos
+                  <Typography variant="caption" sx={{ color: COLORS.textSecondary, fontWeight: 700, letterSpacing: 0.5 }}>
+                    {dayjs(activeEvent.eventDate).format("MMM DD, YYYY")}
                   </Typography>
                 </Box>
-                <Typography variant="h5" sx={{ color: "#0f172a", fontWeight: 800, lineHeight: 1.2 }}>
+                
+                <Typography variant="h4" sx={{ color: "#0f172a", fontWeight: 900, lineHeight: 1.1, mb: 1.5, letterSpacing: "-1px" }}>
                   {activeEvent.title}
                 </Typography>
+                
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 3 }}>
+                  <Box sx={{ width: 32, height: 2, bgcolor: COLORS.primary, borderRadius: 1 }} />
+                  <Typography variant="body2" sx={{ color: COLORS.textSecondary, fontWeight: 600 }}>
+                    {total} Photos in this batch
+                  </Typography>
+                </Box>
               </Box>
-              <Stack direction="row" spacing={1}>
-                <IconButton
-                  onClick={() => {
-                    navigator.clipboard.writeText(window.location.href);
-                    alert("Link copied!");
-                  }}
-                  size="small"
-                  sx={{ bgcolor: "#f1f5f9", color: "#64748b", "&:hover": { color: COLORS.primary } }}
-                >
-                  <Share2 size={16} />
-                </IconButton>
-                <IconButton onClick={closeModal} size="small" sx={{ bgcolor: "#f1f5f9", color: "#64748b", "&:hover": { bgcolor: "#fee2e2", color: "#ef4444" } }}>
-                  <X size={18} />
-                </IconButton>
-              </Stack>
+
+              {/* Highlights Section */}
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="overline" sx={{ color: COLORS.primary, fontWeight: 900, mb: 2, display: 'block', letterSpacing: 2 }}>
+                  Project Highlights
+                </Typography>
+                
+                <Stack spacing={2}>
+                  {(allImages[sliderIndex]?.highlights || []).length > 0 ? (
+                    allImages[sliderIndex].highlights.map((h, i) => (
+                      <Box key={i} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
+                        <Box sx={{ 
+                          mt: 0.5, 
+                          color: COLORS.primary, 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center'
+                        }}>
+                          <RightIcon size={16} weight="bold" />
+                        </Box>
+                        <Typography variant="body2" sx={{ color: "#334155", fontWeight: 600, lineHeight: 1.5 }}>
+                          {h}
+                        </Typography>
+                      </Box>
+                    ))
+                  ) : (
+                    <Typography variant="body2" sx={{ color: COLORS.textSecondary, fontStyle: 'italic' }}>
+                      No specific highlights for this photo.
+                    </Typography>
+                  )}
+                </Stack>
+              </Box>
+
+              {/* Footer Actions */}
+              <Box sx={{ pt: 3, mt: 'auto', borderTop: "1px solid rgba(0,0,0,0.05)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <Typography variant="caption" sx={{ color: COLORS.textSecondary, fontWeight: 700 }}>
+                  DLK SOFTWARE SOLUTIONS
+                </Typography>
+                <Stack direction="row" spacing={1}>
+                  <IconButton 
+                    onClick={() => {
+                      navigator.clipboard.writeText(window.location.href);
+                      alert("Link copied!");
+                    }}
+                    size="small" 
+                    sx={{ color: "#94a3b8", "&:hover": { color: COLORS.primary, bgcolor: alpha(COLORS.primary, 0.05) } }}
+                  >
+                    <Share2 size={16} />
+                  </IconButton>
+                  <IconButton onClick={closeModal} size="small" sx={{ color: "#94a3b8", "&:hover": { color: "#ef4444", bgcolor: "#fef2f2" } }}>
+                    <X size={20} />
+                  </IconButton>
+                </Stack>
+              </Box>
             </Box>
 
-            {/* Main Image Viewport (Minimal Black Background) */}
-            <Box sx={{ position: "relative", width: "100%", height: { xs: 220, sm: 320, md: 380 }, bgcolor: "#000", overflow: "hidden" }}>
-              {total > 0 ? (
-                <Fade in key={sliderIndex} timeout={350}>
-                  <Box
-                    component="img"
-                    src={getImgUrl(allImages[sliderIndex])}
-                    alt=""
-                    sx={{ width: "100%", height: "100%", objectFit: "contain", userSelect: "none" }}
-                  />
-                </Fade>
-              ) : (
-                <Box sx={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}>
-                  <ImgIcon size={48} opacity={0.3} />
-                </Box>
+            {/* Right Section: Image Viewport */}
+            <Box sx={{ 
+              flex: 1, 
+              bgcolor: "#0f172a", 
+              position: "relative", 
+              display: "flex", 
+              flexDirection: "column",
+              height: { xs: "60vh", md: "85vh" },
+              minHeight: { xs: "400px", md: "auto" }
+            }}>
+              {/* Mobile Close Button */}
+              {isMobile && (
+                <IconButton
+                  onClick={closeModal}
+                  sx={{
+                    position: "absolute",
+                    top: 16,
+                    right: 16,
+                    zIndex: 10,
+                    bgcolor: "rgba(0,0,0,0.5)",
+                    color: "white",
+                    backdropFilter: "blur(8px)",
+                    "&:hover": { bgcolor: "rgba(0,0,0,0.7)" }
+                  }}
+                >
+                  <X size={24} />
+                </IconButton>
               )}
+              <Box sx={{ 
+                flex: 1, 
+                position: "relative", 
+                display: "flex", 
+                alignItems: "center", 
+                justifyContent: "center",
+                overflow: "hidden",
+                p: { xs: 2, md: 3 }
+              }}>
+                {total > 0 ? (
+                  <Fade in key={sliderIndex} timeout={400}>
+                    <Box
+                      component="img"
+                      src={getImgUrl(allImages[sliderIndex]?.url || allImages[sliderIndex])}
+                      alt=""
+                      sx={{ 
+                        maxWidth: "100%", 
+                        maxHeight: "100%", 
+                        objectFit: "contain", 
+                        borderRadius: 2,
+                        boxShadow: "0 20px 40px rgba(0,0,0,0.4)",
+                        userSelect: "none" 
+                      }}
+                    />
+                  </Fade>
+                ) : (
+                  <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2, color: "rgba(255,255,255,0.2)" }}>
+                    <ImgIcon size={64} />
+                    <Typography>No Image Available</Typography>
+                  </Box>
+                )}
 
-              {/* Navigation Arrows */}
-              {total > 1 && (
-                <>
-                  <IconButton
-                    onClick={() => setSliderIndex(i => (i - 1 + total) % total)}
-                    sx={{ position: "absolute", left: 16, top: "50%", transform: "translateY(-50%)", bgcolor: "rgba(255,255,255,0.12)", color: "white", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.1)", "&:hover": { bgcolor: COLORS.primary } }}
-                  >
-                    <LeftIcon size={20} />
-                  </IconButton>
-                  <IconButton
-                    onClick={() => setSliderIndex(i => (i + 1) % total)}
-                    sx={{ position: "absolute", right: 16, top: "50%", transform: "translateY(-50%)", bgcolor: "rgba(255,255,255,0.12)", color: "white", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.1)", "&:hover": { bgcolor: COLORS.primary } }}
-                  >
-                    <RightIcon size={20} />
-                  </IconButton>
-                </>
-              )}
+                {/* Navigation Controls Overlay */}
+                {total > 1 && (
+                  <>
+                    <IconButton
+                      onClick={() => setSliderIndex(i => (i - 1 + total) % total)}
+                      sx={{ 
+                        position: "absolute", 
+                        left: 20, 
+                        bgcolor: "rgba(255,255,255,0.08)", 
+                        color: "white", 
+                        backdropFilter: "blur(12px)", 
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        "&:hover": { bgcolor: COLORS.primary, border: `1px solid ${COLORS.primary}` } 
+                      }}
+                    >
+                      <LeftIcon size={24} />
+                    </IconButton>
+                    <IconButton
+                      onClick={() => setSliderIndex(i => (i + 1) % total)}
+                      sx={{ 
+                        position: "absolute", 
+                        right: 20, 
+                        bgcolor: "rgba(255,255,255,0.08)", 
+                        color: "white", 
+                        backdropFilter: "blur(12px)", 
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        "&:hover": { bgcolor: COLORS.primary, border: `1px solid ${COLORS.primary}` } 
+                      }}
+                    >
+                      <RightIcon size={24} />
+                    </IconButton>
+                  </>
+                )}
+              </Box>
+
+              {/* Progress & Thumbnails Row */}
+              <Box sx={{ 
+                px: 3, 
+                py: 2, 
+                bgcolor: "rgba(0,0,0,0.2)", 
+                backdropFilter: "blur(20px)",
+                display: "flex", 
+                alignItems: "center", 
+                justifyContent: "space-between",
+                borderTop: "1px solid rgba(255,255,255,0.05)"
+              }}>
+                <Typography sx={{ color: "rgba(255,255,255,0.5)", fontSize: "0.75rem", fontWeight: 700, letterSpacing: 1 }}>
+                  IMAGE {sliderIndex + 1} OF {total}
+                </Typography>
+                
+                <Box sx={{ display: "flex", gap: 1 }}>
+                  {allImages.slice(Math.max(0, sliderIndex - 2), Math.min(total, sliderIndex + 3)).map((img, idx) => {
+                    const actualIdx = allImages.indexOf(img);
+                    return (
+                      <Box
+                        key={actualIdx}
+                        onClick={() => setSliderIndex(actualIdx)}
+                        sx={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: 1,
+                          overflow: 'hidden',
+                          cursor: 'pointer',
+                          border: `2px solid ${sliderIndex === actualIdx ? COLORS.primary : 'transparent'}`,
+                          transition: 'all 0.2s ease',
+                          opacity: sliderIndex === actualIdx ? 1 : 0.4,
+                          '&:hover': { opacity: 1 }
+                        }}
+                      >
+                        <img src={getImgUrl(img.url || img)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      </Box>
+                    );
+                  })}
+                </Box>
+              </Box>
             </Box>
           </Box>
         )}

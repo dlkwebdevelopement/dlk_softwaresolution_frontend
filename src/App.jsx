@@ -4,7 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import FloatingEnquiry from "./components/FloatingEnquiry";
 import { Toaster } from "react-hot-toast";
 import { CaptchaProvider } from "./context/CaptchaContext";
-import HumanVerificationModal from "./components/HumanVerificationModal";
+// import HumanVerificationModal from "./components/HumanVerificationModal";
 
 const theme = createTheme({
   palette: {
@@ -165,7 +165,7 @@ const App = () => {
 
           {/* Only this */}
           <FloatingEnquiry />
-          <HumanVerificationModal />
+          {/* <HumanVerificationModal /> */}
         </CaptchaProvider>
       </ThemeProvider>
     </BrowserRouter>
