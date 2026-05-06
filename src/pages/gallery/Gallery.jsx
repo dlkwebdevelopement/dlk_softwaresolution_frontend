@@ -281,13 +281,7 @@ export default function Gallery() {
     return [...new Set(years)].sort((a, b) => b - a);
   }, [events]);
 
-  const getImgUrl = (urlData) => {
-  if (!urlData) return "";
-  const url = typeof urlData === 'string' ? urlData : urlData.url;
-  if (!url) return "";
-  if (url.startsWith("http")) return url;
-  return `${BASE_URL}/${url}`;
-};
+
 
   const allImages = useMemo(() => {
     if (!activeEvent) return [];

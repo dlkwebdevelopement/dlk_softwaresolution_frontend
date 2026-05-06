@@ -87,7 +87,7 @@ const GalleryItem = ({ album, onOpen, height = 300 }) => {
     >
       <Box
         component="img"
-        src={album.thumbnail || (album.batches?.[0]?.images?.length > 0 ? getImgUrl(album.batches[0].images[0]) : "")}
+        src={getImgUrl(album.thumbnail || album.batches?.[0]?.images?.[0])}
         sx={{
           width: '100%',
           height: '100%',
