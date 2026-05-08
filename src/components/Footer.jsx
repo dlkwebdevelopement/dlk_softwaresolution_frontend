@@ -222,21 +222,28 @@ const FooterColumn = ({ title, items, delay }) => (
         {title}
       </Typography>
       <Box component="ul" sx={{ listStyle: "none", p: 0, m: 0 }}>
-        {items.map((item, index) => (
-          <Box
-            component="li"
-            key={index}
-            sx={{
-              mb: { xs: "8px", md: "10px" },
-              animation: `${slideInLeft} 0.3s ease-out ${delay + index * 50}ms both`,
-            }}
-          >
-            <FooterLink component={RouterLink} to={item.path || "#"}>
-              <ArrowForwardIcon sx={{ fontSize: 14, opacity: 0.5 }} />
-              {item.name || item}
-            </FooterLink>
-          </Box>
-        ))}
+        {items.map((item, index) => {
+          const isExternal = item.path?.startsWith('http');
+          return (
+            <Box
+              component="li"
+              key={index}
+              sx={{
+                mb: { xs: "8px", md: "10px" },
+                animation: `${slideInLeft} 0.3s ease-out ${delay + index * 50}ms both`,
+              }}
+            >
+              <FooterLink 
+                component={isExternal ? 'a' : RouterLink} 
+                to={!isExternal ? (item.path || "#") : undefined}
+                href={isExternal ? item.path : undefined}
+              >
+                <ArrowForwardIcon sx={{ fontSize: 14, opacity: 0.5 }} />
+                {item.name || item}
+              </FooterLink>
+            </Box>
+          );
+        })}
       </Box>
     </Box>
   </Grow>
@@ -532,7 +539,7 @@ const Footer = () => {
               { name: "Offers", path: "/offers" },
               { name: "Careers", path: "/career" },
               { name: "Contact Us", path: "/contact" },
-              { name: "Blog", path: "/blogs" }
+              { name: "Blog", path: "https://dlksoftwaresolutions.co.in/projectblogs/" }
             ]}
             delay={600}
           />

@@ -328,7 +328,7 @@ const Blog = () => {
           <Box sx={{ mt: 1 }}>
             <Button
               variant="contained"
-              onClick={() => navigate("/blogs")}
+              onClick={() => window.location.href = "https://dlksoftwaresolutions.co.in/projectblogs/"}
               endIcon={<ArrowForwardIcon size={18} />}
               sx={{
                 bgcolor: colors.primary,
@@ -375,7 +375,7 @@ const Blog = () => {
                   $hovered={hoveredCard === idx}
                   onMouseEnter={() => setHoveredCard(idx)}
                   onMouseLeave={() => setHoveredCard(null)}
-                  onClick={() => navigate(`/blogs/${blog.slug || blog.id}`)}
+                  onClick={() => window.location.href = "https://dlksoftwaresolutions.co.in/projectblogs/"}
                   elevation={0}
                 >
                   {blog.image && (

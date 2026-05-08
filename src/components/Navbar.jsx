@@ -498,7 +498,11 @@ const Navbar = () => {
   };
 
   const handleNavigation = (path) => {
-    navigate(path);
+    if (path.startsWith('http')) {
+      window.location.href = path;
+    } else {
+      navigate(path);
+    }
     setOpen(false);
   };
 
@@ -768,7 +772,7 @@ const Navbar = () => {
                   >
                     {[
                       { icon: <MapIcon />, text: "Roadmap", path: "/roadmap" },
-                      { icon: <MenuBookIcon />, text: "Blog", path: "/blogs" },
+                      { icon: <MenuBookIcon />, text: "Blog", path: "https://dlksoftwaresolutions.co.in/projectblogs/" },
                       { icon: <LocalOfferIcon />, text: "Offers", path: "/offers" },
                     ].map((item, index) => (
                       <ListItemButton
@@ -1161,7 +1165,7 @@ const Navbar = () => {
                 <List component="div" disablePadding sx={{ pl: 4 }}>
                   {[
                     { icon: <MapIcon />, text: "Roadmap", path: "/roadmap" },
-                    { icon: <MenuBookIcon />, text: "Blog", path: "/blogs" },
+                    { icon: <MenuBookIcon />, text: "Blog", path: "https://dlksoftwaresolutions.co.in/projectblogs/" },
                     { icon: <LocalOfferIcon />, text: "Offers", path: "/offers" },
                   ].map((item, index) => (
                     <MobileMenuItem
