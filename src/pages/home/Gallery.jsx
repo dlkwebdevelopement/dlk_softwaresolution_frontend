@@ -57,6 +57,24 @@ const colors = {
   white: "#ffffff",
 };
 
+// Helper to get a deterministic "random" image for the day
+const getDailyCoverImage = (album) => {
+  const allImages = album.batches?.flatMap(batch => batch.images) || [];
+  if (allImages.length === 0) return album.thumbnail;
+
+  // Use the current date to get a consistent index for today
+  const now = new Date();
+  const dateSeed = now.getFullYear() * 1000 + (now.getMonth() + 1) * 100 + now.getDate();
+  
+  // Use album ID to offset the index so different albums show different images
+  const albumSeed = (album._id || album.id || "").split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  
+  const index = (dateSeed + albumSeed) % allImages.length;
+  const selectedImage = allImages[index];
+  
+  return typeof selectedImage === 'string' ? selectedImage : selectedImage?.url;
+};
+
 // Styled Components
 const GalleryItem = ({ album, onOpen, height = 300 }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -87,7 +105,7 @@ const GalleryItem = ({ album, onOpen, height = 300 }) => {
     >
       <Box
         component="img"
-        src={getImgUrl(album.thumbnail || album.batches?.[0]?.images?.[0])}
+        src={getImgUrl(getDailyCoverImage(album))}
         sx={{
           width: '100%',
           height: '100%',
@@ -98,7 +116,7 @@ const GalleryItem = ({ album, onOpen, height = 300 }) => {
       />
 
       {/* Fallback for missing image */}
-      {(!album.thumbnail && !album.batches?.[0]?.images?.length) && (
+      {!getDailyCoverImage(album) && (
         <Box sx={{
           position: 'absolute', inset: 0,
           background: `linear-gradient(135deg, ${colors.primaryLight} 0%, ${colors.white} 100%)`,
