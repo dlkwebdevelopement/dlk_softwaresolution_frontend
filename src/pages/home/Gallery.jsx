@@ -57,28 +57,38 @@ const colors = {
   white: "#ffffff",
 };
 
+const SAMPLE_IMAGES = [
+  "/photos/services.png",
+  "/photos/realestate.png",
+  "/photos/travel.png"
+];
+
 // Helper to get a deterministic "random" image for the day
 const getDailyCoverImage = (album) => {
   const allImages = album.batches?.flatMap(batch => batch.images) || [];
-  if (allImages.length === 0) return album.thumbnail;
 
-  // Use the current date to get a consistent index for today
-  const now = new Date();
-  const dateSeed = now.getFullYear() * 1000 + (now.getMonth() + 1) * 100 + now.getDate();
-  
-  // Use album ID to offset the index so different albums show different images
-  const albumSeed = (album._id || album.id || "").split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  
-  const index = (dateSeed + albumSeed) % allImages.length;
+  const date = new Date();
+  const dateSeed = date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate();
+  const idHash = (album._id || album.id || "").split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+
+  if (allImages.length === 0) {
+    if (album.thumbnail) return getImgUrl(album.thumbnail);
+    return SAMPLE_IMAGES[idHash % SAMPLE_IMAGES.length];
+  }
+
+  const index = (dateSeed + idHash) % allImages.length;
   const selectedImage = allImages[index];
-  
-  return typeof selectedImage === 'string' ? selectedImage : selectedImage?.url;
+
+  const imgUrl = typeof selectedImage === 'string' ? selectedImage : selectedImage?.url;
+  return getImgUrl(imgUrl);
 };
 
 // Styled Components
 const GalleryItem = ({ album, onOpen, height = 300 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const navigate = useNavigate();
+  const coverImage = getDailyCoverImage(album);
+
   return (
     <Box
       onMouseEnter={() => setIsHovered(true)}
@@ -92,7 +102,7 @@ const GalleryItem = ({ album, onOpen, height = 300 }) => {
         cursor: 'pointer',
         transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
         boxShadow: isHovered ? '0 12px 24px rgba(0,0,0,0.2)' : '0 4px 12px rgba(0,0,0,0.1)',
-        transform: isHovered ? 'translateY(-4px)' : 'none',
+        transform: 'none',
         '&:after': {
           content: '""',
           position: 'absolute',
@@ -105,26 +115,15 @@ const GalleryItem = ({ album, onOpen, height = 300 }) => {
     >
       <Box
         component="img"
-        src={getImgUrl(getDailyCoverImage(album))}
+        src={coverImage}
         sx={{
           width: '100%',
           height: '100%',
           objectFit: 'cover',
           transition: 'transform 0.6s ease',
-          transform: isHovered ? 'scale(1.1)' : 'scale(1)'
+          transform: 'none'
         }}
       />
-
-      {/* Fallback for missing image */}
-      {!getDailyCoverImage(album) && (
-        <Box sx={{
-          position: 'absolute', inset: 0,
-          background: `linear-gradient(135deg, ${colors.primaryLight} 0%, ${colors.white} 100%)`,
-          display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.6
-        }}>
-          <PhotoLibraryIcon size={40} color={colors.primary} style={{ opacity: 0.5 }} />
-        </Box>
-      )}
 
       <Box sx={{
         position: 'absolute',
@@ -134,42 +133,10 @@ const GalleryItem = ({ album, onOpen, height = 300 }) => {
         p: 1,
         zIndex: 2,
         color: 'white',
-        transform: isHovered ? 'translateY(-5px)' : 'none',
+        transform: 'none',
         transition: 'all 0.3s ease'
       }}>
-        <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
-          <Chip
-            label={["Training", "Workshop", "Certification"][album.albumName.length % 3]}
-            size="small"
-            variant="outlined"
-            sx={{
-              borderColor: 'rgba(255,255,255,0.5)',
-              color: 'white',
-              fontSize: '0.65rem',
-              height: '24px',
-              fontWeight: 800,
-              textTransform: 'uppercase',
-              backdropFilter: 'blur(4px)'
-            }}
-          />
-        </Stack>
 
-        {album.batch && (
-          <Chip
-            label={album.batch}
-            size="small"
-            sx={{
-              bgcolor: alpha(colors.primary, 0.9),
-              color: 'white',
-              fontSize: '0.6rem',
-              height: '20px',
-              fontWeight: 800,
-              mb: 1,
-              borderRadius: '4px',
-              border: '1px solid rgba(255,255,255,0.2)'
-            }}
-          />
-        )}
         <Typography variant="h6" sx={{
           fontWeight: 900,
           fontSize: '1.15rem',

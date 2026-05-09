@@ -8,9 +8,8 @@ import VerifiedIcon from '@mui/icons-material/Verified';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import SpeedIcon from '@mui/icons-material/Speed';
 import GroupIcon from '@mui/icons-material/Group';
-import { useCaptcha } from "../../context/CaptchaContext";
-import CaptchaWrapper from "../../components/CaptchaWrapper";
 import toast from "react-hot-toast";
+import SuccessPopup from "../../components/SuccessPopup";
 
 // Animations
 const fadeIn = keyframes`
@@ -130,8 +129,8 @@ export default function QuickEnquiry() {
   });
 
   const [loading, setLoading] = useState(false);
-  const { isVerified, setVerified, triggerModal } = useCaptcha();
-  const recaptchaRef = useRef(null);
+  const [showSuccess, setShowSuccess] = useState(false);
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -148,20 +147,15 @@ export default function QuickEnquiry() {
       return;
     }
 
-    if (!isVerified) {
-      triggerModal();
-      toast.error("Please complete the security check");
-      setLoading(false);
-      return;
-    }
+
 
     try {
       await PostRequest(ADMIN_POST_ENQUIRIES, { 
         ...formData, 
-        inquiryType: "Quick Enquiry", 
-        captchaToken: "SESSION_VERIFIED" 
+        inquiryType: "Quick Enquiry" 
       });
-      toast.success("Enquiry submitted! Our team will contact you shortly.");
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 2000);
       
       setFormData({
         name: "",
@@ -171,7 +165,7 @@ export default function QuickEnquiry() {
         location: "Vadapalani",
         timeslot: "Morning",
       });
-      if (recaptchaRef.current) recaptchaRef.current.reset();
+
     } catch (err) {
       toast.error("Submission failed. Please try again.");
     } finally {
@@ -365,6 +359,7 @@ export default function QuickEnquiry() {
           </Grid>
         </Grid>
       </Container>
+      <SuccessPopup open={showSuccess} onClose={() => setShowSuccess(false)} />
     </Box>
   );
 }

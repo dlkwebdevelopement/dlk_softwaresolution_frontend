@@ -3,8 +3,7 @@ import AppRoute from "./routes/AppRoute";
 import { BrowserRouter } from "react-router-dom";
 import FloatingEnquiry from "./components/FloatingEnquiry";
 import { Toaster } from "react-hot-toast";
-import { CaptchaProvider } from "./context/CaptchaContext";
-// import HumanVerificationModal from "./components/HumanVerificationModal";
+
 
 const theme = createTheme({
   palette: {
@@ -108,9 +107,7 @@ const theme = createTheme({
           font-family: "Poppins", sans-serif !important;
           color: #111c12;
         }
-        .grecaptcha-badge { 
-          visibility: hidden !important;
-        }
+
       `,
     },
   },
@@ -120,8 +117,7 @@ const App = () => {
   return (
     <BrowserRouter>
       <ThemeProvider theme={theme}>
-        <CaptchaProvider>
-          <CssBaseline />
+        <CssBaseline />
           <Toaster 
             position="top-center"
             reverseOrder={false}
@@ -161,12 +157,11 @@ const App = () => {
               },
             }}
           />
-          <AppRoute />
+        <AppRoute />
 
           {/* Only this */}
           <FloatingEnquiry />
-          {/* <HumanVerificationModal /> */}
-        </CaptchaProvider>
+
       </ThemeProvider>
     </BrowserRouter>
   );

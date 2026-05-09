@@ -4,7 +4,8 @@ import { styled, keyframes } from "@mui/material/styles";
 import { PostRequest } from "../../api/api";
 import { ADMIN_POST_ENQUIRIES } from "../../api/endpoints";
 import SendIcon from '@mui/icons-material/Send';
-import { useCaptcha } from "../../context/CaptchaContext";
+import SuccessPopup from "../../components/SuccessPopup";
+
 
 // Animations
 const fadeIn = keyframes`
@@ -59,10 +60,10 @@ export default function EnquiryFormAlone() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
-  const { isVerified, triggerModal } = useCaptcha();
-  const recaptchaRef = useRef(null);
+
 
   const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -81,9 +82,7 @@ export default function EnquiryFormAlone() {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleCaptchaChange = (value) => {
-    setCaptchaToken(value);
-  };
+
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -112,16 +111,12 @@ export default function EnquiryFormAlone() {
       setLoading(false);
       return;
     }
-    if (!isVerified) {
-      triggerModal();
-      setError("Please complete the security check");
-      setLoading(false);
-      return;
-    }
+
 
     try {
-      await PostRequest(ADMIN_POST_ENQUIRIES, { ...formData, inquiryType: "Quick Enquiry", captchaToken: "SESSION_VERIFIED" });
-      setSuccess("Enquiry submitted successfully!");
+      await PostRequest(ADMIN_POST_ENQUIRIES, { ...formData, inquiryType: "Quick Enquiry" });
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 2000);
       setFormData({
         name: "",
         email: "",
@@ -130,9 +125,7 @@ export default function EnquiryFormAlone() {
         location: "",
         timeslot: "",
       });
-      if (recaptchaRef.current) {
-        recaptchaRef.current.reset();
-      }
+
     } catch (err) {
       setError("Failed to submit enquiry: " + err.message);
     } finally {
@@ -255,6 +248,7 @@ export default function EnquiryFormAlone() {
           {loading ? "Submitting..." : "Get Started Now"}
         </Button>
       </Box>
+      <SuccessPopup open={showSuccess} onClose={() => setShowSuccess(false)} />
     </GlassFormCard>
   );
 }

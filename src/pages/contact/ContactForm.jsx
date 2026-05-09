@@ -27,9 +27,8 @@ import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import { PostRequest } from "../../api/api";
 import { ADMIN_POST_CONTACT } from "../../api/endpoints";
-import { useCaptcha } from "../../context/CaptchaContext";
-import CaptchaWrapper from "../../components/CaptchaWrapper";
 import toast from "react-hot-toast";
+import SuccessPopup from "../../components/SuccessPopup";
 
 // Animations
 const fadeIn = keyframes`
@@ -202,8 +201,8 @@ export default function ContactForm() {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
-  const { isVerified, setVerified, triggerModal } = useCaptcha();
-  const recaptchaRef = useRef(null);
+  const [showSuccess, setShowSuccess] = useState(false);
+
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
 
   const validateForm = () => {
@@ -237,10 +236,7 @@ export default function ContactForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-    if (!isVerified) {
-      triggerModal();
-      return setSnackbar({ open: true, message: "Please complete the security check", severity: "warning" });
-    }
+
 
     setIsSubmitting(true);
     try {
@@ -251,15 +247,13 @@ export default function ContactForm() {
         phone: formData.phone,
         message: formData.message,
         acceptTerms: formData.acceptTerms,
-        captchaToken: "SESSION_VERIFIED"
       });
 
       if (response?.success || response?.message === "Message submitted successfully") {
-        setSubmitSuccess(true);
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 2000);
 
         setFormData({ firstName: "", lastName: "", email: "", phone: "", message: "", acceptTerms: true });
-        if (recaptchaRef.current) recaptchaRef.current.reset();
-        setTimeout(() => setSubmitSuccess(false), 8000);
       } else {
         setSnackbar({ open: true, message: response?.message || response?.error || "Transmission failed", severity: "error" });
       }
@@ -470,6 +464,7 @@ export default function ContactForm() {
           {snackbar.message}
         </Alert>
       </Snackbar>
+      <SuccessPopup open={showSuccess} onClose={() => setShowSuccess(false)} />
     </PageWrapper>
   );
 }

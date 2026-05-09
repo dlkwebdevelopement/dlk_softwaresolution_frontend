@@ -1,6 +1,4 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useCaptcha } from "../../context/CaptchaContext";
-import CaptchaWrapper from "../../components/CaptchaWrapper";
 import {
   Box,
   Typography,
@@ -26,6 +24,7 @@ import { ADMIN_GET_BLOGS_SLUG, GET_ALL_BLOGS, ADMIN_POST_ENQUIRIES } from "../..
 import { getImgUrl } from "../../api/api";
 import SendIcon from '@mui/icons-material/Send';
 import toast from "react-hot-toast";
+import SuccessPopup from "../../components/SuccessPopup";
 import AOS from "aos";
 import "aos/dist/aos.css";
 
@@ -46,9 +45,9 @@ export default function BlogContentPage() {
   const [blog, setBlog] = useState(null);
   const [latestPosts, setLatestPosts] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const { isVerified, setVerified, triggerModal } = useCaptcha();
-  const recaptchaRef = useRef(null);
+
 
   // Auto-scroll logic array
   useEffect(() => {
@@ -141,19 +140,16 @@ export default function BlogContentPage() {
     if (!email.trim() || !validateEmail(email)) return toast.error("Valid email is required");
     if (!mobile.trim() || mobile.length !== 10) return toast.error("Mobile number must be 10 digits");
     if (!course.trim() || !location.trim() || !timeslot.trim()) return toast.error("Please fill all fields");
-    if (!isVerified) {
-      triggerModal();
-      return toast.error("Please complete the security check");
-    }
+
 
     try {
       const data = await PostRequest(ADMIN_POST_ENQUIRIES, { 
         ...formData, 
-        inquiryType: "Blog",
-        captchaToken: "SESSION_VERIFIED" 
+        inquiryType: "Blog", 
       });
       if (data?.message === "Enquiry submitted successfully!") {
-        toast.success("Quick Enquiry submitted successfully! We will contact you soon.");
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 2000);
         
         setFormData({
           name: "",
@@ -163,9 +159,7 @@ export default function BlogContentPage() {
           location: "",
           timeslot: "",
         });
-        if (recaptchaRef.current) {
-          recaptchaRef.current.reset();
-        }
+
       } else {
         toast.error(data.message || "Submission failed");
       }
@@ -715,6 +709,7 @@ export default function BlogContentPage() {
           </Container>
         </Box>
       )}
+      <SuccessPopup open={showSuccess} onClose={() => setShowSuccess(false)} />
     </Box>
   );
 }

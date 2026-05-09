@@ -3,8 +3,7 @@ import { Link as RouterLink } from "react-router-dom";
 import { GetRequest, PostRequest } from "../api/api";
 import { ADMIN_GET_CATEGORIES, ADMIN_POST_CONTACT } from "../api/endpoints";
 import toast from "react-hot-toast";
-import { useCaptcha } from "../context/CaptchaContext";
-import CaptchaWrapper from "./CaptchaWrapper";
+import SuccessPopup from "./SuccessPopup";
 import {
   Box,
   Typography,
@@ -287,7 +286,8 @@ const ContactInfo = ({ icon: Icon, text, subtext }) => (
 const Footer = () => {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { isVerified, setVerified, triggerModal } = useCaptcha();
+  const [showSuccess, setShowSuccess] = useState(false);
+
   const [topCourses, setTopCourses] = useState([
     { name: "AI & Machine Learning", path: "#" },
     { name: "Web Development", path: "#" },
@@ -327,11 +327,7 @@ const Footer = () => {
       return;
     }
 
-    if (!isVerified) {
-      triggerModal();
-      toast.error("Please complete the security check");
-      return;
-    }
+
 
     setIsLoading(true);
     try {
@@ -342,11 +338,11 @@ const Footer = () => {
         phone: "N/A",
         message: "Newsletter Subscription Request",
         acceptTerms: true,
-        captchaToken: isVerified ? "SESSION_VERIFIED" : localToken
       };
 
       await PostRequest(ADMIN_POST_CONTACT, payload);
-      toast.success("Subscribed successfully! Thank you for staying updated.");
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 2000);
       
       setEmail("");
     } catch (err) {
@@ -667,6 +663,7 @@ const Footer = () => {
           </Box >
         </Fade >
       </Container >
+      <SuccessPopup open={showSuccess} onClose={() => setShowSuccess(false)} message="Subscribed Successfully!" />
     </Box >
   );
 };

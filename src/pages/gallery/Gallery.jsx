@@ -33,6 +33,22 @@ const COLORS = {
 };
 const colors = COLORS;
 
+const SAMPLE_IMAGES = [
+  "/photos/services.png",
+  "/photos/realestate.png",
+  "/photos/travel.png"
+];
+
+const getDailyRandomImage = (images, identifier) => {
+  if (!images || images.length === 0) return null;
+  const date = new Date();
+  const dateSeed = date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate();
+  const idHash = identifier?.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) || 0;
+  const randomIndex = (dateSeed + idHash) % images.length;
+  const img = images[randomIndex];
+  return typeof img === 'string' ? img : img?.url || img;
+};
+
 // Styled Components
 const GlassCard = styled(({ $hovered, ...p }) => <Paper {...p} />)(({ $hovered }) => ({
   background: "rgba(255,255,255,0.85)",
@@ -102,6 +118,20 @@ const ScrollButton = styled(IconButton, {
 // ─── Album Card ────────────────────────────────────────────────────────────────
 function AlbumCard({ album, onSelect }) {
   const [hovered, setHovered] = useState(false);
+
+  const getAlbumCover = () => {
+    const allBatchImages = album.batches?.flatMap(batch => batch.images || []) || [];
+    const randomImage = getDailyRandomImage(allBatchImages, album.id);
+    if (randomImage) return getImgUrl(randomImage);
+    if (album.thumbnail) return getImgUrl(album.thumbnail);
+
+    // Pick a sample image based on album ID
+    const idHash = album.id?.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) || 0;
+    return SAMPLE_IMAGES[idHash % SAMPLE_IMAGES.length];
+  };
+
+  const coverImage = getAlbumCover();
+
   return (
     <GlassCard
       $hovered={hovered}
@@ -111,27 +141,16 @@ function AlbumCard({ album, onSelect }) {
       sx={{ cursor: "pointer" }}
     >
       <Box sx={{ position: "relative", overflow: "hidden", height: 280 }}>
-        {(album.thumbnail || (album.batches?.[0]?.images?.length > 0)) ? (
-          <CardMedia
-            component="img"
-            image={album.thumbnail ? getImgUrl(album.thumbnail) : getImgUrl(album.batches[0].images[0])}
-            alt={album.albumName}
-            sx={{
-              width: "100%", height: "100%", objectFit: "cover",
-              transition: "transform 0.6s cubic-bezier(0.4,0,0.2,1)",
-              transform: hovered ? "scale(1.1)" : "scale(1)",
-            }}
-          />
-        ) : (
-          <Box sx={{
-            width: "100%", height: "100%",
-            background: `linear-gradient(135deg, ${COLORS.light} 0%, #fff 100%)`,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            opacity: 0.8
-          }}>
-            <ImgIcon size={48} color={COLORS.primary} style={{ opacity: 0.4 }} />
-          </Box>
-        )}
+        <CardMedia
+          component="img"
+          image={coverImage}
+          alt={album.albumName}
+          sx={{
+            width: "100%", height: "100%", objectFit: "cover",
+            transition: "transform 0.6s cubic-bezier(0.4,0,0.2,1)",
+            transform: hovered ? "scale(1.1)" : "scale(1)",
+          }}
+        />
         <Box sx={{
           position: "absolute", inset: 0,
           background: "linear-gradient(180deg,transparent 30%,rgba(20,53,18,0.85) 100%)",
@@ -179,71 +198,91 @@ function EventCard({ event, onSelect }) {
           onClick={() => onSelect(event)}
           sx={{ cursor: "pointer" }}
         >
-          <Box sx={{ position: "relative", overflow: "hidden", height: 220 }}>
-            {event.mainImage ? (
-              <CardMedia
-                component="img"
-                image={getImgUrl(event.mainImage)}
-                alt={event.title}
-                sx={{
-                  width: "100%", height: "100%", objectFit: "cover",
-                  transition: "transform 0.6s cubic-bezier(0.4,0,0.2,1)",
-                  transform: hovered ? "scale(1.1) rotate(1deg)" : "scale(1)",
-                }}
-              />
-            ) : (
-              <Box sx={{
-                width: "100%", height: "100%",
-                background: `linear-gradient(135deg, ${COLORS.light} 0%, #fff 100%)`,
-                display: "flex", alignItems: "center", justifyContent: "center",
-              }}>
-                <ImgIcon size={40} color={COLORS.primary} style={{ opacity: 0.4 }} />
-              </Box>
-            )}
+          <Box sx={{ position: "relative", overflow: "hidden", height: 180 }}>
+            <CardMedia
+              component="img"
+              image={event.mainImage ? getImgUrl(event.mainImage) : SAMPLE_IMAGES[(event._id || "").split('').reduce((a, b) => a + b.charCodeAt(0), 0) % SAMPLE_IMAGES.length]}
+              alt={event.title}
+              sx={{
+                width: "100%", height: "100%", objectFit: "cover",
+                transition: "transform 0.6s cubic-bezier(0.4,0,0.2,1)",
+                transform: "none",
+              }}
+            />
+
+            {/* Overlay */}
             <Box sx={{
               position: "absolute", inset: 0,
-              background: "linear-gradient(180deg,transparent 0%,rgba(0,0,0,0.45) 100%)",
-              opacity: hovered ? 0.85 : 0.45, transition: "opacity 0.4s ease",
+              background: "linear-gradient(180deg,transparent 0%,rgba(0,0,0,0.5) 100%)",
+              opacity: hovered ? 0.7 : 0.3, transition: "opacity 0.4s ease",
             }} />
-            <Box sx={{ position: "absolute", bottom: 14, right: 14 }}>
+
+            {/* Top Tags */}
+            <Box sx={{ position: "absolute", top: 16, left: 16, right: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              {event.isBatch ? (
+                <Chip
+                  label={`BATCH ${event.batchNumber || ''}`}
+                  size="small"
+                  sx={{
+                    bgcolor: "#f5c842",
+                    color: "#000",
+                    fontWeight: 900,
+                    fontSize: "0.65rem",
+                    px: 1,
+                    height: 22,
+                    borderRadius: "4px",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
+                  }}
+                />
+              ) : <Box />}
+
               <Chip
                 label={`${(event.galleryImages?.length || 0) + (event.mainImage ? 1 : 0)} Photos`}
                 size="small"
-                sx={{ bgcolor: "rgba(0,0,0,0.7)", color: "white", backdropFilter: "blur(8px)", fontWeight: 700, fontSize: "0.65rem", border: "1px solid rgba(255,255,255,0.1)" }}
+                sx={{
+                  bgcolor: "rgba(255,255,255,0.9)",
+                  color: "#1a2b1b",
+                  backdropFilter: "blur(8px)",
+                  fontWeight: 800,
+                  fontSize: "0.65rem",
+                  border: "1px solid rgba(255,255,255,0.2)",
+                  height: 24
+                }}
               />
             </Box>
           </Box>
 
-          <CardContent sx={{ p: 3, flexGrow: 1, display: "flex", flexDirection: "column" }}>
-
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1.5 }}>
-              <IconBox sx={{ bgcolor: "#f1f5f9", color: "#0f172a" }}><CollegeIcon size={17} /></IconBox>
+          <CardContent sx={{ p: 2, flexGrow: 1, display: "flex", flexDirection: "column", gap: 1 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <IconBox sx={{ bgcolor: alpha(COLORS.primary, 0.08), color: COLORS.primary, width: 28, height: 28 }}>
+                <CollegeIcon size={14} />
+              </IconBox>
               <Box>
-                <Typography variant="caption" color="text.secondary" sx={{ display: "block", fontWeight: 500 }}>College</Typography>
-                <Typography variant="body2" sx={{ fontWeight: 600, color: "#334155" }}>{event.collegeName || "N/A"}</Typography>
+                <Typography variant="body2" sx={{ fontWeight: 700, color: "#1e293b", fontSize: '0.8rem' }}>
+                  {event.collegeName || "DLK Solutions"}
+                </Typography>
               </Box>
             </Box>
 
             <Typography variant="h6" sx={{
-              fontWeight: 700, fontSize: "1.1rem", mb: 2, color: "#1e293b",
-              lineHeight: 1.4, minHeight: "3em",
+              fontWeight: 800, fontSize: "0.95rem", color: "#0f172a",
+              lineHeight: 1.2, minHeight: "2.4em",
               display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden",
             }}>
               {event.title}
             </Typography>
 
-            <Stack spacing={1.5} sx={{ mb: 3 }}>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                <IconBox><CalIcon size={17} /></IconBox>
-                <Box>
-                  <Typography variant="caption" color="text.secondary" sx={{ display: "block", fontWeight: 500 }}>Date</Typography>
-                  <Typography variant="body2" sx={{ fontWeight: 600, color: "#334155" }}>
-                    {dayjs(event.eventDate).format("DD MMM, YYYY")}
-                  </Typography>
-                </Box>
+            <Box sx={{ mt: 'auto', pt: 1, borderTop: '1px solid rgba(0,0,0,0.05)', display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                <Clock size={12} color={COLORS.primary} />
+                <Typography variant="caption" sx={{ fontWeight: 700, color: COLORS.textSecondary, fontSize: '0.7rem' }}>
+                  {dayjs(event.eventDate).format("DD MMM, YY")}
+                </Typography>
               </Box>
-            </Stack>
-
+              <IconButton size="small" sx={{ color: COLORS.primary, p: 0.5 }}>
+                <RightIcon size={14} />
+              </IconButton>
+            </Box>
           </CardContent>
         </GlassCard>
       </Box>
@@ -276,10 +315,19 @@ export default function Gallery() {
   };
 
   const availableYears = useMemo(() => {
-    if (!events || events.length === 0) return [];
-    const years = events.map(e => dayjs(e.eventDate).year());
-    return [...new Set(years)].sort((a, b) => b - a);
-  }, [events]);
+    const yearsSet = new Set();
+    if (Array.isArray(events)) {
+      events.forEach(e => {
+        if (e.eventDate) yearsSet.add(dayjs(e.eventDate).year());
+      });
+    }
+    if (Array.isArray(albums)) {
+      albums.forEach(a => {
+        if (a.updatedAt) yearsSet.add(dayjs(a.updatedAt).year());
+      });
+    }
+    return [...yearsSet].sort((a, b) => b - a);
+  }, [events, albums]);
 
 
 
@@ -349,7 +397,7 @@ export default function Gallery() {
         ]);
         const albumData = albumRes.success ? albumRes.data : albumRes;
         setAlbums(Array.isArray(albumData) ? albumData : []);
-        
+
         const eventData = eventRes?.data || (eventRes?.success ? eventRes.data : eventRes) || [];
         setEvents(Array.isArray(eventData) ? eventData : []);
 
@@ -378,14 +426,15 @@ export default function Gallery() {
 
       // Add batches as virtual events
       if (selectedAlbum.batches && selectedAlbum.batches.length > 0) {
-        const batchEvents = selectedAlbum.batches.map(batch => ({
+        const batchEvents = selectedAlbum.batches.map((batch, index) => ({
           _id: `batch-${batch._id}`,
           title: batch.batchName,
-          mainImage: batch.images?.[0],
-          galleryImages: batch.images?.slice(1) || [],
+          mainImage: getDailyRandomImage(batch.images, batch._id) || batch.images?.[0],
+          galleryImages: batch.images?.filter(img => (typeof img === 'string' ? img : img.url) !== getDailyRandomImage(batch.images, batch._id)) || [],
           eventDate: selectedAlbum.updatedAt || new Date(),
           collegeName: "DLK Solutions",
           isBatch: true,
+          batchNumber: index + 1,
           categoryId: { albumName: selectedAlbum.albumName }
         }));
         result = [...batchEvents, ...result];
@@ -400,12 +449,21 @@ export default function Gallery() {
   const filteredAlbums = useMemo(() => {
     const albumsArray = Array.isArray(albums) ? albums : [];
     if (!selectedYear || selectedYear === "All") return albumsArray;
-    const albumsWithEventsInYear = new Set(
-      (events || [])
-        .filter(e => dayjs(e.eventDate).year().toString() === selectedYear.toString())
-        .map(e => e.categoryId?._id || e.categoryId?.albumName)
-    );
-    return albumsArray.filter(a => albumsWithEventsInYear.has(a.id) || albumsWithEventsInYear.has(a.albumName));
+
+    const targetYear = selectedYear.toString();
+
+    return albumsArray.filter(a => {
+      // Check if album itself was updated in that year (relevant for batches)
+      if (a.updatedAt && dayjs(a.updatedAt).year().toString() === targetYear) return true;
+
+      // Check if any specific event for this album exists in that year
+      const hasEventInYear = (events || []).some(e =>
+        (e.categoryId?._id === a.id || e.categoryId?.albumName === a.albumName) &&
+        dayjs(e.eventDate).year().toString() === targetYear
+      );
+
+      return hasEventInYear;
+    });
   }, [albums, events, selectedYear]);
 
   // ─── Render Helpers ──────────────────────────────────────────────────────────
@@ -583,16 +641,16 @@ export default function Gallery() {
         }}
       >
         {activeEvent && (
-          <Box sx={{ 
-            display: "flex", 
-            flexDirection: { xs: "column-reverse", md: "row" }, 
+          <Box sx={{
+            display: "flex",
+            flexDirection: { xs: "column-reverse", md: "row" },
             minHeight: { md: 400 },
             height: isMobile ? "100%" : "auto"
           }}>
             {/* Left Section: Information & Highlights */}
-            <Box sx={{ 
-              width: { xs: "100%", md: "340px" }, 
-              p: { xs: 2.5, md: 3.5 }, 
+            <Box sx={{
+              width: { xs: "100%", md: "340px" },
+              p: { xs: 2.5, md: 3.5 },
               borderRight: { md: "1px solid rgba(0,0,0,0.06)" },
               bgcolor: "white",
               display: "flex",
@@ -606,11 +664,11 @@ export default function Gallery() {
                   <Chip
                     label={activeEvent.categoryId?.albumName || "Gallery"}
                     size="small"
-                    sx={{ 
-                      bgcolor: alpha(COLORS.primary, 0.08), 
-                      color: COLORS.primary, 
-                      fontWeight: 800, 
-                      fontSize: "0.7rem", 
+                    sx={{
+                      bgcolor: alpha(COLORS.primary, 0.08),
+                      color: COLORS.primary,
+                      fontWeight: 800,
+                      fontSize: "0.7rem",
                       height: 22,
                       px: 0.5,
                       borderRadius: '6px'
@@ -620,11 +678,11 @@ export default function Gallery() {
                     {dayjs(activeEvent.eventDate).format("MMM DD, YYYY")}
                   </Typography>
                 </Box>
-                
+
                 <Typography variant="h4" sx={{ color: "#0f172a", fontWeight: 900, lineHeight: 1.1, mb: 1.5, letterSpacing: "-1px" }}>
                   {activeEvent.title}
                 </Typography>
-                
+
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 3 }}>
                   <Box sx={{ width: 32, height: 2, bgcolor: COLORS.primary, borderRadius: 1 }} />
                   <Typography variant="body2" sx={{ color: COLORS.textSecondary, fontWeight: 600 }}>
@@ -638,16 +696,16 @@ export default function Gallery() {
                 <Typography variant="overline" sx={{ color: COLORS.primary, fontWeight: 900, mb: 2, display: 'block', letterSpacing: 2 }}>
                   Project Highlights
                 </Typography>
-                
+
                 <Stack spacing={2}>
                   {(allImages[sliderIndex]?.highlights || []).length > 0 ? (
                     allImages[sliderIndex].highlights.map((h, i) => (
                       <Box key={i} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
-                        <Box sx={{ 
-                          mt: 0.5, 
-                          color: COLORS.primary, 
-                          display: 'flex', 
-                          alignItems: 'center', 
+                        <Box sx={{
+                          mt: 0.5,
+                          color: COLORS.primary,
+                          display: 'flex',
+                          alignItems: 'center',
                           justifyContent: 'center'
                         }}>
                           <RightIcon size={16} weight="bold" />
@@ -671,12 +729,12 @@ export default function Gallery() {
                   DLK SOFTWARE SOLUTIONS
                 </Typography>
                 <Stack direction="row" spacing={1}>
-                  <IconButton 
+                  <IconButton
                     onClick={() => {
                       navigator.clipboard.writeText(window.location.href);
                       alert("Link copied!");
                     }}
-                    size="small" 
+                    size="small"
                     sx={{ color: "#94a3b8", "&:hover": { color: COLORS.primary, bgcolor: alpha(COLORS.primary, 0.05) } }}
                   >
                     <Share2 size={16} />
@@ -689,11 +747,11 @@ export default function Gallery() {
             </Box>
 
             {/* Right Section: Image Viewport */}
-            <Box sx={{ 
-              flex: 1, 
-              bgcolor: "#0f172a", 
-              position: "relative", 
-              display: "flex", 
+            <Box sx={{
+              flex: 1,
+              bgcolor: "#0f172a",
+              position: "relative",
+              display: "flex",
               flexDirection: "column",
               height: { xs: "60vh", md: "85vh" },
               minHeight: { xs: "400px", md: "auto" }
@@ -716,11 +774,11 @@ export default function Gallery() {
                   <X size={24} />
                 </IconButton>
               )}
-              <Box sx={{ 
-                flex: 1, 
-                position: "relative", 
-                display: "flex", 
-                alignItems: "center", 
+              <Box sx={{
+                flex: 1,
+                position: "relative",
+                display: "flex",
+                alignItems: "center",
                 justifyContent: "center",
                 overflow: "hidden",
                 p: { xs: 2, md: 3 }
@@ -731,13 +789,13 @@ export default function Gallery() {
                       component="img"
                       src={getImgUrl(allImages[sliderIndex]?.url || allImages[sliderIndex])}
                       alt=""
-                      sx={{ 
-                        maxWidth: "100%", 
-                        maxHeight: "100%", 
-                        objectFit: "contain", 
+                      sx={{
+                        maxWidth: "100%",
+                        maxHeight: "100%",
+                        objectFit: "contain",
                         borderRadius: 2,
                         boxShadow: "0 20px 40px rgba(0,0,0,0.4)",
-                        userSelect: "none" 
+                        userSelect: "none"
                       }}
                     />
                   </Fade>
@@ -753,28 +811,28 @@ export default function Gallery() {
                   <>
                     <IconButton
                       onClick={() => setSliderIndex(i => (i - 1 + total) % total)}
-                      sx={{ 
-                        position: "absolute", 
-                        left: 20, 
-                        bgcolor: "rgba(255,255,255,0.08)", 
-                        color: "white", 
-                        backdropFilter: "blur(12px)", 
+                      sx={{
+                        position: "absolute",
+                        left: 20,
+                        bgcolor: "rgba(255,255,255,0.08)",
+                        color: "white",
+                        backdropFilter: "blur(12px)",
                         border: "1px solid rgba(255,255,255,0.1)",
-                        "&:hover": { bgcolor: COLORS.primary, border: `1px solid ${COLORS.primary}` } 
+                        "&:hover": { bgcolor: COLORS.primary, border: `1px solid ${COLORS.primary}` }
                       }}
                     >
                       <LeftIcon size={24} />
                     </IconButton>
                     <IconButton
                       onClick={() => setSliderIndex(i => (i + 1) % total)}
-                      sx={{ 
-                        position: "absolute", 
-                        right: 20, 
-                        bgcolor: "rgba(255,255,255,0.08)", 
-                        color: "white", 
-                        backdropFilter: "blur(12px)", 
+                      sx={{
+                        position: "absolute",
+                        right: 20,
+                        bgcolor: "rgba(255,255,255,0.08)",
+                        color: "white",
+                        backdropFilter: "blur(12px)",
                         border: "1px solid rgba(255,255,255,0.1)",
-                        "&:hover": { bgcolor: COLORS.primary, border: `1px solid ${COLORS.primary}` } 
+                        "&:hover": { bgcolor: COLORS.primary, border: `1px solid ${COLORS.primary}` }
                       }}
                     >
                       <RightIcon size={24} />
@@ -784,20 +842,20 @@ export default function Gallery() {
               </Box>
 
               {/* Progress & Thumbnails Row */}
-              <Box sx={{ 
-                px: 3, 
-                py: 2, 
-                bgcolor: "rgba(0,0,0,0.2)", 
+              <Box sx={{
+                px: 3,
+                py: 2,
+                bgcolor: "rgba(0,0,0,0.2)",
                 backdropFilter: "blur(20px)",
-                display: "flex", 
-                alignItems: "center", 
+                display: "flex",
+                alignItems: "center",
                 justifyContent: "space-between",
                 borderTop: "1px solid rgba(255,255,255,0.05)"
               }}>
                 <Typography sx={{ color: "rgba(255,255,255,0.5)", fontSize: "0.75rem", fontWeight: 700, letterSpacing: 1 }}>
                   IMAGE {sliderIndex + 1} OF {total}
                 </Typography>
-                
+
                 <Box sx={{ display: "flex", gap: 1 }}>
                   {allImages.slice(Math.max(0, sliderIndex - 2), Math.min(total, sliderIndex + 3)).map((img, idx) => {
                     const actualIdx = allImages.indexOf(img);

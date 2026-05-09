@@ -20,7 +20,7 @@ import VerifiedIcon from "@mui/icons-material/Verified";
 import { PostRequest } from "../api/api";
 import { ADMIN_POST_ENQUIRIES } from "../api/endpoints";
 import toast from "react-hot-toast";
-import ReCAPTCHA from "react-google-recaptcha";
+import SuccessPopup from "./SuccessPopup";
 
 const StyledDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialog-paper": {
@@ -66,8 +66,8 @@ export default function QuickEnquiryModal({ open, onClose, initialCourse = "", i
   });
 
   const [loading, setLoading] = useState(false);
-  const [captchaToken, setCaptchaToken] = useState(null);
-  const recaptchaRef = React.useRef(null);
+  const [showSuccess, setShowSuccess] = useState(false);
+
 
   useEffect(() => {
     if (open) {
@@ -90,15 +90,11 @@ export default function QuickEnquiryModal({ open, onClose, initialCourse = "", i
       return;
     }
 
-    if (!captchaToken) {
-      toast.error("Please verify that you are not a robot");
-      setLoading(false);
-      return;
-    }
+
 
     try {
-      await PostRequest(ADMIN_POST_ENQUIRIES, { ...formData, inquiryType, captchaToken });
-      toast.success("Enquiry submitted! We will contact you shortly.");
+      await PostRequest(ADMIN_POST_ENQUIRIES, { ...formData, inquiryType });
+      setShowSuccess(true);
       setFormData({
         name: "",
         email: "",
@@ -107,7 +103,11 @@ export default function QuickEnquiryModal({ open, onClose, initialCourse = "", i
         location: "Vadapalani",
         timeslot: "Morning",
       });
-      onClose();
+      // onClose will be called by SuccessPopup's timer or we can handle it here
+      setTimeout(() => {
+        setShowSuccess(false);
+        onClose();
+      }, 2000);
     } catch (err) {
       toast.error("Failed to submit enquiry. Please try again.");
     } finally {
@@ -233,13 +233,7 @@ export default function QuickEnquiryModal({ open, onClose, initialCourse = "", i
                 </StyledTextField>
               </Stack>
 
-              <Box sx={{ display: "flex", justifyContent: "center", py: 1 }}>
-                <ReCAPTCHA
-                  ref={recaptchaRef}
-                  sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
-                  onChange={(val) => setCaptchaToken(val)}
-                />
-              </Box>
+
 
               <Button
                 type="submit"
@@ -266,6 +260,7 @@ export default function QuickEnquiryModal({ open, onClose, initialCourse = "", i
           </form>
         </Stack>
       </DialogContent>
+      <SuccessPopup open={showSuccess} onClose={() => setShowSuccess(false)} />
     </StyledDialog>
   );
 }
