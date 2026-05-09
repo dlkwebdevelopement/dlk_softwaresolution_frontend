@@ -199,16 +199,31 @@ function EventCard({ event, onSelect }) {
           sx={{ cursor: "pointer" }}
         >
           <Box sx={{ position: "relative", overflow: "hidden", height: 180 }}>
-            <CardMedia
-              component="img"
-              image={event.mainImage ? getImgUrl(event.mainImage) : SAMPLE_IMAGES[(event._id || "").split('').reduce((a, b) => a + b.charCodeAt(0), 0) % SAMPLE_IMAGES.length]}
-              alt={event.title}
-              sx={{
-                width: "100%", height: "100%", objectFit: "cover",
-                transition: "transform 0.6s cubic-bezier(0.4,0,0.2,1)",
-                transform: "none",
-              }}
-            />
+            {getImgUrl(event.mainImage) ? (
+              <CardMedia
+                component="img"
+                image={getImgUrl(event.mainImage)}
+                alt={event.title}
+                sx={{
+                  width: "100%", height: "100%", objectFit: "cover",
+                  transition: "transform 0.6s cubic-bezier(0.4,0,0.2,1)",
+                  transform: "none",
+                }}
+              />
+            ) : (
+              <Box sx={{
+                width: "100%", height: "100%",
+                background: "#f8faf7",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                flexDirection: "column", gap: 1,
+                border: "1px dashed rgba(0,0,0,0.1)"
+              }}>
+                <ImgIcon size={28} color={COLORS.primary} style={{ opacity: 0.3 }} />
+                <Typography sx={{ color: COLORS.textSecondary, fontWeight: 800, fontSize: "0.7rem", letterSpacing: 1 }}>
+                  NOT AVAILABLE
+                </Typography>
+              </Box>
+            )}
 
             {/* Overlay */}
             <Box sx={{
@@ -429,8 +444,8 @@ export default function Gallery() {
         const batchEvents = selectedAlbum.batches.map((batch, index) => ({
           _id: `batch-${batch._id}`,
           title: batch.batchName,
-          mainImage: getDailyRandomImage(batch.images, batch._id) || batch.images?.[0],
-          galleryImages: batch.images?.filter(img => (typeof img === 'string' ? img : img.url) !== getDailyRandomImage(batch.images, batch._id)) || [],
+          mainImage: batch.images?.[0],
+          galleryImages: batch.images || [],
           eventDate: selectedAlbum.updatedAt || new Date(),
           collegeName: "DLK Solutions",
           isBatch: true,
