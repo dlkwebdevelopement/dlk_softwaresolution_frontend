@@ -445,7 +445,7 @@ export default function Gallery() {
           _id: `batch-${batch._id}`,
           title: batch.batchName,
           mainImage: batch.images?.[0],
-          galleryImages: batch.images || [],
+          galleryImages: batch.images?.slice(1) || [],
           eventDate: selectedAlbum.updatedAt || new Date(),
           collegeName: "DLK Solutions",
           isBatch: true,
