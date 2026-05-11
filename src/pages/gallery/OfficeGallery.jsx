@@ -135,6 +135,12 @@ const CategoryCard = ({ category, onClick }) => {
             <Typography variant="caption" sx={{ fontWeight: 700, opacity: 0.9 }}>
               {category.totalCount} Photos
             </Typography>     
+            <Box sx={{ width: 4, height: 4, borderRadius: '50%', bgcolor: 'white', opacity: 0.5 }} />
+            <Typography variant="caption" sx={{ fontWeight: 700, opacity: 0.9 }}>
+              {category.imagesByDay.length === 1 
+                ? dayjs(category.imagesByDay[0].date).format('DD MMM YYYY')
+                : `${category.imagesByDay.length} Days`}
+            </Typography>
           </Stack>
         </CategoryOverlay>
       </Box>
