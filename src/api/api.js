@@ -19,10 +19,27 @@ export default api;
 // ✅ Helper to get full image URL
 export const getImgUrl = (pathData) => {
   if (!pathData) return "";
-  const path = typeof pathData === 'string' ? pathData : pathData.url;
+  let path = typeof pathData === 'string' ? pathData : pathData.url;
   if (!path) return "";
-  if (path.startsWith("http")) return path;
-  // Handle double slashes if any
+
+  // If the path is an absolute URL pointing to localhost or the production domain,
+  // we strip the domain part to ensure we use the current BASE_URL.
+  // This helps when DB has stale local URLs or absolute paths.
+  if (path.startsWith("http")) {
+    const localPrefix = "http://localhost:5000";
+    const prodPrefix = "https://backend.dlksoftwaresolutions.co.in";
+    
+    if (path.startsWith(localPrefix)) {
+      path = path.replace(localPrefix, "");
+    } else if (path.startsWith(prodPrefix)) {
+      path = path.replace(prodPrefix, "");
+    } else {
+      // It's an external URL (like an S3 bucket or placeholder), return as is
+      return path;
+    }
+  }
+
+  // Handle double slashes or missing leading slashes
   const cleanPath = path.startsWith("/") ? path : `/${path}`;
   return `${BASE_URL}${cleanPath}`;
 };

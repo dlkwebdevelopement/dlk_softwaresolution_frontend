@@ -24,7 +24,7 @@ const fadeIn = keyframes`from { opacity: 0; transform: translateY(10px); } to { 
 const shimmer = keyframes`0%{transform:translateX(-100%)}100%{transform:translateX(100%)}`;
 const rotateGradient = keyframes`0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}`;
 
-// --- Color Palette (Exact match with Gallery.jsx) ---
+// --- Color Palette ---
 const COLORS = {
   primary: "#3DB843",
   dark: "#1a4718",
@@ -57,63 +57,13 @@ const StyledFormControl = styled(FormControl)(({ theme }) => ({
   }
 }));
 
-const CategoryScrollContainer = styled(Box)(({ theme }) => ({
-  position: 'relative',
-  marginBottom: theme.spacing(6),
-  '&::after': {
-    content: '""',
-    position: 'absolute',
-    right: 0, top: 0, bottom: 0,
-    width: '40px',
-    background: `linear-gradient(to left, ${COLORS.light}, transparent)`,
-    pointerEvents: 'none',
-    zIndex: 2,
-  }
-}));
-
-const CategoryTrack = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  gap: theme.spacing(2),
-  overflowX: 'auto',
-  scrollBehavior: 'smooth',
-  msOverflowStyle: 'none',
-  scrollbarWidth: 'none',
-  padding: theme.spacing(1, 0),
-  '&::-webkit-scrollbar': { display: 'none' },
-  whiteSpace: 'nowrap',
-}));
-
-const CategoryPill = styled(Box, {
-  shouldForwardProp: (prop) => prop !== '$active'
-})(({ $active }) => ({
-  padding: '10px 22px',
-  borderRadius: '12px',
-  fontSize: '0.85rem',
-  fontWeight: 800,
-  cursor: 'pointer',
-  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-  userSelect: 'none',
-  border: `1px solid ${$active ? COLORS.primary : "rgba(0,0,0,0.08)"}`,
-  backgroundColor: $active ? COLORS.primary : 'white',
-  color: $active ? 'white' : COLORS.textSecondary,
-  boxShadow: $active ? `0 8px 16px ${alpha(COLORS.primary, 0.2)}` : '0 2px 4px rgba(0,0,0,0.02)',
-  display: 'flex',
-  alignItems: 'center',
-  gap: '8px',
-  '&:hover': {
-    transform: 'translateY(-1px)',
-    borderColor: COLORS.primary,
-    color: $active ? 'white' : COLORS.primary,
-  }
-}));
-
 const GlassCard = styled(Card)(({ theme }) => ({
   background: "rgba(255,255,255,0.85)",
   backdropFilter: "blur(10px)",
   border: `1px solid rgba(61,184,67,0.25)`,
   borderRadius: 24,
   overflow: "hidden",
-  cursor: "zoom-in",
+  cursor: "pointer",
   position: "relative",
   transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
   height: "100%",
@@ -122,47 +72,90 @@ const GlassCard = styled(Card)(({ theme }) => ({
     transform: "translateY(-10px)",
     boxShadow: "0 20px 40px rgba(61,184,67,0.25)",
     borderColor: "rgba(61,184,67,0.8)",
-    '& img': { transform: 'scale(1.1)' },
     '& .overlay': { opacity: 1 },
-    "&::after": {
-      content: '""',
-      position: "absolute",
-      top: 0, left: "-100%",
-      width: "100%", height: "100%",
-      background: "linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent)",
-      animation: `${shimmer} 2s infinite`,
-      pointerEvents: "none",
-      zIndex: 2
-    },
   }
 }));
 
-const ImageOverlay = styled(Box)({
+const CategoryOverlay = styled(Box)({
   position: 'absolute',
   inset: 0,
-  background: 'linear-gradient(180deg, transparent 30%, rgba(20, 53, 18, 0.85) 100%)',
-  opacity: 0,
-  transition: 'opacity 0.4s ease',
+  background: 'linear-gradient(180deg, transparent 40%, rgba(20, 53, 18, 0.9) 100%)',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'flex-end',
-  padding: '20px',
-  zIndex: 1,
+  padding: '24px',
+  color: 'white',
+  zIndex: 2,
 });
 
+// --- Helper Components ---
+
+const CategoryCard = ({ category, onClick }) => {
+  const [currentImgIndex, setCurrentImgIndex] = useState(0);
+  const coverImages = category.coverImages || [];
+
+  useEffect(() => {
+    if (coverImages.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentImgIndex((prev) => (prev + 1) % coverImages.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [coverImages.length]);
+
+  return (
+    <GlassCard onClick={() => onClick(category)}>
+      <Box sx={{ position: 'relative', pt: '120%', overflow: 'hidden' }}>
+        {coverImages.length > 0 ? (
+          <Fade in key={currentImgIndex} timeout={800}>
+            <CardMedia
+              component="img"
+              image={getImgUrl(coverImages[currentImgIndex].url)}
+              sx={{
+                position: 'absolute', top: 0, left: 0,
+                width: '100%', height: '100%',
+                objectFit: 'cover', transition: 'transform 0.6s ease'
+              }}
+            />
+          </Fade>
+        ) : (
+          <Box sx={{ 
+            position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', 
+            bgcolor: alpha(COLORS.primary, 0.05), display: 'flex', alignItems: 'center', justifyContent: 'center' 
+          }}>
+            <ImgIcon size={48} color={alpha(COLORS.primary, 0.2)} />
+          </Box>
+        )}
+        
+        <CategoryOverlay>
+          <Typography variant="h5" sx={{ fontWeight: 900, mb: 0.5, letterSpacing: '-0.5px', color: 'white' }}>
+            {category.categoryName}
+          </Typography>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <ImgIcon size={14} />
+            <Typography variant="caption" sx={{ fontWeight: 700, opacity: 0.9 }}>
+              {category.totalCount} Photos
+            </Typography>     
+          </Stack>
+        </CategoryOverlay>
+      </Box>
+    </GlassCard>
+  );
+};
+
 // --- Main Page Component ---
+
 export default function OfficeGallery() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const scrollRef = useRef(null);
 
   const [batches, setBatches] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  const [selectedYear, setSelectedYear] = useState("");
-  const [selectedBatchId, setSelectedBatchId] = useState("");
-  const [selectedCategoryId, setSelectedCategoryId] = useState("");
+  const [selectedYear, setSelectedYear] = useState(""); // Empty means "All"
+  const [selectedBatchId, setSelectedBatchId] = useState(""); // Empty means "All"
   
+
+  // For Lightbox inside Modal
   const [showLightbox, setShowLightbox] = useState(false);
   const [sliderIndex, setSliderIndex] = useState(0);
   const [activeImages, setActiveImages] = useState([]);
@@ -172,26 +165,10 @@ export default function OfficeGallery() {
       try {
         setLoading(true);
         const res = await GetRequest(GET_ALL_OFFICE_GALLERY);
-        const data = res.success ? res.data : res;
-        const batchesData = Array.isArray(data) ? data : [];
+        const data = res?.data || res;
+        const batchesData = Array.isArray(data) ? data : (Array.isArray(res) ? res : []);
+        console.log("Gallery Batches Loaded:", batchesData);
         setBatches(batchesData);
-
-        if (batchesData.length > 0) {
-          const years = [...new Set(batchesData.map(b => b.date ? dayjs(b.date).year().toString() : dayjs().year().toString()))].sort((a, b) => b - a);
-          const latestYear = years[0];
-          setSelectedYear(latestYear);
-
-          const batchesInYear = batchesData.filter(b => (b.date ? dayjs(b.date).year().toString() : dayjs().year().toString()) === latestYear);
-          const sortedBatches = [...batchesInYear].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
-          const latestBatch = sortedBatches[0];
-          
-          if (latestBatch) {
-            setSelectedBatchId(latestBatch._id);
-            if (latestBatch.categories?.length > 0) {
-              setSelectedCategoryId(latestBatch.categories[0]._id);
-            }
-          }
-        }
       } catch (err) {
         console.error("Gallery Fetch Error:", err);
       } finally {
@@ -202,45 +179,80 @@ export default function OfficeGallery() {
   }, []);
 
   const years = useMemo(() => {
-    return [...new Set(batches.map(b => b.date ? dayjs(b.date).year().toString() : dayjs().year().toString()))].sort((a, b) => b - a);
+    const uniqueYears = [...new Set(batches.map(b => b.date ? dayjs(b.date).year().toString() : dayjs().year().toString()))];
+    return uniqueYears.sort((a, b) => b - a);
   }, [batches]);
 
   const batchesInSelectedYear = useMemo(() => {
-    return batches
-      .filter(b => (b.date ? dayjs(b.date).year().toString() : dayjs().year().toString()) === selectedYear)
-      .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+    if (!selectedYear) return batches;
+    return batches.filter(b => (b.date ? dayjs(b.date).year().toString() : dayjs().year().toString()) === selectedYear);
   }, [batches, selectedYear]);
 
-  const currentBatch = useMemo(() => {
-    return batches.find(b => b._id === selectedBatchId);
-  }, [batches, selectedBatchId]);
-
-  const currentCategory = useMemo(() => {
-    return currentBatch?.categories?.find(c => c._id === selectedCategoryId);
-  }, [currentBatch, selectedCategoryId]);
-
-  const handleYearChange = (year) => {
-    setSelectedYear(year);
-    const inYear = batches.filter(b => (b.date ? dayjs(b.date).year().toString() : dayjs().year().toString()) === year);
-    const latest = [...inYear].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))[0];
-    if (latest) {
-      setSelectedBatchId(latest._id);
-      if (latest.categories?.length > 0) {
-        setSelectedCategoryId(latest.categories[0]._id);
-      } else {
-        setSelectedCategoryId("");
-      }
+  const filteredBatches = useMemo(() => {
+    let filtered = batches;
+    if (selectedYear) {
+      filtered = filtered.filter(b => (b.date ? dayjs(b.date).year().toString() : dayjs().year().toString()) === selectedYear);
     }
-  };
-
-  const handleBatchChange = (batchId) => {
-    setSelectedBatchId(batchId);
-    const batch = batches.find(b => b._id === batchId);
-    if (batch?.categories?.length > 0) {
-      setSelectedCategoryId(batch.categories[0]._id);
-    } else {
-      setSelectedCategoryId("");
+    if (selectedBatchId) {
+      filtered = filtered.filter(b => (b._id || b.id) === selectedBatchId);
     }
+    return filtered;
+  }, [batches, selectedYear, selectedBatchId]);
+
+  const mergedCategories = useMemo(() => {
+    const map = new Map();
+    
+    filteredBatches.forEach(batch => {
+      batch.categories?.forEach(cat => {
+        const name = cat.categoryName;
+        if (!map.has(name)) {
+          map.set(name, {
+            categoryName: name,
+            images: [],
+            imagesByDayMap: new Map()
+          });
+        }
+        
+        const group = map.get(name);
+        const catImages = (cat.images || []).map(img => ({
+          ...img,
+          categoryName: name,
+          batchName: batch.batchName,
+          batchDate: batch.date
+        }));
+        
+        group.images.push(...catImages);
+        
+        const dateKey = batch.date ? dayjs(batch.date).format('YYYY-MM-DD') : 'unknown';
+        if (!group.imagesByDayMap.has(dateKey)) {
+          group.imagesByDayMap.set(dateKey, []);
+        }
+        group.imagesByDayMap.get(dateKey).push(...catImages);
+      });
+    });
+
+    return Array.from(map.values()).map(group => {
+      // Sort days descending
+      const days = Array.from(group.imagesByDayMap.entries())
+        .map(([date, imgs]) => ({ date, imgs }))
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      return {
+        ...group,
+        totalCount: group.images.length,
+        imagesByDay: days,
+        // One cover image per day for rotation
+        coverImages: days.map(d => d.imgs[0])
+      };
+    }).sort((a, b) => b.totalCount - a.totalCount);
+  }, [filteredBatches]);
+
+  console.log("Merged Categories:", mergedCategories);
+
+  const handleOpenCategory = (category) => {
+    setActiveImages(category.images);
+    setSliderIndex(0);
+    setShowLightbox(true);
   };
 
   const handleOpenLightbox = (images, index) => {
@@ -249,20 +261,9 @@ export default function OfficeGallery() {
     setShowLightbox(true);
   };
 
-  useEffect(() => {
-    if (!showLightbox) return;
-    const handleKeyDown = (e) => {
-      if (e.key === "ArrowLeft") setSliderIndex(i => (i - 1 + activeImages.length) % activeImages.length);
-      else if (e.key === "ArrowRight") setSliderIndex(i => (i + 1) % activeImages.length);
-      else if (e.key === "Escape") setShowLightbox(false);
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [showLightbox, activeImages]);
-
   return (
     <Box sx={{ minHeight: "80vh", bgcolor: COLORS.light, pb: 10 }}>
-      {/* Exact Header Alignment from Gallery.jsx */}
+      {/* Header Section */}
       <Box sx={{
         background: `linear-gradient(135deg, ${COLORS.dark} 0%, ${COLORS.primary} 100%)`,
         py: { xs: 8, md: 12 }, color: "white", textAlign: "center",
@@ -287,7 +288,7 @@ export default function OfficeGallery() {
             <Typography sx={{ color: "white", fontWeight: 800 }}>Office Gallery</Typography>
           </Breadcrumbs>
 
-          <Typography variant="h3" sx={{ fontWeight: 600, fontSize: { xs: "2.4rem", md: "3.2rem" }, mb: 2, lineHeight: 1.1 }}>
+          <Typography variant="h3" sx={{ fontWeight: 800, fontSize: { xs: "2.4rem", md: "3.2rem" }, mb: 2, lineHeight: 1.1, color: "white" }}>
             Office & Culture
           </Typography>
           
@@ -297,21 +298,34 @@ export default function OfficeGallery() {
         </Container>
       </Box>
 
-      {/* Filter Row - Exact Right Alignment from Gallery.jsx */}
-      <Container maxWidth="xl" sx={{ mb: 4 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 2 }}>
-          <Typography variant="subtitle2" sx={{ color: COLORS.textSecondary, fontWeight: 700, display: { xs: 'none', sm: 'block' } }}>
-            Filter by:
+      {/* Filters Section */}
+      <Container maxWidth="xl" sx={{ mb: 6 }}>
+        <Box sx={{ 
+          display: 'flex', 
+          flexDirection: { xs: 'column', md: 'row' },
+          justifyContent: 'space-between', 
+          alignItems: { xs: 'flex-start', md: 'center' }, 
+          gap: 3,
+          bgcolor: 'white',
+          p: 2,
+          borderRadius: 4,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.03)'
+        }}>
+          <Typography variant="h6" sx={{ fontWeight: 800, color: COLORS.textPrimary, display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Filter size={20} color={COLORS.primary} />
+            Browse Categories
           </Typography>
-          <Stack direction="row" spacing={2}>
+
+          <Stack direction="row" spacing={2} sx={{ width: { xs: '100%', md: 'auto' } }}>
             <StyledFormControl variant="outlined" size="small">
               <Select
                 value={selectedYear}
-                onChange={(e) => handleYearChange(e.target.value)}
+                onChange={(e) => { setSelectedYear(e.target.value); setSelectedBatchId(""); }}
                 displayEmpty
                 startAdornment={<CalIcon size={16} color={COLORS.primary} style={{ marginRight: 8 }} />}
                 IconComponent={() => <ChevronDown size={16} />}
               >
+                <MenuItem value="" sx={{ fontWeight: 600 }}>All Years</MenuItem>
                 {years.map(y => (
                   <MenuItem key={y} value={y} sx={{ fontWeight: 600 }}>Year {y}</MenuItem>
                 ))}
@@ -321,13 +335,14 @@ export default function OfficeGallery() {
             <StyledFormControl variant="outlined" size="small" sx={{ minWidth: 200 }}>
               <Select
                 value={selectedBatchId}
-                onChange={(e) => handleBatchChange(e.target.value)}
+                onChange={(e) => setSelectedBatchId(e.target.value)}
                 displayEmpty
                 startAdornment={<Layers size={16} color={COLORS.primary} style={{ marginRight: 8 }} />}
                 IconComponent={() => <ChevronDown size={16} />}
               >
+                <MenuItem value="" sx={{ fontWeight: 600 }}>All Batches</MenuItem>
                 {batchesInSelectedYear.map(b => (
-                  <MenuItem key={b._id} value={b._id} sx={{ fontWeight: 600 }}>
+                  <MenuItem key={b._id || b.id} value={b._id || b.id} sx={{ fontWeight: 600 }}>
                     {b.batchName}
                   </MenuItem>
                 ))}
@@ -337,88 +352,51 @@ export default function OfficeGallery() {
         </Box>
       </Container>
 
+      {/* Category Grid */}
       <Container maxWidth="xl">
-        {/* Horizontal Category Track */}
-        {currentBatch && (
-          <CategoryScrollContainer>
-            <CategoryTrack ref={scrollRef}>
-              {currentBatch.categories?.map((cat) => (
-                <CategoryPill
-                  key={cat._id}
-                  $active={selectedCategoryId === cat._id}
-                  onClick={() => setSelectedCategoryId(cat._id)}
-                >
-                  {cat.categoryName}
-                </CategoryPill>
-              ))}
-            </CategoryTrack>
-          </CategoryScrollContainer>
-        )}
-
-        {/* Image Gallery Grid - No Paper wrapper, direct Grid */}
         {loading ? (
-          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", py: 10 }}>
-            <CircularProgress size={50} thickness={5} sx={{ color: COLORS.primary }} />
+          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", py: 15 }}>
+            <CircularProgress size={60} thickness={4} sx={{ color: COLORS.primary }} />
+            <Typography sx={{ mt: 2, fontWeight: 700, color: COLORS.textSecondary }}>Loading Gallery...</Typography>
           </Box>
         ) : (
           <Box>
-            {currentCategory ? (
+            {mergedCategories.length > 0 ? (
               <Grid container spacing={4} sx={{ animation: `${fadeIn} 0.6s ease-out` }}>
-                {currentCategory.images?.map((img, i) => (
-                  <Grid item xs={6} sm={4} md={3} key={i}>
-                    <GlassCard onClick={() => handleOpenLightbox(currentCategory.images, i)}>
-                      <Box sx={{ position: 'relative', pt: '100%', overflow: 'hidden' }}>
-                        <CardMedia
-                          component="img"
-                          image={getImgUrl(img.url)}
-                          sx={{
-                            position: 'absolute', top: 0, left: 0,
-                            width: '100%', height: '100%',
-                            objectFit: 'cover', transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
-                          }}
-                        />
-                        <ImageOverlay className="overlay">
-                          <Typography sx={{ color: 'white', fontWeight: 800, fontSize: '0.85rem', mb: 0.5 }}>
-                            {currentCategory.categoryName}
-                          </Typography>
-                          <Typography sx={{ color: alpha('#ffffff', 0.8), fontSize: '0.7rem', fontWeight: 600, lineClamp: 1, display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                            {img.highlights?.[0] || "View Highlights"}
-                          </Typography>
-                        </ImageOverlay>
+                {mergedCategories.map((category, i) => (
+                  <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={category.categoryName}>
+                    <Fade in timeout={400 + i * 100}>
+                      <Box sx={{ height: '100%' }}>
+                        <CategoryCard category={category} onClick={handleOpenCategory} />
                       </Box>
-                    </GlassCard>
+                    </Fade>
                   </Grid>
                 ))}
-                {(!currentCategory.images || currentCategory.images.length === 0) && (
-                  <Grid item xs={12}>
-                    <Box sx={{ textAlign: "center", py: 12, bgcolor: "white", borderRadius: 8, border: '1px dashed #ced4cd' }}>
-                      <Typography variant="h6" color="text.secondary">No images found.</Typography>
-                    </Box>
-                  </Grid>
-                )}
               </Grid>
             ) : (
-              <Box sx={{ textAlign: "center", py: 12 }}>
-                <Typography color="text.secondary">Select a category to view images.</Typography>
+              <Box sx={{ textAlign: "center", py: 15, bgcolor: "white", borderRadius: 8, border: '1px dashed #ced4cd' }}>
+                <ImgIcon size={64} color="#ced4cd" style={{ marginBottom: 16 }} />
+                <Typography variant="h5" color="text.secondary" sx={{ fontWeight: 700 }}>No categories found.</Typography>
+                <Typography color="text.secondary">Try adjusting your filters.</Typography>
               </Box>
             )}
           </Box>
         )}
       </Container>
 
-      {/* Lightbox - Exact structure from Gallery.jsx */}
+
+      {/* Lightbox - Reused from previous version */}
       <Dialog
         open={showLightbox}
         onClose={() => setShowLightbox(false)}
         maxWidth="lg"
         fullWidth
         PaperProps={{
-          sx: { borderRadius: isMobile ? 0 : 4, overflow: "hidden", background: "white", boxShadow: "0 24px 60px rgba(0,0,0,0.15)" }
+          sx: { borderRadius: 4, overflow: "hidden", background: "white", boxShadow: "0 24px 60px rgba(0,0,0,0.15)" }
         }}
       >
         {activeImages.length > 0 && (
           <Box sx={{ display: "flex", flexDirection: { xs: "column-reverse", md: "row" }, minHeight: { md: 400 } }}>
-            {/* Info Section */}
             <Box sx={{
               width: { xs: "100%", md: "340px" }, p: 4,
               borderRight: { md: "1px solid rgba(0,0,0,0.06)" },
@@ -426,12 +404,12 @@ export default function OfficeGallery() {
             }}>
               <Box sx={{ mb: 3 }}>
                 <Stack direction="row" spacing={1} sx={{ mb: 1.5 }}>
-                  <Chip label={selectedYear} size="small" sx={{ fontWeight: 800, bgcolor: alpha(COLORS.primary, 0.1), color: COLORS.primary }} />
-                  <Chip label={currentCategory?.categoryName} size="small" sx={{ fontWeight: 800 }} />
+                  <Chip label={dayjs(activeImages[sliderIndex].batchDate).format('YYYY')} size="small" sx={{ fontWeight: 800, bgcolor: alpha(COLORS.primary, 0.1), color: COLORS.primary }} />
+                  <Chip label={activeImages[sliderIndex].categoryName} size="small" sx={{ fontWeight: 800 }} />
                 </Stack>
                 <Typography variant="h5" sx={{ fontWeight: 900, mb: 1, color: COLORS.textPrimary }}>Gallery Details</Typography>
                 <Typography variant="body2" sx={{ color: COLORS.textSecondary, fontWeight: 600 }}>
-                  Image {sliderIndex + 1} of {activeImages.length}
+                  {activeImages[sliderIndex].batchName} • {dayjs(activeImages[sliderIndex].batchDate).format('DD MMM YYYY')}
                 </Typography>
               </Box>
 
@@ -457,7 +435,6 @@ export default function OfficeGallery() {
               </Box>
             </Box>
 
-            {/* Viewport */}
             <Box sx={{ flex: 1, bgcolor: "#0f172a", position: "relative", display: "flex", alignItems: "center", justifyContent: "center", p: 2 }}>
               <Fade in key={sliderIndex} timeout={400}>
                 <Box
@@ -489,3 +466,17 @@ export default function OfficeGallery() {
     </Box>
   );
 }
+
+const AppBar = styled(Box)(({ theme }) => ({
+  backgroundColor: 'white',
+  position: 'sticky',
+  top: 0,
+  zIndex: theme.zIndex.appBar,
+}));
+
+const Toolbar = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  height: 80,
+  padding: '0 24px',
+}));
