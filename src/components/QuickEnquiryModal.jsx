@@ -21,6 +21,8 @@ import { PostRequest } from "../api/api";
 import { ADMIN_POST_ENQUIRIES } from "../api/endpoints";
 import toast from "react-hot-toast";
 import SuccessPopup from "./SuccessPopup";
+import ReCAPTCHA from "react-google-recaptcha";
+import { RECAPTCHA_SITE_KEY } from "../api/constants";
 
 const StyledDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialog-paper": {
@@ -67,6 +69,8 @@ export default function QuickEnquiryModal({ open, onClose, initialCourse = "", i
 
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState(null);
+  const captchaRef = React.useRef(null);
 
 
   useEffect(() => {
@@ -81,6 +85,10 @@ export default function QuickEnquiryModal({ open, onClose, initialCourse = "", i
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!captchaToken) {
+      toast.error("Please complete the reCAPTCHA");
+      return;
+    }
     setLoading(true);
 
     const { name, email, mobile, course, location, timeslot } = formData;
@@ -103,6 +111,8 @@ export default function QuickEnquiryModal({ open, onClose, initialCourse = "", i
         location: "Vadapalani",
         timeslot: "Morning",
       });
+      setCaptchaToken(null);
+      if (captchaRef.current) captchaRef.current.reset();
       // onClose will be called by SuccessPopup's timer or we can handle it here
       setTimeout(() => {
         setShowSuccess(false);
@@ -233,7 +243,13 @@ export default function QuickEnquiryModal({ open, onClose, initialCourse = "", i
                 </StyledTextField>
               </Stack>
 
-
+              <Box sx={{ display: 'flex', justifyContent: 'center', my: 1 }}>
+                <ReCAPTCHA
+                  ref={captchaRef}
+                  sitekey={RECAPTCHA_SITE_KEY}
+                  onChange={(token) => setCaptchaToken(token)}
+                />
+              </Box>
 
               <Button
                 type="submit"

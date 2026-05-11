@@ -10,6 +10,8 @@ import SpeedIcon from '@mui/icons-material/Speed';
 import GroupIcon from '@mui/icons-material/Group';
 import toast from "react-hot-toast";
 import SuccessPopup from "../../components/SuccessPopup";
+import ReCAPTCHA from "react-google-recaptcha";
+import { RECAPTCHA_SITE_KEY } from "../../api/constants";
 
 // Animations
 const fadeIn = keyframes`
@@ -130,6 +132,8 @@ export default function QuickEnquiry() {
 
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState(null);
+  const captchaRef = useRef(null);
 
 
   const handleChange = (e) => {
@@ -138,6 +142,12 @@ export default function QuickEnquiry() {
 
   const handleSubmit = async (e) => {
     if(e) e.preventDefault();
+    
+    if (!captchaToken) {
+      toast.error("Please complete the reCAPTCHA");
+      return;
+    }
+
     setLoading(true);
 
     const { name, email, mobile, course, location, timeslot } = formData;
@@ -165,6 +175,8 @@ export default function QuickEnquiry() {
         location: "Vadapalani",
         timeslot: "Morning",
       });
+      setCaptchaToken(null);
+      if (captchaRef.current) captchaRef.current.reset();
 
     } catch (err) {
       toast.error("Submission failed. Please try again.");
@@ -331,7 +343,13 @@ export default function QuickEnquiry() {
                     </Grid>
                   </Grid>
 
-
+                  <Box sx={{ display: 'flex', justifyContent: 'center', my: 1 }}>
+                    <ReCAPTCHA
+                      ref={captchaRef}
+                      sitekey={RECAPTCHA_SITE_KEY}
+                      onChange={(token) => setCaptchaToken(token)}
+                    />
+                  </Box>
 
                   <Button
                     type="submit"

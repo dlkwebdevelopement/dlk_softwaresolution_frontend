@@ -31,6 +31,8 @@ import { PostRequest } from "../../api/api";
 import { ADMIN_POST_REGISTRATIONS } from "../../api/endpoints";
 import { BASE_URL, getImgUrl } from "../../api/api";
 import toast from "react-hot-toast";
+import ReCAPTCHA from "react-google-recaptcha";
+import { RECAPTCHA_SITE_KEY } from "../../api/constants";
 
 /* ---------------- PRICING DATA ---------------- */
 
@@ -263,6 +265,8 @@ const PricingPlans = () => {
     phone: "",
     courseId: "",
   });
+  const [captchaToken, setCaptchaToken] = useState(null);
+  const captchaRef = React.useRef(null);
 
   useEffect(() => {
     AOS.init({
@@ -318,6 +322,10 @@ const PricingPlans = () => {
 
   /* ✅ SUBMIT */
   const handleSubmit = async () => {
+    if (!captchaToken) {
+      toast.error("Please complete the reCAPTCHA");
+      return;
+    }
     if (!formData.fullName.trim()) return toast.error("Full name is required");
     if (!formData.email.trim() || !validateEmail(formData.email)) return toast.error("Valid email is required");
     if (!formData.phone.trim() || formData.phone.length !== 10) return toast.error("Phone number must be 10 digits");
@@ -342,6 +350,8 @@ const PricingPlans = () => {
         phone: "",
         courseId: "",
       });
+      setCaptchaToken(null);
+      if (captchaRef.current) captchaRef.current.reset();
     } catch (err) {
       console.error(err);
       toast.error("Server error");
@@ -553,6 +563,14 @@ const PricingPlans = () => {
                     </MenuItem>
                   ))}
                 </TextField>
+
+                <Box sx={{ display: 'flex', justifyContent: 'center', my: 1 }}>
+                  <ReCAPTCHA
+                    ref={captchaRef}
+                    sitekey={RECAPTCHA_SITE_KEY}
+                    onChange={(token) => setCaptchaToken(token)}
+                  />
+                </Box>
               </Stack>
             </DialogContent>
 

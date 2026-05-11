@@ -32,6 +32,8 @@ import {
 } from "../../api/endpoints";
 import toast from "react-hot-toast";
 import SuccessPopup from "../../components/SuccessPopup";
+import ReCAPTCHA from "react-google-recaptcha";
+import { RECAPTCHA_SITE_KEY } from "../../api/constants";
 
 /* ---------------- DUMMY DATA ---------------- */
 
@@ -213,6 +215,8 @@ const ServicesCards = () => {
     courseId: "",
   });
   const [showSuccess, setShowSuccess] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState(null);
+  const captchaRef = React.useRef(null);
 
 
 
@@ -266,6 +270,10 @@ const ServicesCards = () => {
   };
 
   const handleSubmit = async () => {
+    if (!captchaToken) {
+      toast.error("Please complete the reCAPTCHA");
+      return;
+    }
     if (!formData.fullName.trim()) return toast.error("Full name is required");
     if (!formData.email.trim() || !validateEmail(formData.email)) return toast.error("Valid email is required");
     if (!formData.phone.trim() || formData.phone.length !== 10) return toast.error("Phone number must be 10 digits");
@@ -290,6 +298,8 @@ const ServicesCards = () => {
           setShowSuccess(false);
           handleClose();
         }, 2000);
+        setCaptchaToken(null);
+        if (captchaRef.current) captchaRef.current.reset();
       } else {
         toast.error(data.message || "Submission failed");
       }
@@ -476,6 +486,14 @@ const ServicesCards = () => {
                     <CheckCircleIcon fontSize="small" />
                     {selectedService.title} Inquiry
                   </Typography>
+                </Box>
+
+                <Box sx={{ display: 'flex', justifyContent: 'center', my: 1 }}>
+                  <ReCAPTCHA
+                    ref={captchaRef}
+                    sitekey={RECAPTCHA_SITE_KEY}
+                    onChange={(token) => setCaptchaToken(token)}
+                  />
                 </Box>
               </Stack>
             </DialogContent>

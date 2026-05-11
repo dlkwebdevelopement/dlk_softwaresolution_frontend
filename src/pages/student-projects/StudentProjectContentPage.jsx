@@ -33,6 +33,8 @@ import { getImgUrl } from "../../api/api";
 import SendIcon from '@mui/icons-material/Send';
 import toast from "react-hot-toast";
 import SuccessPopup from "../../components/SuccessPopup";
+import ReCAPTCHA from "react-google-recaptcha";
+import { RECAPTCHA_SITE_KEY } from "../../api/constants";
 import AOS from "aos";
 import "aos/dist/aos.css";
 
@@ -55,6 +57,8 @@ export default function StudentProjectContentPage() {
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState(null);
+  const captchaRef = useRef(null);
   const [cats, setCats] = useState([]);
 
   // Auto-scroll logic array
@@ -140,6 +144,10 @@ export default function StudentProjectContentPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!captchaToken) {
+      toast.error("Please complete the reCAPTCHA");
+      return;
+    }
     const { name, email, mobile, course, location, timeslot } = formData;
     
     if (!name.trim()) return toast.error("Name is required");
@@ -161,7 +169,8 @@ export default function StudentProjectContentPage() {
           location: "",
           timeslot: "",
         });
-
+        setCaptchaToken(null);
+        if (captchaRef.current) captchaRef.current.reset();
       } else {
         toast.error(data.message || "Submission failed");
       }
@@ -512,8 +521,13 @@ export default function StudentProjectContentPage() {
                         }}
                       />
                     </Stack>
-
-
+                    <Box sx={{ display: 'flex', justifyContent: 'center', my: 1 }}>
+                      <ReCAPTCHA
+                        ref={captchaRef}
+                        sitekey={RECAPTCHA_SITE_KEY}
+                        onChange={(token) => setCaptchaToken(token)}
+                      />
+                    </Box>
 
                     <Button
                       type="submit"

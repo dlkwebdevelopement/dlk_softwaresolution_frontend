@@ -52,6 +52,8 @@ import {
 } from "../../api/endpoints";
 import { BASE_URL, getImgUrl } from "../../api/api";
 import toast from "react-hot-toast";
+import ReCAPTCHA from "react-google-recaptcha";
+import { RECAPTCHA_SITE_KEY } from "../../api/constants";
 
 // Animations
 const floatAnimation = keyframes`
@@ -218,6 +220,8 @@ const Ads = () => {
     phone: "",
     courseId: "",
   });
+  const [captchaToken, setCaptchaToken] = useState(null);
+  const captchaRef = React.useRef(null);
 
   // Calculate gaps for different breakpoints
   const GAP_MOBILE = 8;
@@ -308,6 +312,10 @@ const Ads = () => {
   };
 
   const handleSubmit = async () => {
+    if (!captchaToken) {
+      toast.error("Please complete the reCAPTCHA");
+      return;
+    }
     // Validation Checks
     if (!formData.fullName.trim()) return toast.error("Full name is required");
     if (!formData.email.trim() || !validateEmail(formData.email)) return toast.error("Please enter a valid email address");
@@ -327,6 +335,8 @@ const Ads = () => {
 
       handleClose();
       setFormData({ fullName: "", email: "", phone: "", courseId: "" });
+      setCaptchaToken(null);
+      if (captchaRef.current) captchaRef.current.reset();
     } catch (err) {
       console.error(err);
       toast.error("Server error");
@@ -994,6 +1004,14 @@ const Ads = () => {
                     ))}
                   </Box>
                 </Paper>
+
+                <Box sx={{ display: 'flex', justifyContent: 'center', my: 1 }}>
+                  <ReCAPTCHA
+                    ref={captchaRef}
+                    sitekey={RECAPTCHA_SITE_KEY}
+                    onChange={(token) => setCaptchaToken(token)}
+                  />
+                </Box>
               </Box>
             </DialogContent>
 

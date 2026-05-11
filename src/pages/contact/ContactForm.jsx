@@ -29,6 +29,8 @@ import { PostRequest } from "../../api/api";
 import { ADMIN_POST_CONTACT } from "../../api/endpoints";
 import toast from "react-hot-toast";
 import SuccessPopup from "../../components/SuccessPopup";
+import ReCAPTCHA from "react-google-recaptcha";
+import { RECAPTCHA_SITE_KEY } from "../../api/constants";
 
 // Animations
 const fadeIn = keyframes`
@@ -203,6 +205,9 @@ export default function ContactForm() {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
+  const [captchaToken, setCaptchaToken] = useState(null);
+  const captchaRef = useRef(null);
+
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
 
   const validateForm = () => {
@@ -237,6 +242,11 @@ export default function ContactForm() {
     e.preventDefault();
     if (!validateForm()) return;
 
+    if (!captchaToken) {
+      toast.error("Please complete the reCAPTCHA");
+      return;
+    }
+
 
     setIsSubmitting(true);
     try {
@@ -254,6 +264,8 @@ export default function ContactForm() {
         setTimeout(() => setShowSuccess(false), 2000);
 
         setFormData({ firstName: "", lastName: "", email: "", phone: "", message: "", acceptTerms: true });
+        setCaptchaToken(null);
+        if (captchaRef.current) captchaRef.current.reset();
       } else {
         setSnackbar({ open: true, message: response?.message || response?.error || "Transmission failed", severity: "error" });
       }
@@ -404,6 +416,14 @@ export default function ContactForm() {
                   {errors.acceptTerms && (
                     <Typography color="error" sx={{ fontSize: "11px", mt: 0.5, fontWeight: 600, uppercase: true }}>{errors.acceptTerms}</Typography>
                   )}
+                </Box>
+
+                <Box sx={{ display: 'flex', justifyContent: 'center', my: 1 }}>
+                  <ReCAPTCHA
+                    ref={captchaRef}
+                    sitekey={RECAPTCHA_SITE_KEY}
+                    onChange={(token) => setCaptchaToken(token)}
+                  />
                 </Box>
 
                 <PremiumButton

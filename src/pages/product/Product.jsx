@@ -13,6 +13,8 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import QuickEnquiryModal from "../../components/QuickEnquiryModal";
+import ReCAPTCHA from "react-google-recaptcha";
+import { RECAPTCHA_SITE_KEY } from "../../api/constants";
 
 const Product = () => {
   const { slug } = useParams();
@@ -23,9 +25,15 @@ const Product = () => {
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [openEnquiry, setOpenEnquiry] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState(null);
+  const captchaRef = useState(null);
 
   const handleDownloadSubmit = async (e) => {
     e.preventDefault();
+    if (!captchaToken) {
+      toast.error("Please complete the reCAPTCHA");
+      return;
+    }
     const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     if (!email.trim() || !validateEmail(email)) return toast.error("Please enter a valid email");
 
@@ -42,6 +50,7 @@ const Product = () => {
       toast.success("Curriculum PDF sent to your email successfully!");
       setOpenDownloadDialog(false);
       setEmail("");
+      setCaptchaToken(null);
     } catch (err) {
       console.error(err);
       toast.error("Failed to process request. Please try again.");
@@ -415,6 +424,13 @@ const Product = () => {
         <form onSubmit={handleDownloadSubmit}>
           <DialogContent sx={{ p: 4, pt: 5 }}>
             <TextField label="Your Email Address *" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required fullWidth sx={{ "& .MuiOutlinedInput-root": { borderRadius: '12px' } }} />
+            
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+              <ReCAPTCHA
+                sitekey={RECAPTCHA_SITE_KEY}
+                onChange={(token) => setCaptchaToken(token)}
+              />
+            </Box>
           </DialogContent>
           <DialogActions sx={{ p: 4, pt: 0, justifyContent: 'flex-end', gap: 1 }}>
             <Button onClick={() => setOpenDownloadDialog(false)} sx={{ color: '#64748b', fontWeight: 600 }}>Cancel</Button>

@@ -5,6 +5,8 @@ import { PostRequest } from "../../api/api";
 import { ADMIN_POST_ENQUIRIES } from "../../api/endpoints";
 import SendIcon from '@mui/icons-material/Send';
 import SuccessPopup from "../../components/SuccessPopup";
+import ReCAPTCHA from "react-google-recaptcha";
+import { RECAPTCHA_SITE_KEY } from "../../api/constants";
 
 
 // Animations
@@ -63,6 +65,8 @@ export default function EnquiryFormAlone() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+  const [captchaToken, setCaptchaToken] = useState(null);
+  const captchaRef = useRef(null);
 
 
   const validateEmail = (email) => {
@@ -85,6 +89,10 @@ export default function EnquiryFormAlone() {
 
 
   const handleSubmit = async () => {
+    if (!captchaToken) {
+      setError("Please complete the reCAPTCHA");
+      return;
+    }
     setLoading(true);
     setError("");
     setSuccess("");
@@ -125,6 +133,8 @@ export default function EnquiryFormAlone() {
         location: "",
         timeslot: "",
       });
+      setCaptchaToken(null);
+      if (captchaRef.current) captchaRef.current.reset();
 
     } catch (err) {
       setError("Failed to submit enquiry: " + err.message);
@@ -218,7 +228,13 @@ export default function EnquiryFormAlone() {
           </Typography>
         )}
 
-
+        <Box sx={{ display: 'flex', justifyContent: 'center', my: 1 }}>
+          <ReCAPTCHA
+            ref={captchaRef}
+            sitekey={RECAPTCHA_SITE_KEY}
+            onChange={(token) => setCaptchaToken(token)}
+          />
+        </Box>
 
         <Button
           onClick={handleSubmit}

@@ -36,6 +36,8 @@ import {
 import { BASE_URL, getImgUrl } from "../../api/api";
 import toast from "react-hot-toast";
 import QuickEnquiryModal from "../../components/QuickEnquiryModal";
+import ReCAPTCHA from "react-google-recaptcha";
+import { RECAPTCHA_SITE_KEY } from "../../api/constants";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
@@ -57,6 +59,8 @@ const CourseOverviewSection = () => {
     rating: 5,
     review: ""
   });
+  const [captchaToken, setCaptchaToken] = useState(null);
+  const captchaRef = React.useRef(null);
 
   // Icon mapping for dynamic courseIncludes
   const iconMap = {
@@ -135,6 +139,10 @@ const CourseOverviewSection = () => {
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
+    if (!captchaToken) {
+      toast.error("Please complete the reCAPTCHA");
+      return;
+    }
     if (!reviewForm.student_name || !reviewForm.review) return toast.error("Please fill all fields");
 
     const payload = {
@@ -150,6 +158,8 @@ const CourseOverviewSection = () => {
       toast.success("Thank you for your review!");
       setOpenReviewModal(false);
       setReviewForm({ student_name: "", rating: 5, review: "" });
+      setCaptchaToken(null);
+      if (captchaRef.current) captchaRef.current.reset();
       fetchCourse(); // Refresh data
     } catch (err) {
       console.error(err);
@@ -1075,6 +1085,14 @@ const CourseOverviewSection = () => {
                 onChange={(e) => setReviewForm({ ...reviewForm, review: e.target.value })}
                 sx={{ "& .MuiOutlinedInput-root": { borderRadius: '12px' } }}
               />
+
+              <Box sx={{ display: 'flex', justifyContent: 'center', my: 1 }}>
+                <ReCAPTCHA
+                  ref={captchaRef}
+                  sitekey={RECAPTCHA_SITE_KEY}
+                  onChange={(token) => setCaptchaToken(token)}
+                />
+              </Box>
 
               <Box sx={{ display: 'flex', gap: 2, pt: 2 }}>
                 <Button 
