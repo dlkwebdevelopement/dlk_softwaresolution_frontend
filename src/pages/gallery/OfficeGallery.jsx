@@ -1,293 +1,270 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import {
-  Box, Typography, Container, Grid, Card, CardMedia, CardContent,
+  Box, Typography, Container, Grid, Card, CardMedia,
   IconButton, Dialog, Chip, Stack, Fade, CircularProgress,
   Paper, Breadcrumbs, Link, Button, alpha,
-  MenuItem, Select, FormControl, InputLabel, InputAdornment
+  MenuItem, Select, FormControl, InputLabel, InputAdornment,
+  useTheme, useMediaQuery
 } from "@mui/material";
 import { styled, keyframes } from "@mui/material/styles";
 import {
-  X, Image as ImgIcon, Calendar as CalIcon, Building2 as CollegeIcon,
-  ArrowRight as RightIcon, ArrowLeft as LeftIcon,
-  FolderOpen as FolderIcon, ChevronRight as ChevronIcon,
-  Clock, Share2
+  X, Image as ImgIcon, Calendar as CalIcon,
+  ChevronRight as ChevronIcon, ChevronLeft as LeftIcon,
+  Clock, Share2, Info, Check, Filter, Layers,
+  ChevronDown, ArrowRight as RightIcon
 } from "lucide-react";
 import { GetRequest } from "../../api/api";
-import { GET_ALL_OFFICE_GALLERY, GET_ALL_OFFICE_GALLERY_EVENTS } from "../../api/endpoints";
+import { GET_ALL_OFFICE_GALLERY } from "../../api/endpoints";
 import dayjs from "dayjs";
 import { getImgUrl } from "../../api/api";
 
-// Animations
+// --- Animations ---
+const fadeIn = keyframes`from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); }`;
 const shimmer = keyframes`0%{transform:translateX(-100%)}100%{transform:translateX(100%)}`;
 const rotateGradient = keyframes`0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}`;
 
-// Color Palette
+// --- Color Palette (Exact match with Gallery.jsx) ---
 const COLORS = {
   primary: "#3DB843",
   dark: "#1a4718",
-  light: "#f0fbf0",
+  light: "#f8faf7",
   textPrimary: "#1e293b",
-  textSecondary: "#64748b"
+  textSecondary: "#64748b",
+  border: "rgba(61,184,67,0.2)"
 };
-const colors = COLORS;
 
-// Styled Components
-const GlassCard = styled(({ $hovered, ...p }) => <Paper {...p} />)(({ $hovered }) => ({
-  background: "rgba(255,255,255,0.85)",
-  backdropFilter: "blur(10px)",
-  border: `1px solid ${$hovered ? "rgba(61,184,67,0.8)" : "rgba(61,184,67,0.25)"}`,
-  borderRadius: 24,
-  overflow: "hidden",
-  display: "flex",
-  flexDirection: "column",
-  height: "100%",
-  transition: "all 0.4s cubic-bezier(0.4,0,0.2,1)",
-  transform: $hovered ? "translateY(-10px)" : "translateY(0)",
-  boxShadow: $hovered ? "0 20px 40px rgba(61,184,67,0.25)" : "0 10px 30px rgba(0,0,0,0.05)",
-  "&::after": {
-    content: '""',
-    position: "absolute",
-    top: 0, left: "-100%",
-    width: "100%", height: "100%",
-    background: "linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent)",
-    animation: $hovered ? `${shimmer} 2s infinite` : "none",
-    pointerEvents: "none",
+// --- Styled Components ---
+
+const StyledFormControl = styled(FormControl)(({ theme }) => ({
+  minWidth: 160,
+  '& .MuiOutlinedInput-root': {
+    borderRadius: '12px',
+    backgroundColor: 'white',
+    fontSize: '0.9rem',
+    fontWeight: 750,
+    color: COLORS.dark,
+    transition: 'all 0.3s ease',
+    '& fieldset': { borderColor: 'rgba(0,0,0,0.1)' },
+    '&:hover fieldset': { borderColor: COLORS.primary },
+    '&.Mui-focused fieldset': { borderColor: COLORS.primary },
   },
+  '& .MuiSelect-select': {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '8px 14px',
+  }
 }));
 
-const IconBox = styled(Box)({
-  display: "flex", alignItems: "center", justifyContent: "center",
-  width: 36, height: 36, borderRadius: 12,
-  background: "#f0fbf0", color: "#2e9133",
-  transition: "all 0.3s ease",
+const CategoryScrollContainer = styled(Box)(({ theme }) => ({
+  position: 'relative',
+  marginBottom: theme.spacing(6),
+  '&::after': {
+    content: '""',
+    position: 'absolute',
+    right: 0, top: 0, bottom: 0,
+    width: '40px',
+    background: `linear-gradient(to left, ${COLORS.light}, transparent)`,
+    pointerEvents: 'none',
+    zIndex: 2,
+  }
+}));
+
+const CategoryTrack = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  gap: theme.spacing(2),
+  overflowX: 'auto',
+  scrollBehavior: 'smooth',
+  msOverflowStyle: 'none',
+  scrollbarWidth: 'none',
+  padding: theme.spacing(1, 0),
+  '&::-webkit-scrollbar': { display: 'none' },
+  whiteSpace: 'nowrap',
+}));
+
+const CategoryPill = styled(Box, {
+  shouldForwardProp: (prop) => prop !== '$active'
+})(({ $active }) => ({
+  padding: '10px 22px',
+  borderRadius: '12px',
+  fontSize: '0.85rem',
+  fontWeight: 800,
+  cursor: 'pointer',
+  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+  userSelect: 'none',
+  border: `1px solid ${$active ? COLORS.primary : "rgba(0,0,0,0.08)"}`,
+  backgroundColor: $active ? COLORS.primary : 'white',
+  color: $active ? 'white' : COLORS.textSecondary,
+  boxShadow: $active ? `0 8px 16px ${alpha(COLORS.primary, 0.2)}` : '0 2px 4px rgba(0,0,0,0.02)',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+  '&:hover': {
+    transform: 'translateY(-1px)',
+    borderColor: COLORS.primary,
+    color: $active ? 'white' : COLORS.primary,
+  }
+}));
+
+const GlassCard = styled(Card)(({ theme }) => ({
+  background: "rgba(255,255,255,0.85)",
+  backdropFilter: "blur(10px)",
+  border: `1px solid rgba(61,184,67,0.25)`,
+  borderRadius: 24,
+  overflow: "hidden",
+  cursor: "zoom-in",
+  position: "relative",
+  transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+  height: "100%",
+  boxShadow: "0 10px 30px rgba(0,0,0,0.05)",
+  '&:hover': {
+    transform: "translateY(-10px)",
+    boxShadow: "0 20px 40px rgba(61,184,67,0.25)",
+    borderColor: "rgba(61,184,67,0.8)",
+    '& img': { transform: 'scale(1.1)' },
+    '& .overlay': { opacity: 1 },
+    "&::after": {
+      content: '""',
+      position: "absolute",
+      top: 0, left: "-100%",
+      width: "100%", height: "100%",
+      background: "linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent)",
+      animation: `${shimmer} 2s infinite`,
+      pointerEvents: "none",
+      zIndex: 2
+    },
+  }
+}));
+
+const ImageOverlay = styled(Box)({
+  position: 'absolute',
+  inset: 0,
+  background: 'linear-gradient(180deg, transparent 30%, rgba(20, 53, 18, 0.85) 100%)',
+  opacity: 0,
+  transition: 'opacity 0.4s ease',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'flex-end',
+  padding: '20px',
+  zIndex: 1,
 });
 
-// ─── Album Card ────────────────────────────────────────────────────────────────
-function AlbumCard({ album, onSelect }) {
-  const [hovered, setHovered] = useState(false);
-  return (
-    <GlassCard
-      $hovered={hovered}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onClick={() => onSelect(album)}
-      sx={{ cursor: "pointer" }}
-    >
-      <Box sx={{ position: "relative", overflow: "hidden", height: 280 }}>
-        {album.thumbnail ? (
-          <CardMedia
-            component="img"
-            image={getImgUrl(album.thumbnail)}
-            alt={album.albumName}
-            sx={{
-              width: "100%", height: "100%", objectFit: "cover",
-              transition: "transform 0.6s cubic-bezier(0.4,0,0.2,1)",
-              transform: hovered ? "scale(1.1)" : "scale(1)",
-            }}
-          />
-        ) : (
-          <Box sx={{
-            width: "100%", height: "100%",
-            background: `linear-gradient(135deg, ${COLORS.light} 0%, #fff 100%)`,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            opacity: 0.8
-          }}>
-            <ImgIcon size={48} color={COLORS.primary} style={{ opacity: 0.4 }} />
-          </Box>
-        )}
-        <Box sx={{
-          position: "absolute", inset: 0,
-          background: "linear-gradient(180deg,transparent 30%,rgba(20,53,18,0.85) 100%)",
-          opacity: hovered ? 1 : 0.75, transition: "opacity 0.4s ease",
-        }} />
-        <Box sx={{ position: "absolute", bottom: 24, left: 24, right: 24 }}>
-          <Typography variant="h5" sx={{ color: "white", fontWeight: 800, mb: 0.5, letterSpacing: "-0.5px" }}>
-            {album.albumName}
-          </Typography>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1, color: "rgba(255,255,255,0.85)" }}>
-            <Typography variant="body2" sx={{ fontWeight: 600 }}>View Events</Typography>
-            <RightIcon size={16} />
-          </Box>
-        </Box>
-      </Box>
-    </GlassCard>
-  );
-}
-
-// ─── Event Card ────────────────────────────────────────────────────────────────
-function EventCard({ event, onSelect }) {
-  const [hovered, setHovered] = useState(false);
-  return (
-    <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
-      <Fade in timeout={300}>
-        <Box>
-          <GlassCard
-            $hovered={hovered}
-            onMouseEnter={() => setHovered(true)}
-            onMouseLeave={() => setHovered(false)}
-            onClick={() => onSelect(event)}
-            sx={{ cursor: "pointer" }}
-          >
-            <Box sx={{ position: "relative", overflow: "hidden", height: 220 }}>
-              {event.mainImage ? (
-                <CardMedia
-                  component="img"
-                  image={getImgUrl(event.mainImage)}
-                  alt={event.title}
-                  sx={{
-                    width: "100%", height: "100%", objectFit: "cover",
-                    transition: "transform 0.6s cubic-bezier(0.4,0,0.2,1)",
-                    transform: hovered ? "scale(1.1) rotate(1deg)" : "scale(1)",
-                  }}
-                />
-              ) : (
-                <Box sx={{
-                  width: "100%", height: "100%",
-                  background: `linear-gradient(135deg, ${COLORS.light} 0%, #fff 100%)`,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                }}>
-                  <ImgIcon size={40} color={COLORS.primary} style={{ opacity: 0.4 }} />
-                </Box>
-              )}
-              <Box sx={{
-                position: "absolute", inset: 0,
-                background: "linear-gradient(180deg,transparent 0%,rgba(0,0,0,0.45) 100%)",
-                opacity: hovered ? 0.85 : 0.45, transition: "opacity 0.4s ease",
-              }} />
-              <Box sx={{ position: "absolute", bottom: 14, right: 14 }}>
-                <Chip
-                  label={`${(event.galleryImages?.length || 0) + (event.mainImage ? 1 : 0)} Photos`}
-                  size="small"
-                  sx={{ bgcolor: "rgba(0,0,0,0.6)", color: "white", backdropFilter: "blur(4px)", fontWeight: 600, fontSize: "0.65rem" }}
-                />
-              </Box>
-            </Box>
-
-            <CardContent sx={{ p: 3, flexGrow: 1, display: "flex", flexDirection: "column" }}>
-              <Typography variant="h6" sx={{
-                fontWeight: 700, fontSize: "1.1rem", mb: 2, color: "#1e293b",
-                lineHeight: 1.4, minHeight: "3em",
-                display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden",
-              }}>
-                {event.title}
-              </Typography>
-
-              <Stack spacing={1.5} sx={{ mb: 3 }}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                  <IconBox><CalIcon size={17} /></IconBox>
-                  <Box>
-                    <Typography variant="caption" color="text.secondary" sx={{ display: "block", fontWeight: 500 }}>Date</Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 600, color: "#334155" }}>
-                      {dayjs(event.eventDate).format("DD MMM, YYYY")}
-                    </Typography>
-                  </Box>
-                </Box>
-              </Stack>
-
-            </CardContent>
-          </GlassCard>
-        </Box>
-      </Fade>
-    </Grid>
-  );
-}
-
-// ─── Main Office Gallery Page ─────────────────────────────────────────────────────────
+// --- Main Page Component ---
 export default function OfficeGallery() {
-  const location = useLocation();
-  const [albums, setAlbums] = useState([]);
-  const [events, setEvents] = useState([]);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const scrollRef = useRef(null);
+
+  const [batches, setBatches] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedAlbum, setSelectedAlbum] = useState(null);
-  const [activeEvent, setActiveEvent] = useState(null);
+  
+  const [selectedYear, setSelectedYear] = useState("");
+  const [selectedBatchId, setSelectedBatchId] = useState("");
+  const [selectedCategoryId, setSelectedCategoryId] = useState("");
+  
+  const [showLightbox, setShowLightbox] = useState(false);
   const [sliderIndex, setSliderIndex] = useState(0);
-  const [selectedYear, setSelectedYear] = useState("All");
-
-  const availableYears = useMemo(() => {
-    if (!events || events.length === 0) return [];
-    const years = events.map(e => dayjs(e.eventDate).year());
-    return [...new Set(years)].sort((a, b) => b - a);
-  }, [events]);
-
-  const allImages = useMemo(() => {
-    if (!activeEvent) return [];
-    // Only show the gallery images in the carousel (exclude the main image shown on the card)
-    const mainImg = activeEvent.mainImage;
-    return (activeEvent.galleryImages || []).filter(img => img && img !== mainImg);
-  }, [activeEvent]);
-
-  const total = allImages.length;
-
-  useEffect(() => {
-    setSliderIndex(0);
-  }, [activeEvent]);
-
-  const openEvent = useCallback((event) => {
-    setActiveEvent(event);
-  }, []);
-
-  const closeModal = useCallback(() => {
-    setActiveEvent(null);
-  }, []);
+  const [activeImages, setActiveImages] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [albumRes, eventRes] = await Promise.all([
-          GetRequest(GET_ALL_OFFICE_GALLERY),
-          GetRequest(GET_ALL_OFFICE_GALLERY_EVENTS),
-        ]);
-        setAlbums(albumRes || []);
-        const eventData = eventRes?.data || [];
-        setEvents(eventData);
+        const res = await GetRequest(GET_ALL_OFFICE_GALLERY);
+        const data = res.success ? res.data : res;
+        const batchesData = Array.isArray(data) ? data : [];
+        setBatches(batchesData);
 
-        // Auto-select album if passed from navigation state
-        if (location.state?.album) {
-          const albumFromState = location.state.album;
-          const matchingAlbum = (albumRes || []).find(a => a.id === albumFromState.id);
-          setSelectedAlbum(matchingAlbum || albumFromState);
+        if (batchesData.length > 0) {
+          const years = [...new Set(batchesData.map(b => b.date ? dayjs(b.date).year().toString() : dayjs().year().toString()))].sort((a, b) => b - a);
+          const latestYear = years[0];
+          setSelectedYear(latestYear);
+
+          const batchesInYear = batchesData.filter(b => (b.date ? dayjs(b.date).year().toString() : dayjs().year().toString()) === latestYear);
+          const sortedBatches = [...batchesInYear].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+          const latestBatch = sortedBatches[0];
+          
+          if (latestBatch) {
+            setSelectedBatchId(latestBatch._id);
+            if (latestBatch.categories?.length > 0) {
+              setSelectedCategoryId(latestBatch.categories[0]._id);
+            }
+          }
         }
       } catch (err) {
-        console.error("Office Gallery fetch error:", err);
+        console.error("Gallery Fetch Error:", err);
       } finally {
         setLoading(false);
       }
     };
     fetchData();
-  }, [location.state]);
+  }, []);
 
+  const years = useMemo(() => {
+    return [...new Set(batches.map(b => b.date ? dayjs(b.date).year().toString() : dayjs().year().toString()))].sort((a, b) => b - a);
+  }, [batches]);
 
-  const filteredEvents = useMemo(() => {
-    let result = events;
-    if (selectedAlbum) {
-      result = result.filter(e =>
-        e.categoryId?._id === selectedAlbum.id ||
-        e.categoryId?.albumName === selectedAlbum.albumName
-      );
+  const batchesInSelectedYear = useMemo(() => {
+    return batches
+      .filter(b => (b.date ? dayjs(b.date).year().toString() : dayjs().year().toString()) === selectedYear)
+      .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+  }, [batches, selectedYear]);
+
+  const currentBatch = useMemo(() => {
+    return batches.find(b => b._id === selectedBatchId);
+  }, [batches, selectedBatchId]);
+
+  const currentCategory = useMemo(() => {
+    return currentBatch?.categories?.find(c => c._id === selectedCategoryId);
+  }, [currentBatch, selectedCategoryId]);
+
+  const handleYearChange = (year) => {
+    setSelectedYear(year);
+    const inYear = batches.filter(b => (b.date ? dayjs(b.date).year().toString() : dayjs().year().toString()) === year);
+    const latest = [...inYear].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))[0];
+    if (latest) {
+      setSelectedBatchId(latest._id);
+      if (latest.categories?.length > 0) {
+        setSelectedCategoryId(latest.categories[0]._id);
+      } else {
+        setSelectedCategoryId("");
+      }
     }
-    if (selectedYear && selectedYear !== "All") {
-      result = result.filter(e => dayjs(e.eventDate).year().toString() === selectedYear.toString());
-    }
-    return result;
-  }, [events, selectedAlbum, selectedYear]);
+  };
 
-  const filteredAlbums = useMemo(() => {
-    if (!selectedYear || selectedYear === "All") return albums;
-    const albumsWithEventsInYear = new Set(
-      events
-        .filter(e => dayjs(e.eventDate).year().toString() === selectedYear.toString())
-        .map(e => e.categoryId?._id || e.categoryId?.albumName)
-    );
-    return albums.filter(a => albumsWithEventsInYear.has(a.id) || albumsWithEventsInYear.has(a.albumName));
-  }, [albums, events, selectedYear]);
+  const handleBatchChange = (batchId) => {
+    setSelectedBatchId(batchId);
+    const batch = batches.find(b => b._id === batchId);
+    if (batch?.categories?.length > 0) {
+      setSelectedCategoryId(batch.categories[0]._id);
+    } else {
+      setSelectedCategoryId("");
+    }
+  };
+
+  const handleOpenLightbox = (images, index) => {
+    setActiveImages(images);
+    setSliderIndex(index);
+    setShowLightbox(true);
+  };
+
+  useEffect(() => {
+    if (!showLightbox) return;
+    const handleKeyDown = (e) => {
+      if (e.key === "ArrowLeft") setSliderIndex(i => (i - 1 + activeImages.length) % activeImages.length);
+      else if (e.key === "ArrowRight") setSliderIndex(i => (i + 1) % activeImages.length);
+      else if (e.key === "Escape") setShowLightbox(false);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [showLightbox, activeImages]);
 
   return (
-    <Box sx={{ minHeight: "80vh", bgcolor: "#f8faf7", pb: 10 }}>
-      {/* Header */}
+    <Box sx={{ minHeight: "80vh", bgcolor: COLORS.light, pb: 10 }}>
+      {/* Exact Header Alignment from Gallery.jsx */}
       <Box sx={{
-        background: `linear-gradient(135deg,${COLORS.dark} 0%,${COLORS.primary} 100%)`,
+        background: `linear-gradient(135deg, ${COLORS.dark} 0%, ${COLORS.primary} 100%)`,
         py: { xs: 8, md: 12 }, color: "white", textAlign: "center",
         mb: 6, position: "relative", overflow: "hidden",
       }}>
@@ -304,202 +281,204 @@ export default function OfficeGallery() {
             separator={<ChevronIcon size={14} color="rgba(255,255,255,0.7)" />}
             sx={{ justifyContent: "center", display: "flex", mb: 2, "& *": { color: "rgba(255,255,255,0.8)" } }}
           >
-            <Link underline="hover" onClick={() => setSelectedAlbum(null)}
-              sx={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 0.5, fontWeight: 600 }}>
-              <FolderIcon size={14} /> Office Gallery
+            <Link underline="hover" color="inherit" href="/" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontWeight: 600 }}>
+               Home
             </Link>
-            {selectedAlbum && (
-              <Typography sx={{ color: "white", fontWeight: 800 }}>{selectedAlbum.albumName}</Typography>
-            )}
+            <Typography sx={{ color: "white", fontWeight: 800 }}>Office Gallery</Typography>
           </Breadcrumbs>
 
-          <Typography variant="h3" sx={{ fontWeight: 600, fontSize: { xs: "2.4rem", md: "3.8rem" }, mb: 2, lineHeight: 1.1 }} color="white">
-            {selectedAlbum ? selectedAlbum.albumName : "Office & Culture"}
+          <Typography variant="h3" sx={{ fontWeight: 600, fontSize: { xs: "2.4rem", md: "3.2rem" }, mb: 2, lineHeight: 1.1 }}>
+            Office & Culture
           </Typography>
-
-          {selectedAlbum && (
-            <Button
-              startIcon={<LeftIcon size={17} />}
-              onClick={() => setSelectedAlbum(null)}
-              variant="outlined"
-              sx={{ color: "white", borderColor: "rgba(255,255,255,0.5)", borderRadius: 3, fontWeight: 700, "&:hover": { borderColor: "white", bgcolor: "rgba(255,255,255,0.1)" } }}
-            >
-              Back to Albums
-            </Button>
-          )}
+          
+          <Typography variant="body1" sx={{ opacity: 0.9, fontWeight: 500, maxWidth: 600, mx: 'auto' }}>
+            A visual journey through our professional milestones and team celebrations.
+          </Typography>
         </Container>
       </Box>
 
-      {/* Year Filter Dropdown */}
-      <Container maxWidth="xl" sx={{ mb: 6 }}>
+      {/* Filter Row - Exact Right Alignment from Gallery.jsx */}
+      <Container maxWidth="xl" sx={{ mb: 4 }}>
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 2 }}>
-           <Typography variant="subtitle2" sx={{ color: COLORS.textSecondary, fontWeight: 700, display: { xs: 'none', sm: 'block' } }}>
-            Browse by Year:
+          <Typography variant="subtitle2" sx={{ color: COLORS.textSecondary, fontWeight: 700, display: { xs: 'none', sm: 'block' } }}>
+            Filter by:
           </Typography>
-          <FormControl 
-            variant="outlined" 
-            size="small"
-            sx={{ 
-              minWidth: 160,
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '12px',
-                bgcolor: 'white',
-                '& fieldset': { borderColor: 'rgba(0,0,0,0.1)' },
-                '&:hover fieldset': { borderColor: COLORS.primary },
-                '&.Mui-focused fieldset': { borderColor: COLORS.primary },
-              }
-            }}
-          >
-            <Select
-              value={selectedYear}
-              onChange={(e) => setSelectedYear(e.target.value)}
-              displayEmpty
-              startAdornment={
-                <InputAdornment position="start">
-                  <CalIcon size={16} color={COLORS.primary} style={{ marginRight: 4 }} />
-                </InputAdornment>
-              }
-              sx={{ fontWeight: 750, color: COLORS.dark }}
-            >
-              <MenuItem value="All" sx={{ fontWeight: 700, borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
-                All Years
-              </MenuItem>
-              {availableYears.map(year => (
-                <MenuItem key={year} value={year.toString()} sx={{ fontWeight: 600 }}>
-                  Year {year}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <Stack direction="row" spacing={2}>
+            <StyledFormControl variant="outlined" size="small">
+              <Select
+                value={selectedYear}
+                onChange={(e) => handleYearChange(e.target.value)}
+                displayEmpty
+                startAdornment={<CalIcon size={16} color={COLORS.primary} style={{ marginRight: 8 }} />}
+                IconComponent={() => <ChevronDown size={16} />}
+              >
+                {years.map(y => (
+                  <MenuItem key={y} value={y} sx={{ fontWeight: 600 }}>Year {y}</MenuItem>
+                ))}
+              </Select>
+            </StyledFormControl>
+
+            <StyledFormControl variant="outlined" size="small" sx={{ minWidth: 200 }}>
+              <Select
+                value={selectedBatchId}
+                onChange={(e) => handleBatchChange(e.target.value)}
+                displayEmpty
+                startAdornment={<Layers size={16} color={COLORS.primary} style={{ marginRight: 8 }} />}
+                IconComponent={() => <ChevronDown size={16} />}
+              >
+                {batchesInSelectedYear.map(b => (
+                  <MenuItem key={b._id} value={b._id} sx={{ fontWeight: 600 }}>
+                    {b.batchName}
+                  </MenuItem>
+                ))}
+              </Select>
+            </StyledFormControl>
+          </Stack>
         </Box>
       </Container>
 
-      {/* Content */}
       <Container maxWidth="xl">
+        {/* Horizontal Category Track */}
+        {currentBatch && (
+          <CategoryScrollContainer>
+            <CategoryTrack ref={scrollRef}>
+              {currentBatch.categories?.map((cat) => (
+                <CategoryPill
+                  key={cat._id}
+                  $active={selectedCategoryId === cat._id}
+                  onClick={() => setSelectedCategoryId(cat._id)}
+                >
+                  {cat.categoryName}
+                </CategoryPill>
+              ))}
+            </CategoryTrack>
+          </CategoryScrollContainer>
+        )}
+
+        {/* Image Gallery Grid - No Paper wrapper, direct Grid */}
         {loading ? (
-          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", py: 15, gap: 3 }}>
-            <CircularProgress size={56} sx={{ color: COLORS.primary }} />
-            <Typography variant="h6" color="text.secondary">Curating your visual experience...</Typography>
-          </Box>
-        ) : !selectedAlbum ? (
-          <Grid container spacing={4} justifyContent="center">
-            {filteredAlbums.map((album, i) => (
-              <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }} key={album.id || i}>
-                <Fade in timeout={400 + i * 100}>
-                  <Box>
-                    <AlbumCard album={album} onSelect={setSelectedAlbum} />
-                  </Box>
-                </Fade>
-              </Grid>
-            ))}
-          </Grid>
-        ) : filteredEvents.length === 0 ? (
-          <Box sx={{ textAlign: "center", py: 15, bgcolor: "white", borderRadius: 8, border: "1px dashed #ced4cd" }}>
-            <ImgIcon size={64} color="#ced4cd" style={{ marginBottom: 16 }} />
-            <Typography variant="h5" color="text.secondary" sx={{ fontWeight: 600 }}>
-              No office events in {selectedYear} yet.
-            </Typography>
-            <Button sx={{ mt: 3, color: COLORS.primary, fontWeight: 700 }} startIcon={<LeftIcon size={17} />} onClick={() => setSelectedAlbum(null)}>
-              Explore other Albums
-            </Button>
+          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", py: 10 }}>
+            <CircularProgress size={50} thickness={5} sx={{ color: COLORS.primary }} />
           </Box>
         ) : (
-          <Grid container spacing={4} justifyContent="center">
-            {filteredEvents.map((event, i) => (
-              <EventCard key={event._id || i} event={event} onSelect={openEvent} />
-            ))}
-          </Grid>
+          <Box>
+            {currentCategory ? (
+              <Grid container spacing={4} sx={{ animation: `${fadeIn} 0.6s ease-out` }}>
+                {currentCategory.images?.map((img, i) => (
+                  <Grid item xs={6} sm={4} md={3} key={i}>
+                    <GlassCard onClick={() => handleOpenLightbox(currentCategory.images, i)}>
+                      <Box sx={{ position: 'relative', pt: '100%', overflow: 'hidden' }}>
+                        <CardMedia
+                          component="img"
+                          image={getImgUrl(img.url)}
+                          sx={{
+                            position: 'absolute', top: 0, left: 0,
+                            width: '100%', height: '100%',
+                            objectFit: 'cover', transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
+                          }}
+                        />
+                        <ImageOverlay className="overlay">
+                          <Typography sx={{ color: 'white', fontWeight: 800, fontSize: '0.85rem', mb: 0.5 }}>
+                            {currentCategory.categoryName}
+                          </Typography>
+                          <Typography sx={{ color: alpha('#ffffff', 0.8), fontSize: '0.7rem', fontWeight: 600, lineClamp: 1, display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                            {img.highlights?.[0] || "View Highlights"}
+                          </Typography>
+                        </ImageOverlay>
+                      </Box>
+                    </GlassCard>
+                  </Grid>
+                ))}
+                {(!currentCategory.images || currentCategory.images.length === 0) && (
+                  <Grid item xs={12}>
+                    <Box sx={{ textAlign: "center", py: 12, bgcolor: "white", borderRadius: 8, border: '1px dashed #ced4cd' }}>
+                      <Typography variant="h6" color="text.secondary">No images found.</Typography>
+                    </Box>
+                  </Grid>
+                )}
+              </Grid>
+            ) : (
+              <Box sx={{ textAlign: "center", py: 12 }}>
+                <Typography color="text.secondary">Select a category to view images.</Typography>
+              </Box>
+            )}
+          </Box>
         )}
       </Container>
 
+      {/* Lightbox - Exact structure from Gallery.jsx */}
       <Dialog
-        open={Boolean(activeEvent)}
-        onClose={closeModal}
-        maxWidth="md"
+        open={showLightbox}
+        onClose={() => setShowLightbox(false)}
+        maxWidth="lg"
         fullWidth
         PaperProps={{
-          sx: {
-            borderRadius: 4,
-            overflow: "hidden",
-            background: "white",
-            boxShadow: "0 24px 60px rgba(0,0,0,0.15)",
-            mt: { xs: 2, sm: 6 },
-            mb: { xs: 2, sm: 6 }
-          }
-        }}
-        sx={{
-          "& .MuiDialog-container": {
-            alignItems: "flex-start"
-          }
+          sx: { borderRadius: isMobile ? 0 : 4, overflow: "hidden", background: "white", boxShadow: "0 24px 60px rgba(0,0,0,0.15)" }
         }}
       >
-        {activeEvent && (
-          <Box sx={{ display: "flex", flexDirection: "column", bgcolor: "white" }}>
-            {/* Header: Title & Meta */}
-            <Box sx={{ px: 3, pt: 3, pb: 2, display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 2, borderBottom: "1px solid rgba(0,0,0,0.05)" }}>
-              <Box sx={{ flex: 1 }}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
-                  <Chip
-                    label={activeEvent.categoryId?.albumName || "Office"}
-                    size="small"
-                    sx={{ bgcolor: COLORS.light, color: COLORS.dark, fontWeight: 700, fontSize: "0.65rem", height: 20 }}
-                  />
-                  <Typography variant="caption" sx={{ color: COLORS.textSecondary, fontWeight: 600 }}>
-                    {total} Photos
-                  </Typography>
-                </Box>
-                <Typography variant="h5" sx={{ color: "#0f172a", fontWeight: 800, lineHeight: 1.2 }}>
-                  {activeEvent.title}
+        {activeImages.length > 0 && (
+          <Box sx={{ display: "flex", flexDirection: { xs: "column-reverse", md: "row" }, minHeight: { md: 400 } }}>
+            {/* Info Section */}
+            <Box sx={{
+              width: { xs: "100%", md: "340px" }, p: 4,
+              borderRight: { md: "1px solid rgba(0,0,0,0.06)" },
+              bgcolor: "white", display: "flex", flexDirection: "column"
+            }}>
+              <Box sx={{ mb: 3 }}>
+                <Stack direction="row" spacing={1} sx={{ mb: 1.5 }}>
+                  <Chip label={selectedYear} size="small" sx={{ fontWeight: 800, bgcolor: alpha(COLORS.primary, 0.1), color: COLORS.primary }} />
+                  <Chip label={currentCategory?.categoryName} size="small" sx={{ fontWeight: 800 }} />
+                </Stack>
+                <Typography variant="h5" sx={{ fontWeight: 900, mb: 1, color: COLORS.textPrimary }}>Gallery Details</Typography>
+                <Typography variant="body2" sx={{ color: COLORS.textSecondary, fontWeight: 600 }}>
+                  Image {sliderIndex + 1} of {activeImages.length}
                 </Typography>
               </Box>
-              <Stack direction="row" spacing={1}>
-                 <IconButton
-                  onClick={() => {
-                    navigator.clipboard.writeText(window.location.href);
-                    alert("Link copied!");
-                  }}
-                  size="small"
-                  sx={{ bgcolor: "#f1f5f9", color: "#64748b", "&:hover": { color: COLORS.primary } }}
-                >
-                  <Share2 size={16} />
-                </IconButton>
-                <IconButton onClick={closeModal} size="small" sx={{ bgcolor: "#f1f5f9", color: "#64748b", "&:hover": { bgcolor: "#fee2e2", color: "#ef4444" } }}>
-                  <X size={18} />
-                </IconButton>
-              </Stack>
+
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="overline" sx={{ color: COLORS.primary, fontWeight: 900, mb: 2, display: 'block' }}>Key Highlights</Typography>
+                <Stack spacing={2}>
+                  {activeImages[sliderIndex].highlights?.length > 0 ? (
+                    activeImages[sliderIndex].highlights.map((h, i) => (
+                      <Box key={i} sx={{ display: 'flex', gap: 1.5 }}>
+                        <Check size={16} color={COLORS.primary} strokeWidth={4} />
+                        <Typography sx={{ fontWeight: 600, color: "#334155", fontSize: '0.9rem' }}>{h}</Typography>
+                      </Box>
+                    ))
+                  ) : (
+                    <Typography variant="body2" sx={{ color: COLORS.textSecondary, fontStyle: 'italic' }}>No highlights available.</Typography>
+                  )}
+                </Stack>
+              </Box>
+
+              <Box sx={{ mt: 4, pt: 3, borderTop: '1px solid rgba(0,0,0,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="caption" sx={{ fontWeight: 800, color: COLORS.textSecondary }}>DLK SOLUTIONS</Typography>
+                <IconButton onClick={() => setShowLightbox(false)}><X size={24} /></IconButton>
+              </Box>
             </Box>
 
-            {/* Main Image Viewport (Minimal Black Background) */}
-            <Box sx={{ position: "relative", width: "100%", height: { xs: 220, sm: 320, md: 380 }, bgcolor: "#000", overflow: "hidden" }}>
-              {total > 0 ? (
-                <Fade in key={sliderIndex} timeout={350}>
-                  <Box
-                    component="img"
-                    src={getImgUrl(allImages[sliderIndex])}
-                    alt=""
-                    sx={{ width: "100%", height: "100%", objectFit: "contain", userSelect: "none" }}
-                  />
-                </Fade>
-              ) : (
-                <Box sx={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}>
-                  <ImgIcon size={48} opacity={0.3} />
-                </Box>
-              )}
-
-              {/* Navigation Arrows */}
-              {total > 1 && (
+            {/* Viewport */}
+            <Box sx={{ flex: 1, bgcolor: "#0f172a", position: "relative", display: "flex", alignItems: "center", justifyContent: "center", p: 2 }}>
+              <Fade in key={sliderIndex} timeout={400}>
+                <Box
+                  component="img"
+                  src={getImgUrl(activeImages[sliderIndex].url)}
+                  sx={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", borderRadius: 2 }}
+                />
+              </Fade>
+              {activeImages.length > 1 && (
                 <>
                   <IconButton
-                    onClick={() => setSliderIndex(i => (i - 1 + total) % total)}
-                    sx={{ position: "absolute", left: 16, top: "50%", transform: "translateY(-50%)", bgcolor: "rgba(255,255,255,0.12)", color: "white", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.1)", "&:hover": { bgcolor: COLORS.primary } }}
+                    onClick={() => setSliderIndex(i => (i - 1 + activeImages.length) % activeImages.length)}
+                    sx={{ position: "absolute", left: 20, bgcolor: "rgba(255,255,255,0.1)", color: "white", "&:hover": { bgcolor: COLORS.primary } }}
                   >
-                    <LeftIcon size={20} />
+                    <LeftIcon size={24} />
                   </IconButton>
                   <IconButton
-                    onClick={() => setSliderIndex(i => (i + 1) % total)}
-                    sx={{ position: "absolute", right: 16, top: "50%", transform: "translateY(-50%)", bgcolor: "rgba(255,255,255,0.12)", color: "white", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.1)", "&:hover": { bgcolor: COLORS.primary } }}
+                    onClick={() => setSliderIndex(i => (i + 1) % activeImages.length)}
+                    sx={{ position: "absolute", right: 20, bgcolor: "rgba(255,255,255,0.1)", color: "white", "&:hover": { bgcolor: COLORS.primary } }}
                   >
-                    <RightIcon size={20} />
+                    <ChevronIcon size={24} />
                   </IconButton>
                 </>
               )}
