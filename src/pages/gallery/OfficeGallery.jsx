@@ -57,6 +57,8 @@ const StyledFormControl = styled(FormControl)(({ theme }) => ({
   }
 }));
 
+
+
 const GlassCard = styled(Card)(({ theme }) => ({
   background: "rgba(255,255,255,0.85)",
   backdropFilter: "blur(10px)",
@@ -88,8 +90,6 @@ const CategoryOverlay = styled(Box)({
   zIndex: 2,
 });
 
-// --- Helper Components ---
-
 const CategoryCard = ({ category, onClick }) => {
   const [currentImgIndex, setCurrentImgIndex] = useState(0);
   const coverImages = category.coverImages || [];
@@ -109,7 +109,7 @@ const CategoryCard = ({ category, onClick }) => {
           <Fade in key={currentImgIndex} timeout={800}>
             <CardMedia
               component="img"
-              image={getImgUrl(coverImages[currentImgIndex].url)}
+              image={getImgUrl(coverImages[currentImgIndex]?.url)}
               sx={{
                 position: 'absolute', top: 0, left: 0,
                 width: '100%', height: '100%',
@@ -159,6 +159,9 @@ export default function OfficeGallery() {
   
   const [selectedYear, setSelectedYear] = useState(""); // Empty means "All"
   const [selectedBatchId, setSelectedBatchId] = useState(""); // Empty means "All"
+  const [selectedCategoryName, setSelectedCategoryName] = useState("");
+
+
   
 
   // For Lightbox inside Modal
@@ -248,10 +251,26 @@ export default function OfficeGallery() {
         totalCount: group.images.length,
         imagesByDay: days,
         // One cover image per day for rotation
-        coverImages: days.map(d => d.imgs[0])
+        coverImages: days.map(d => d.imgs[0]).filter(Boolean)
       };
-    }).sort((a, b) => b.totalCount - a.totalCount);
+    }).sort((a, b) => {
+      const dateA = a.imagesByDay[0] ? new Date(a.imagesByDay[0].date) : 0;
+      const dateB = b.imagesByDay[0] ? new Date(b.imagesByDay[0].date) : 0;
+      return dateB - dateA;
+    });
   }, [filteredBatches]);
+
+  useEffect(() => {
+    if (mergedCategories.length > 0) {
+      if (!selectedCategoryName || !mergedCategories.find(c => c.categoryName === selectedCategoryName)) {
+        setSelectedCategoryName(mergedCategories[0].categoryName);
+      }
+    }
+  }, [mergedCategories, selectedCategoryName]);
+
+  const selectedCategory = useMemo(() => {
+    return mergedCategories.find(c => c.categoryName === selectedCategoryName) || (mergedCategories.length > 0 ? mergedCategories[0] : null);
+  }, [mergedCategories, selectedCategoryName]);
 
   console.log("Merged Categories:", mergedCategories);
 
@@ -326,7 +345,7 @@ export default function OfficeGallery() {
             <StyledFormControl variant="outlined" size="small">
               <Select
                 value={selectedYear}
-                onChange={(e) => { setSelectedYear(e.target.value); setSelectedBatchId(""); }}
+                onChange={(e) => { setSelectedYear(e.target.value); }}
                 displayEmpty
                 startAdornment={<CalIcon size={16} color={COLORS.primary} style={{ marginRight: 8 }} />}
                 IconComponent={() => <ChevronDown size={16} />}
@@ -358,7 +377,7 @@ export default function OfficeGallery() {
         </Box>
       </Container>
 
-      {/* Category Grid */}
+      {/* Category Selection & Image Grid */}
       <Container maxWidth="xl">
         {loading ? (
           <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", py: 15 }}>
@@ -368,22 +387,157 @@ export default function OfficeGallery() {
         ) : (
           <Box>
             {mergedCategories.length > 0 ? (
-              <Grid container spacing={4} sx={{ animation: `${fadeIn} 0.6s ease-out` }}>
-                {mergedCategories.map((category, i) => (
-                  <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={category.categoryName}>
-                    <Fade in timeout={400 + i * 100}>
-                      <Box sx={{ height: '100%' }}>
-                        <CategoryCard category={category} onClick={handleOpenCategory} />
+              (selectedBatchId) ? (
+                <>
+                  {/* Horizontal Category Selector */}
+                  <Box sx={{ 
+                    overflowX: 'auto', 
+                    display: 'flex', 
+                    gap: { xs: 3, md: 5 }, 
+                    pb: 1, 
+                    mb: 6,
+                    borderBottom: '2px solid rgba(0,0,0,0.05)',
+                    '&::-webkit-scrollbar': { display: 'none' },
+                    msOverflowStyle: 'none',
+                    scrollbarWidth: 'none',
+                  }}>
+                    {mergedCategories.map((cat) => (
+                      <Box
+                        key={cat.categoryName}
+                        onClick={() => setSelectedCategoryName(cat.categoryName)}
+                        sx={{
+                          cursor: 'pointer',
+                          position: 'relative',
+                          pb: 2,
+                          transition: 'all 0.3s ease',
+                        }}
+                      >
+                        <Typography
+                          sx={{
+                            fontSize: { xs: '0.95rem', md: '1.1rem' },
+                            fontWeight: 800,
+                            color: selectedCategoryName === cat.categoryName ? COLORS.primary : COLORS.textSecondary,
+                            whiteSpace: 'nowrap',
+                            transition: 'all 0.3s ease',
+                            '&:hover': { color: COLORS.primary }
+                          }}
+                        >
+                          {cat.categoryName}
+                        </Typography>
+                        {selectedCategoryName === cat.categoryName && (
+                          <Fade in={true}>
+                            <Box
+                              sx={{
+                                position: 'absolute',
+                                bottom: -2,
+                                left: 0,
+                                right: 0,
+                                height: 4,
+                                bgcolor: COLORS.primary,
+                                borderRadius: '4px 4px 0 0'
+                              }}
+                            />
+                          </Fade>
+                        )}
                       </Box>
-                    </Fade>
-                  </Grid>
-                ))}
-              </Grid>
+                    ))}
+                  </Box>
+
+                  {/* Images of Selected Category */}
+                  {selectedCategory && (
+                    <Box sx={{ animation: `${fadeIn} 0.6s ease-out` }}>
+                      {selectedCategory.imagesByDay.map((day, dayIdx) => (
+                        <Box key={day.date} sx={{ mb: 8 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 4 }}>
+                            <Stack direction="row" spacing={2} alignItems="center">
+                              <Box sx={{ 
+                                p: 1.5, borderRadius: 3, 
+                                bgcolor: alpha(COLORS.primary, 0.1), color: COLORS.primary,
+                                display: 'flex', alignItems: 'center', justifyContent: 'center'
+                              }}>
+                                <CalIcon size={20} />
+                              </Box>
+                              <Box>
+                                <Typography variant="h5" sx={{ fontWeight: 900, color: COLORS.dark }}>
+                                  {dayjs(day.date).format('DD MMMM YYYY')}
+                                </Typography>
+                                <Typography variant="caption" sx={{ fontWeight: 700, color: COLORS.textSecondary }}>
+                                  {day.imgs.length} Photos captured on this day
+                                </Typography>
+                              </Box>
+                            </Stack>
+                          </Box>
+
+                          <Grid container spacing={3}>
+                            {day.imgs.map((img, imgIdx) => (
+                              <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={imgIdx}>
+                                <Fade in timeout={400 + imgIdx * 50}>
+                                  <Card
+                                    onClick={() => handleOpenLightbox(day.imgs, imgIdx)}
+                                    sx={{
+                                      borderRadius: 5,
+                                      overflow: 'hidden',
+                                      cursor: 'pointer',
+                                      position: 'relative',
+                                      pt: '100%',
+                                      boxShadow: '0 10px 30px rgba(0,0,0,0.05)',
+                                      border: '1px solid rgba(0,0,0,0.03)',
+                                      transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                                      '&:hover': {
+                                        transform: 'translateY(-8px)',
+                                        boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+                                        '& img': { transform: 'scale(1.1)' },
+                                        '& .img-overlay': { opacity: 1 }
+                                      }
+                                    }}
+                                  >
+                                    <Box
+                                      component="img"
+                                      src={getImgUrl(img.url)}
+                                      sx={{
+                                        position: 'absolute', top: 0, left: 0,
+                                        width: '100%', height: '100%',
+                                        objectFit: 'cover', transition: 'transform 0.6s ease'
+                                      }}
+                                    />
+                                    <Box className="img-overlay" sx={{
+                                      position: 'absolute', inset: 0,
+                                      background: 'linear-gradient(to top, rgba(0,0,0,0.4), transparent)',
+                                      opacity: 0, transition: 'opacity 0.3s ease',
+                                      display: 'flex', alignItems: 'flex-end', p: 2
+                                    }}>
+                                      <IconButton size="small" sx={{ bgcolor: 'white', color: COLORS.primary, '&:hover': { bgcolor: 'white' } }}>
+                                        <RightIcon size={18} />
+                                      </IconButton>
+                                    </Box>
+                                  </Card>
+                                </Fade>
+                              </Grid>
+                            ))}
+                          </Grid>
+                        </Box>
+                      ))}
+                    </Box>
+                  )}
+                </>
+              ) : (
+                <Grid container spacing={4} sx={{ animation: `${fadeIn} 0.6s ease-out` }}>
+                  {mergedCategories.map((category, i) => (
+                    <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={category.categoryName}>
+                      <Fade in timeout={400 + i * 100}>
+                        <Box sx={{ height: '100%' }}>
+                          <CategoryCard category={category} onClick={handleOpenCategory} />
+                        </Box>
+                      </Fade>
+                    </Grid>
+                  ))}
+                </Grid>
+              )
             ) : (
               <Box sx={{ textAlign: "center", py: 15, bgcolor: "white", borderRadius: 8, border: '1px dashed #ced4cd' }}>
                 <ImgIcon size={64} color="#ced4cd" style={{ marginBottom: 16 }} />
-                <Typography variant="h5" color="text.secondary" sx={{ fontWeight: 700 }}>No categories found.</Typography>
-                <Typography color="text.secondary">Try adjusting your filters.</Typography>
+                <Typography variant="h5" color="text.secondary" sx={{ fontWeight: 700 }}>No gallery content found.</Typography>
+                <Typography color="text.secondary">Try adjusting your filters or year selection.</Typography>
               </Box>
             )}
           </Box>
@@ -410,19 +564,19 @@ export default function OfficeGallery() {
             }}>
               <Box sx={{ mb: 3 }}>
                 <Stack direction="row" spacing={1} sx={{ mb: 1.5 }}>
-                  <Chip label={dayjs(activeImages[sliderIndex].batchDate).format('YYYY')} size="small" sx={{ fontWeight: 800, bgcolor: alpha(COLORS.primary, 0.1), color: COLORS.primary }} />
-                  <Chip label={activeImages[sliderIndex].categoryName} size="small" sx={{ fontWeight: 800 }} />
+                  <Chip label={dayjs(activeImages[sliderIndex]?.batchDate).format('YYYY')} size="small" sx={{ fontWeight: 800, bgcolor: alpha(COLORS.primary, 0.1), color: COLORS.primary }} />
+                  <Chip label={activeImages[sliderIndex]?.categoryName} size="small" sx={{ fontWeight: 800 }} />
                 </Stack>
                 <Typography variant="h5" sx={{ fontWeight: 900, mb: 1, color: COLORS.textPrimary }}>Gallery Details</Typography>
                 <Typography variant="body2" sx={{ color: COLORS.textSecondary, fontWeight: 600 }}>
-                  {activeImages[sliderIndex].batchName} • {dayjs(activeImages[sliderIndex].batchDate).format('DD MMM YYYY')}
+                  {activeImages[sliderIndex]?.batchName} • {dayjs(activeImages[sliderIndex]?.batchDate).format('DD MMM YYYY')}
                 </Typography>
               </Box>
 
               <Box sx={{ flex: 1 }}>
                 <Typography variant="overline" sx={{ color: COLORS.primary, fontWeight: 900, mb: 2, display: 'block' }}>Key Highlights</Typography>
                 <Stack spacing={2}>
-                  {activeImages[sliderIndex].highlights?.length > 0 ? (
+                  {activeImages[sliderIndex]?.highlights?.length > 0 ? (
                     activeImages[sliderIndex].highlights.map((h, i) => (
                       <Box key={i} sx={{ display: 'flex', gap: 1.5 }}>
                         <Check size={16} color={COLORS.primary} strokeWidth={4} />
@@ -445,7 +599,7 @@ export default function OfficeGallery() {
               <Fade in key={sliderIndex} timeout={400}>
                 <Box
                   component="img"
-                  src={getImgUrl(activeImages[sliderIndex].url)}
+                  src={getImgUrl(activeImages[sliderIndex]?.url)}
                   sx={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", borderRadius: 2 }}
                 />
               </Fade>
