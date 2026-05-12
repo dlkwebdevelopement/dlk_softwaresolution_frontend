@@ -265,7 +265,7 @@ const StudentProjects = () => {
               lineHeight: 1.15,
             }}
           >
-            Insights & <Box component="span" sx={{ color: colors.primary }}>Future Tech</Box>
+            Successful Student <Box component="span" sx={{ color: colors.primary }}>Projects</Box>
           </Typography>
 
           <Typography

@@ -25,14 +25,6 @@ import CourseFAQ from "../pages/product/CourseFAQ";
 import PricingPlans from "../pages/product/PricingPlans";
 import ScrollToTop from "../components/ScrollToTop";
 import OverviewSection from "../pages/product/CourseOverviewSection";
-import Blog from "../pages/home/Blog";
-import BlogBanner from "../pages/blog/BlogBanner";
-import BlogContentPage from "../pages/blog/BlogContentPage";
-import BlogList from "../pages/blog/BlogList";
-import StudentProjects from "../pages/home/StudentProjects";
-import StudentProjectBanner from "../pages/student-projects/StudentProjectBanner";
-import StudentProjectContentPage from "../pages/student-projects/StudentProjectContentPage";
-import StudentProjectList from "../pages/student-projects/StudentProjectList";
 import Career from "../pages/career/Career";
 import NotFound from "../pages/NotFound";
 
@@ -72,8 +64,6 @@ const AppRoute = () => {
               {/* <Companies /> */}
               <LogoCarousel />
               <Comments />
-              <StudentProjects />
-              <Blog />
 
               <BottomInfo />
               <Footer />
@@ -118,61 +108,9 @@ const AppRoute = () => {
           }
         />
 
-        {/* BLOG PAGES */}
-        <Route
-          path="/blogs"
-          element={
-            <>
-              <Navbar />
-              <Box sx={{ mt: 10 }}></Box>
-              <BlogList />
-              <BottomInfo />
-              <Footer />
-            </>
-          }
-        />
 
-        <Route
-          path="/blogs/:slug"
-          element={
-            <>
-              <Navbar />
-              <Box sx={{ mt: 15 }}></Box>
-              <BlogBanner />
-              <BlogContentPage />
-              <BottomInfo />
-              <Footer />
-            </>
-          }
-        />
 
-        {/* STUDENT PROJECT PAGES */}
-        <Route
-          path="/student-projects"
-          element={
-            <>
-              <Navbar />
-              <Box sx={{ mt: 10 }}></Box>
-              <StudentProjectList />
-              <BottomInfo />
-              <Footer />
-            </>
-          }
-        />
 
-        <Route
-          path="/student-projects/:slug"
-          element={
-            <>
-              <Navbar />
-              <Box sx={{ mt: 15 }}></Box>
-              <StudentProjectBanner />
-              <StudentProjectContentPage />
-              <BottomInfo />
-              <Footer />
-            </>
-          }
-        />
 
         {/* VIDEOS PAGE */}
         <Route

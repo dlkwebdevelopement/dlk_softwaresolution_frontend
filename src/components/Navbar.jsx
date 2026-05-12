@@ -618,7 +618,6 @@ const Navbar = () => {
                       { icon: <SchoolIcon />, text: "Become an Instructor", path: "/become-instructor" },
                       { icon: <WorkIcon />, text: "Career", path: "/career" },
                       { icon: <EmojiEventsIcon />, text: "Placement", path: "/placement" },
-                      { icon: <RocketLaunchIcon />, text: "Student Projects", path: "/student-projects" },
                     ].map((item, index) => (
                       <ListItemButton
                         key={index}
@@ -734,6 +733,11 @@ const Navbar = () => {
                 <NavText className="nav-text">Workshop</NavText>
               </NavItem>
 
+              <NavItem onClick={() => handleNavigation("https://dlksoftwaresolutions.co.in/projectblogs/")}>
+                <MenuBookIcon className="nav-icon" sx={{ fontSize: 20, mr: 1, color: colors.dark, transition: "all 0.4s ease" }} />
+                <NavText className="nav-text">Blog</NavText>
+              </NavItem>
+
               {/* Resources Dropdown */}
               <Box
                 sx={{ position: "relative" }}
@@ -772,7 +776,6 @@ const Navbar = () => {
                   >
                     {[
                       { icon: <MapIcon />, text: "Roadmap", path: "/roadmap" },
-                      { icon: <MenuBookIcon />, text: "Blog", path: "https://dlksoftwaresolutions.co.in/projectblogs/" },
                       { icon: <LocalOfferIcon />, text: "Offers", path: "/offers" },
                     ].map((item, index) => (
                       <ListItemButton
@@ -1029,7 +1032,6 @@ const Navbar = () => {
                     { icon: <SchoolIcon />, text: "Become an Instructor", path: "/become-instructor" },
                     { icon: <WorkIcon />, text: "Career", path: "/career" },
                     { icon: <EmojiEventsIcon />, text: "Placement", path: "/placement" },
-                    { icon: <RocketLaunchIcon />, text: "Student Projects", path: "/student-projects" },
                   ].map((item, index) => (
                     <MobileMenuItem
                       key={index}
@@ -1132,6 +1134,28 @@ const Navbar = () => {
               />
             </MobileMenuItem>
 
+            <MobileMenuItem
+              onClick={() => handleNavigation("https://dlksoftwaresolutions.co.in/projectblogs/")}
+              sx={{
+                backgroundColor: alpha(colors.primary, 0.04),
+                borderRadius: "16px",
+                border: `1px solid ${alpha(colors.primary, 0.08)}`,
+                mt: 1
+              }}
+            >
+              <ListItemIcon sx={{ color: colors.primary, minWidth: 40 }}>
+                <MenuBookIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary="Blog"
+                primaryTypographyProps={{
+                  fontWeight: 700,
+                  color: colors.dark,
+                  fontSize: "1.05rem"
+                }}
+              />
+            </MobileMenuItem>
+
             {/* Resources Mobile Section */}
             <List sx={{ width: "100%" }}>
               <MobileMenuItem
@@ -1165,7 +1189,6 @@ const Navbar = () => {
                 <List component="div" disablePadding sx={{ pl: 4 }}>
                   {[
                     { icon: <MapIcon />, text: "Roadmap", path: "/roadmap" },
-                    { icon: <MenuBookIcon />, text: "Blog", path: "https://dlksoftwaresolutions.co.in/projectblogs/" },
                     { icon: <LocalOfferIcon />, text: "Offers", path: "/offers" },
                   ].map((item, index) => (
                     <MobileMenuItem
