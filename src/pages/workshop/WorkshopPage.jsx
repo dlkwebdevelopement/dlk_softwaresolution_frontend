@@ -434,13 +434,13 @@ export default function WorkshopPage({ viewMode = "grid" }) {
           />
 
           <Typography
-            variant="h2"
+            variant="h3"
             sx={{
               fontWeight: 900,
               mb: 2,
               fontSize: "clamp(2rem, 5vw, 3.2rem)",
               color: colors.textPrimary,
-              letterSpacing: "-0.03em",
+              letterSpacing: "-0.02em",
               lineHeight: 1.15,
             }}
           >

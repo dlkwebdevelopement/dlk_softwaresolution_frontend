@@ -370,13 +370,15 @@ export default function Comments() {
           <Typography
             variant="h3"
             sx={{
-              fontWeight: 600,
+              fontWeight: 900,
               mb: 2,
-              fontSize: 'clamp(1.7rem, 3.2vw, 2.5rem)',
-              color: 'var(--green-dark)',
+              fontSize: "clamp(2rem, 5vw, 3.2rem)",
+              color: "#0f172a",
+              letterSpacing: "-0.02em",
+              lineHeight: 1.15,
             }}
           >
-            <Box component="span" sx={{ color: 'black' }}>What Our</Box> Students Say
+            Student <Box component="span" sx={{ color: colors.primary }}>Success Stories</Box>
           </Typography>
 
           <Typography

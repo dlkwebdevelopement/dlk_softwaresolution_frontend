@@ -377,13 +377,13 @@ const Gallery = () => {
           </Stack>
 
           <Typography
-            variant="h2"
+            variant="h3"
             sx={{
               fontWeight: 900,
               mb: 2,
               fontSize: "clamp(2rem, 5vw, 3.2rem)",
-              color: "#000",
-              letterSpacing: "-0.03em",
+              color: "#0f172a",
+              letterSpacing: "-0.02em",
               lineHeight: 1.15,
             }}
           >

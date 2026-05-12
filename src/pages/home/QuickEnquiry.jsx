@@ -250,15 +250,18 @@ export default function QuickEnquiry() {
                     </Typography>
                   </Box>
                 </FloatingBadge>
-                <Typography variant="h3" sx={{
-                  fontWeight: 800,
-                  color: "var(--dark)",
-                  fontSize: { xs: '2rem', md: '2.8rem' },
-                  lineHeight: 1.1,
-                  mb: 2,
-                  letterSpacing: '-0.02em'
-                }}>
-                  Get a <span style={{ color: "var(--green)" }}>Free Consultation</span> Today!
+                <Typography
+                  variant="h3"
+                  sx={{
+                    fontWeight: 900,
+                    mb: 2,
+                    fontSize: "clamp(2rem, 5vw, 3.2rem)",
+                    color: "#0f172a",
+                    letterSpacing: "-0.02em",
+                    lineHeight: 1.15,
+                  }}
+                >
+                  Get a <Box component="span" sx={{ color: "var(--green)" }}>Free Consultation</Box> Today!
                 </Typography>
                 <Typography sx={{ color: "text.secondary", fontSize: '1.1rem', maxWidth: '500px' }}>
                   Fill the form below and let our experts guide you to your dream IT career.

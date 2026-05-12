@@ -56,17 +56,17 @@ export default function LogoCarousel() {
           {/* LEFT CONTENT: TEXT */}
           <Box sx={{ flex: { xs: '1', sm: '1' }, textAlign: 'left' }}>
             <Typography
-              variant="h2"
+              variant="h3"
               sx={{
-                fontWeight: 800,
-                color: "#111827",
-                fontSize: { xs: '2.5rem', sm: '2.8rem', md: '3.5rem' },
-                lineHeight: 1.05,
-                mb: 3,
-                letterSpacing: '-0.03em',
+                fontWeight: 900,
+                mb: 2,
+                fontSize: "clamp(2rem, 5vw, 3.2rem)",
+                color: "#0f172a",
+                letterSpacing: "-0.02em",
+                lineHeight: 1.15,
               }}
             >
-              We Tie-Up <Box component="span" sx={{ color: '#16a34a' }}>with Leading IT and MNC</Box> Companies
+              We Tie-Up <Box component="span" sx={{ color: "#3DB843" }}>with Leading IT and MNC</Box> Companies
             </Typography>
 
             <Typography 

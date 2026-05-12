@@ -395,14 +395,17 @@ const Ads = () => {
 
           {/* Title */}
           <Typography
-            variant="h2"
+            variant="h3"
             sx={{
-              fontWeight: 600,
-              fontSize: 'clamp(1.7rem, 3.2vw, 2.5rem)',
-              color: 'black',
+              fontWeight: 900,
+              mb: 2,
+              fontSize: "clamp(2rem, 5vw, 3.2rem)",
+              color: "#0f172a",
+              letterSpacing: "-0.02em",
+              lineHeight: 1.15,
             }}
           >
-            Popular <Box component="span" sx={{ color: 'var(--green-dark)' }}>Courses</Box>
+            Popular <Box component="span" sx={{ color: colors.primary }}>Career Courses</Box>
           </Typography>
 
           <Typography

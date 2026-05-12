@@ -146,15 +146,17 @@ const Category = () => {
 
 
           <SectionTitle
-            variant="h4"
+            variant="h3"
             sx={{
-              fontWeight: 600,
-              fontSize: 'clamp(1.7rem, 3.2vw, 2.5rem)',
-              color: 'var(--green-dark)',
-              mb: 1
+              fontWeight: 900,
+              mb: 2,
+              fontSize: "clamp(2rem, 5vw, 3.2rem)",
+              color: "#0f172a",
+              letterSpacing: "-0.02em",
+              lineHeight: 1.15,
             }}
           >
-            <Box component="span" sx={{ color: 'black' }}>Explore</Box> Categories
+            Explore <Box component="span" sx={{ color: "var(--green)" }}>Course Categories</Box>
           </SectionTitle>
 
 
