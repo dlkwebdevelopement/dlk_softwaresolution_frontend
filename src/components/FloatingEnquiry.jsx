@@ -64,7 +64,8 @@ export default function FloatingEnquiry() {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            boxShadow: "0 2px 10px rgba(0,0,0,0.1)"
+            boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+            flexShrink: 0
           }}>
             <Stack direction="row" alignItems="center" spacing={1}>
               <Box
@@ -80,8 +81,8 @@ export default function FloatingEnquiry() {
           </Box>
 
           <iframe
-            src="https://chatbot.dlksoftwaresolutions.co.in/"
-            style={{ width: "100%", height: "100%", border: "none" }}
+            src=" http://localhost:5174/"
+            style={{ width: "100%", flex: 1, border: "none" }}
             title="DLK Chatbot"
           />
         </Box>
