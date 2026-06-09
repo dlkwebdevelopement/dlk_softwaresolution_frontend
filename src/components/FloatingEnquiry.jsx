@@ -81,7 +81,7 @@ export default function FloatingEnquiry() {
           </Box>
 
           <iframe
-            src=" http://localhost:5174/"
+            src=" https://chatbot.dlksoftwaresolutions.co.in/"
             style={{ width: "100%", flex: 1, border: "none" }}
             title="DLK Chatbot"
           />
