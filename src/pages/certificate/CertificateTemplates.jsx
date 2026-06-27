@@ -79,7 +79,7 @@ export const CertificateLayout = ({ children, title, date }) => {
       </Box>
 
       {/* Footer / Signatures */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 7, pt: 4, alignItems: 'flex-end' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 5, pt: 4, alignItems: 'flex-end' }}>
         <Box textAlign="center">
           <Box sx={{ width: '150px', height: '100px', mb: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <img src="/photos/seal.jpeg" alt="Company Seal" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
