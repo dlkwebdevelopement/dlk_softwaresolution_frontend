@@ -100,13 +100,7 @@ const CertificatePage = () => {
                     error={!!errors.department} helperText={errors.department?.message}
                   />
                 </Grid>
-                <Grid item xs={12} sm={4}>
-                  <TextField 
-                    fullWidth label="Current Year (e.g. 3rd Year) *" 
-                    {...register('year', { required: 'Year is required' })}
-                    error={!!errors.year} helperText={errors.year?.message}
-                  />
-                </Grid>
+
                 <Grid item xs={12} sm={4}>
                   <TextField 
                     fullWidth label="Internship Start Date *" type="date" InputLabelProps={{ shrink: true }}
@@ -135,13 +129,7 @@ const CertificatePage = () => {
                   />
                 </Grid>
                 
-                {startDate && endDate && (
-                    <Grid item xs={12}>
-                        <Alert severity="info" sx={{ borderRadius: 2 }}>
-                            Calculated Duration: {calculateDuration(startDate, endDate)}
-                        </Alert>
-                    </Grid>
-                )}
+
 
                 <Grid item xs={12} mt={2} textAlign="center">
                   <Button 

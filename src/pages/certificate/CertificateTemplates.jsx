@@ -31,7 +31,13 @@ export const CertificateLayout = ({ children, title, date }) => {
         fontFamily: '"Times New Roman", Times, serif',
         display: 'flex',
         flexDirection: 'column',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        '& .MuiTypography-root': {
+          fontFamily: '"Times New Roman", Times, serif',
+        },
+        '& .MuiTypography-body1': {
+          fontSize: '14px',
+        }
       }}
     >
       <img 
@@ -44,11 +50,11 @@ export const CertificateLayout = ({ children, title, date }) => {
           width: '100%',
           height: '100%',
           zIndex: 0,
-          objectFit: 'cover'
+          objectFit: 'fill'
         }} 
       />
       
-      <Box sx={{ position: 'relative', zIndex: 1, padding: '280px 80px 320px 80px', display: 'flex', flexDirection: 'column', height: '100%', boxSizing: 'border-box' }}>
+      <Box sx={{ position: 'relative', zIndex: 1, padding: '300px 80px 320px 80px', display: 'flex', flexDirection: 'column', height: '100%', boxSizing: 'border-box' }}>
       {/* Date */}
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
         <Typography variant="body1" sx={{ fontFamily: 'inherit', fontWeight: 'bold' }}>
@@ -64,27 +70,30 @@ export const CertificateLayout = ({ children, title, date }) => {
       )}
 
       {/* Content */}
-      <Box sx={{ fontSize: '18px', lineHeight: 1.3 }}>
+      <Box 
+        sx={{ fontSize: '14px', lineHeight: 1.3, outline: 'none', '&:focus': { outline: '1px dashed #ccc' } }}
+        contentEditable
+        suppressContentEditableWarning
+      >
         {children}
       </Box>
 
       {/* Footer / Signatures */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between',mt:1, pt: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 7, pt: 4, alignItems: 'flex-end' }}>
         <Box textAlign="center">
-          <Box sx={{ width: '150px', height: '60px', mb: 1, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
-            <Typography variant="body2" sx={{ fontStyle: 'italic', color: '#999', fontFamily: 'inherit' }}>(Seal)</Typography>
+          <Box sx={{ width: '150px', height: '100px', mb: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <img src="/photos/seal.jpeg" alt="Company Seal" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
           </Box>
           <Typography sx={{ borderTop: '1px solid #333', pt: 1, fontWeight: 'bold', fontFamily: 'inherit' }}>
             Company Seal
           </Typography>
         </Box>
         <Box textAlign="center">
-          <Box sx={{ width: '200px', height: '60px', mb: 1 }}></Box>
+          <Box sx={{ width: '200px', height: '100px', mb: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <img src="/photos/sign.jpeg" alt="Authorized Signature" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+          </Box>
           <Typography sx={{ borderTop: '1px solid #333', pt: 1, fontWeight: 'bold', fontFamily: 'inherit' }}>
             Authorized Signatory
-          </Typography>
-          <Typography variant="body2" sx={{ fontFamily: 'inherit' }}>
-            Human Resources
           </Typography>
         </Box>
       </Box>

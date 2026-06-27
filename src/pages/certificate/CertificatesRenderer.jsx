@@ -33,6 +33,95 @@ const CertificatesRenderer = ({ data }) => {
     setPreviewModalOpen(true);
   };
 
+  const handlePreviewDownload = async () => {
+    const toastId = toast.loading('Generating PDF...');
+    try {
+      const element = document.getElementById('preview-cert-render');
+      const canvas = await html2canvas(element, { scale: 3, useCORS: true });
+      const imgData = canvas.toDataURL('image/jpeg', 0.85);
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`${data.studentName.replace(/\s+/g, '_')}_${currentPreview.title.replace(/\s+/g, '_')}.pdf`);
+      toast.success('Downloaded successfully!', { id: toastId });
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to download.', { id: toastId });
+    }
+  };
+
+  const handlePreviewPrint = async () => {
+    const toastId = toast.loading('Preparing Print...');
+    try {
+      const element = document.getElementById('preview-cert-render');
+      const canvas = await html2canvas(element, { scale: 3, useCORS: true });
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      const iframe = document.createElement('iframe');
+      iframe.style.position = 'fixed';
+      iframe.style.right = '0';
+      iframe.style.bottom = '0';
+      iframe.style.width = '0';
+      iframe.style.height = '0';
+      iframe.style.border = '0';
+      document.body.appendChild(iframe);
+      iframe.contentWindow.document.write(`
+        <html>
+          <head>
+            <title>Print Certificate</title>
+            <style>
+              body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: flex-start; }
+              img { width: 100%; height: auto; max-width: 210mm; }
+              @media print {
+                @page { margin: 0; size: A4 portrait; }
+                body { margin: 0; }
+              }
+            </style>
+          </head>
+          <body>
+            <img src="${imgData}" onload="window.print();" />
+          </body>
+        </html>
+      `);
+      iframe.contentWindow.document.close();
+      setTimeout(() => {
+        if (document.body.contains(iframe)) document.body.removeChild(iframe);
+      }, 10000);
+      toast.success('Print ready!', { id: toastId });
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to print.', { id: toastId });
+    }
+  };
+
+  const handlePreviewEmail = async () => {
+    if (!data.studentEmail) {
+      toast.error('Student email is missing from the form!');
+      return;
+    }
+    const toastId = toast.loading('Sending Email...');
+    try {
+      const element = document.getElementById('preview-cert-render');
+      const canvas = await html2canvas(element, { scale: 3, useCORS: true });
+      const imgData = canvas.toDataURL('image/jpeg', 0.85);
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+      const pdfBase64 = pdf.output('datauristring');
+      await PostRequest('/certificates/send-email', {
+        email: data.studentEmail,
+        pdfBase64,
+        title: currentPreview.title,
+        studentName: data.studentName
+      });
+      toast.success('Email sent successfully!', { id: toastId });
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to send email.', { id: toastId });
+    }
+  };
+
   const handleDownload = async (certId, title) => {
     setLoading(prev => ({ ...prev, [certId]: true }));
     try {
@@ -228,11 +317,16 @@ const CertificatesRenderer = ({ data }) => {
         }}>
           <Box sx={{ p: 2, backgroundColor: '#222', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Typography variant="h6" color="#fff">
-              {currentPreview?.title}
+              {currentPreview?.title} <span style={{fontSize: '12px', color: '#aaa'}}>(Click text to edit)</span>
             </Typography>
-            <IconButton onClick={() => setPreviewModalOpen(false)} sx={{ color: '#fff' }}>
-              <CloseIcon />
-            </IconButton>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button variant="contained" color="primary" size="small" onClick={handlePreviewDownload}>Download Edits</Button>
+                <Button variant="contained" color="secondary" size="small" onClick={handlePreviewPrint}>Print Edits</Button>
+                <Button variant="contained" color="info" size="small" onClick={handlePreviewEmail}>Email Edits</Button>
+                <IconButton onClick={() => setPreviewModalOpen(false)} sx={{ color: '#fff', ml: 1 }}>
+                  <CloseIcon />
+                </IconButton>
+            </Box>
           </Box>
           <Box sx={{ flex: 1, overflow: 'auto', p: 3, display: 'flex', justifyContent: 'center', backgroundColor: '#555' }}>
             {currentPreview && (
@@ -241,7 +335,9 @@ const CertificatesRenderer = ({ data }) => {
                 transformOrigin: 'top center',
                 pb: '100%' // give some scroll room
               }}>
-                <currentPreview.Component data={data} />
+                <Box id="preview-cert-render">
+                  <currentPreview.Component data={data} />
+                </Box>
               </Box>
             )}
           </Box>
