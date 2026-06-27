@@ -39,6 +39,7 @@ import WorkshopPage from "../pages/workshop/WorkshopPage";
 import PrivacyPolicy from "../pages/legal/PrivacyPolicy";
 import TermsOfService from "../pages/legal/TermsOfService";
 import CategoryCourseList from "../pages/product/CategoryCourseList";
+import CertificatePage from "../pages/certificate/CertificatePage";
 
 const AppRoute = () => {
   return (
@@ -243,6 +244,19 @@ const AppRoute = () => {
               <Navbar />
               <Box sx={{ mt: 10 }}></Box>
               <TermsOfService />
+              <BottomInfo />
+              <Footer />
+            </>
+          }
+        />
+
+        <Route
+          path="/certificate"
+          element={
+            <>
+              <Navbar />
+              <Box sx={{ mt: { xs: 8, md: 10 } }}></Box>
+              <CertificatePage />
               <BottomInfo />
               <Footer />
             </>
