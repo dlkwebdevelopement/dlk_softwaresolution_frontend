@@ -50,14 +50,20 @@ export const CertificateLayout = ({ children, title, date }) => {
           width: '100%',
           height: '100%',
           zIndex: 0,
-          objectFit: 'fill'
+          objectFit: 'fill',
+          transform: 'scale(1.04)'
         }} 
       />
       
       <Box sx={{ position: 'relative', zIndex: 1, padding: '300px 80px 320px 80px', display: 'flex', flexDirection: 'column', height: '100%', boxSizing: 'border-box' }}>
       {/* Date */}
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-        <Typography variant="body1" sx={{ fontFamily: 'inherit', fontWeight: 'bold' }}>
+        <Typography 
+          variant="body1" 
+          sx={{ fontFamily: 'inherit', fontWeight: 'bold', outline: 'none', '&:focus': { outline: '1px dashed #ccc' } }}
+          contentEditable
+          suppressContentEditableWarning
+        >
           Date: {dayjs(date).format('DD MMM YYYY')}
         </Typography>
       </Box>
@@ -104,7 +110,7 @@ export const CertificateLayout = ({ children, title, date }) => {
 
 export const AcceptanceLetterTemplate = ({ data }) => {
   return (
-    <CertificateLayout title={null} date={dayjs().format('YYYY-MM-DD')}>
+    <CertificateLayout title={null} date={data.startDate}>
       <Typography sx={{ fontFamily: 'inherit', mb: 1, textAlign: 'justify', lineHeight: 1.5 }}>
         To
       </Typography>

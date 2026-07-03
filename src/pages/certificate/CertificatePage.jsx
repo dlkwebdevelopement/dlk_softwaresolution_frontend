@@ -81,8 +81,8 @@ const CertificatePage = () => {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField 
-                    fullWidth label="Student Email *" type="email"
-                    {...register('studentEmail', { required: 'Student Email is required' })}
+                    fullWidth label="Student Email (Optional)" type="email"
+                    {...register('studentEmail')}
                     error={!!errors.studentEmail} helperText={errors.studentEmail?.message}
                   />
                 </Grid>
