@@ -22,42 +22,7 @@ const Product = () => {
   const navigate = useNavigate();
 
   const [openDownloadDialog, setOpenDownloadDialog] = useState(false);
-  const [email, setEmail] = useState("");
-  const [submitting, setSubmitting] = useState(false);
   const [openEnquiry, setOpenEnquiry] = useState(false);
-  const [captchaToken, setCaptchaToken] = useState(null);
-  const captchaRef = useState(null);
-
-  const handleDownloadSubmit = async (e) => {
-    e.preventDefault();
-    if (!captchaToken) {
-      toast.error("Please complete the reCAPTCHA");
-      return;
-    }
-    const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    if (!email.trim() || !validateEmail(email)) return toast.error("Please enter a valid email");
-
-    try {
-      setSubmitting(true);
-      await PostRequest(ADMIN_POST_REGISTRATIONS, {
-        fullName: "Curriculum Downloader",
-        email,
-        phone: "0000000000",
-        courseId: course?._id || course?.id,
-        inquiryType: `Curriculum Download: ${course?.title || "Course"}`
-      });
-
-      toast.success("Curriculum PDF sent to your email successfully!");
-      setOpenDownloadDialog(false);
-      setEmail("");
-      setCaptchaToken(null);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to process request. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   useEffect(() => {
     console.log("Current slug:", slug);
@@ -396,50 +361,13 @@ const Product = () => {
       </Box>
 
       {/* CURRICULUM DOWNLOAD DIALOG */}
-      <Dialog
+      <QuickEnquiryModal
         open={openDownloadDialog}
         onClose={() => setOpenDownloadDialog(false)}
-        maxWidth="sm"
-        fullWidth
-        PaperProps={{ sx: { borderRadius: '24px' } }}
-      >
-        <DialogTitle sx={{ bgcolor: '#0f172a', color: '#fff', position: "relative", p: 4 }}>
-          <Typography
-            variant="h5"
-            fontWeight={600}
-            sx={{
-              fontFamily: '"Poppins", sans-serif',
-              color: "#ffffff", // white color
-            }}
-          >
-            Download Curriculum
-          </Typography>
-          <Typography variant="body2" sx={{ opacity: 0.9, mt: 0.5 }}>
-            Enter your email to receive the download link.
-          </Typography>
-          <IconButton onClick={() => setOpenDownloadDialog(false)} sx={{ position: "absolute", right: 16, top: 20, color: "#fff", bgcolor: 'rgba(255,255,255,0.1)', "&:hover": { bgcolor: 'rgba(255,255,255,0.2)' } }}>
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        <form onSubmit={handleDownloadSubmit}>
-          <DialogContent sx={{ p: 4, pt: 5 }}>
-            <TextField label="Your Email Address *" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required fullWidth sx={{ "& .MuiOutlinedInput-root": { borderRadius: '12px' } }} />
-            
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-              <ReCAPTCHA
-                sitekey={RECAPTCHA_SITE_KEY}
-                onChange={(token) => setCaptchaToken(token)}
-              />
-            </Box>
-          </DialogContent>
-          <DialogActions sx={{ p: 4, pt: 0, justifyContent: 'flex-end', gap: 1 }}>
-            <Button onClick={() => setOpenDownloadDialog(false)} sx={{ color: '#64748b', fontWeight: 600 }}>Cancel</Button>
-            <Button type="submit" disabled={submitting} variant="contained" sx={{ bgcolor: '#10b981', px: 4, py: 1.5, borderRadius: '12px', fontWeight: 600, boxShadow: '0 4px 12px rgba(16,185,129,0.3)', "&:hover": { bgcolor: '#059669' } }}>
-              {submitting ? "Processing..." : "Download Now"}
-            </Button>
-          </DialogActions>
-        </form>
-      </Dialog>
+        initialCourse={course?.title}
+        inquiryType={`Curriculum Download: ${course?.title || "Course"}`}
+        successMessage="Curriculum will send successfully to your mail"
+      />
 
       <style>
         {`

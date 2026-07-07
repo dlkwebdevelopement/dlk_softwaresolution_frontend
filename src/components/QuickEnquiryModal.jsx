@@ -57,7 +57,7 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
 const locations = ["Vadapalani", "Porur", "Online"];
 const timeslots = ["Morning", "Afternoon", "Evening"];
 
-export default function QuickEnquiryModal({ open, onClose, initialCourse = "", inquiryType = "Quick Enquiry" }) {
+export default function QuickEnquiryModal({ open, onClose, initialCourse = "", inquiryType = "Quick Enquiry", customSubmit, successMessage }) {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -101,7 +101,11 @@ export default function QuickEnquiryModal({ open, onClose, initialCourse = "", i
 
 
     try {
-      await PostRequest(ADMIN_POST_ENQUIRIES, { ...formData, inquiryType });
+      if (customSubmit) {
+        await customSubmit(formData);
+      } else {
+        await PostRequest(ADMIN_POST_ENQUIRIES, { ...formData, inquiryType });
+      }
       setShowSuccess(true);
       setFormData({
         name: "",
@@ -276,7 +280,7 @@ export default function QuickEnquiryModal({ open, onClose, initialCourse = "", i
           </form>
         </Stack>
       </DialogContent>
-      <SuccessPopup open={showSuccess} onClose={() => setShowSuccess(false)} />
+      <SuccessPopup open={showSuccess} onClose={() => setShowSuccess(false)} message={successMessage || "Enquiry Submitted Successfully"} />
     </StyledDialog>
   );
 }
