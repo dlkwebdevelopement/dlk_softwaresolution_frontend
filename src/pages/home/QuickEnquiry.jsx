@@ -143,7 +143,7 @@ export default function QuickEnquiry() {
   const handleSubmit = async (e) => {
     if(e) e.preventDefault();
     
-    if (!captchaToken) {
+    if (!captchaToken && window.location.hostname !== 'localhost') {
       toast.error("Please complete the reCAPTCHA");
       return;
     }

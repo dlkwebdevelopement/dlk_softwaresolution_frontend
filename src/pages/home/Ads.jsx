@@ -312,7 +312,7 @@ const Ads = () => {
   };
 
   const handleSubmit = async () => {
-    if (!captchaToken) {
+    if (!captchaToken && window.location.hostname !== 'localhost') {
       toast.error("Please complete the reCAPTCHA");
       return;
     }

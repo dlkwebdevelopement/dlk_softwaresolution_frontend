@@ -242,7 +242,7 @@ export default function ContactForm() {
     e.preventDefault();
     if (!validateForm()) return;
 
-    if (!captchaToken) {
+    if (!captchaToken && window.location.hostname !== 'localhost') {
       toast.error("Please complete the reCAPTCHA");
       return;
     }

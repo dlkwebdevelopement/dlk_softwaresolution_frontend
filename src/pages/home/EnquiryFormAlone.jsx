@@ -89,7 +89,7 @@ export default function EnquiryFormAlone() {
 
 
   const handleSubmit = async () => {
-    if (!captchaToken) {
+    if (!captchaToken && window.location.hostname !== 'localhost') {
       setError("Please complete the reCAPTCHA");
       return;
     }
