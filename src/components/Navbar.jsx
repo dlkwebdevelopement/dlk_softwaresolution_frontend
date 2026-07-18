@@ -49,6 +49,9 @@ import VideoLibraryIcon from "@mui/icons-material/VideoLibrary";
 import PhotoLibraryIcon from "@mui/icons-material/PhotoLibrary";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import EditNoteIcon from "@mui/icons-material/EditNote";
+import DocumentScannerIcon from "@mui/icons-material/DocumentScanner";
 import { GetRequest } from "../api/api";
 import { ADMIN_GET_ALL_CATEGORIES_WITH_SUB } from "../api/endpoints";
 
@@ -164,7 +167,7 @@ const NavItem = styled(Box)({
   display: "flex",
   alignItems: "center",
   cursor: "pointer",
-  padding: "6px 14px",
+  padding: "5px 10px",
   borderRadius: "50px",
   transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
   position: "relative",
@@ -183,10 +186,11 @@ const NavItem = styled(Box)({
 
 const NavText = styled(Typography)({
   color: colors.dark,
-  fontSize: "0.9rem",
+  fontSize: "0.96rem",
   fontWeight: 500,
-  letterSpacing: "0.2px",
+  letterSpacing: "0.1px",
   transition: "color 0.3s ease",
+  whiteSpace: "nowrap",
 });
 
 const MegaMenuContainer = styled(Paper)({
@@ -456,25 +460,25 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [courseOpen, setCourseOpen] = useState(false);
-  const [fortuneOpen, setFortuneOpen] = useState(false);
   const [mobileCatOpen, setMobileCatOpen] = useState(null);
   const [roadMap, setRoadMapOpen] = useState(false);
   const [workShop, setWorkShopOpen] = useState(false);
   const [cats, setCats] = useState([]);
   const [mobileAllCoursesOpen, setMobileAllCoursesOpen] = useState(false);
-  const [mobileFortuneOpen, setMobileFortuneOpen] = useState(false);
   const [mediaOpen, setMediaOpen] = useState(false);
   const [mobileMediaOpen, setMobileMediaOpen] = useState(false);
   const [resourcesOpen, setResourcesOpen] = useState(false);
   const [mobileResourcesOpen, setMobileResourcesOpen] = useState(false);
+  const [productsOpen, setProductsOpen] = useState(false);
+  const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
   const courseCloseTimer = useRef(null);
 
   const openCourseMenu = () => {
     clearTimeout(courseCloseTimer.current);
     setCourseOpen(true);
-    setFortuneOpen(false);
     setMediaOpen(false);
     setResourcesOpen(false);
+    setProductsOpen(false);
   };
 
   const closeCourseMenu = () => {
@@ -498,7 +502,7 @@ const Navbar = () => {
   };
 
   const handleNavigation = (path) => {
-    if (path.startsWith('http')) {
+    if (path.startsWith('http') || path.endsWith('.html')) {
       window.location.href = path;
     } else {
       navigate(path);
@@ -525,7 +529,7 @@ const Navbar = () => {
   return (
     <>
       <GlassAppBar position="fixed" elevation={0}>
-        <Container maxWidth="xl">
+        <Container maxWidth="xl" disableGutters sx={{ px: { xs: "8px", md: "12px" } }}>
           <Toolbar
             sx={{
               display: "flex",
@@ -548,10 +552,12 @@ const Navbar = () => {
             {/* DESKTOP NAVIGATION */}
             <Stack
               direction="row"
-              spacing={1}
+              spacing={0.5}
               sx={{
                 display: { xs: "none", md: "flex" },
                 alignItems: "center",
+                flex: 1,
+                justifyContent: "center",
               }}
             >
               <NavItem onClick={() => navigate("/")}>
@@ -578,31 +584,31 @@ const Navbar = () => {
                 />
               </Box>
 
-              {/* Fortune Dropdown */}
+              {/* Our Software Products Nav Item */}
               <Box
                 sx={{ position: "relative" }}
                 onMouseEnter={() => {
-                  setFortuneOpen(true);
-                  setCourseOpen(false);
+                  setProductsOpen(true);
                   setMediaOpen(false);
+                  setCourseOpen(false);
                   setResourcesOpen(false);
                 }}
-                onMouseLeave={() => setFortuneOpen(false)}
+                onMouseLeave={() => setProductsOpen(false)}
               >
                 <NavItem>
-                  <EmojiEventsIcon className="nav-icon" sx={{ fontSize: 20, mr: 1, color: colors.dark, transition: "all 0.4s ease" }} />
-                  <NavText className="nav-text">Fortune</NavText>
+                  <TrendingUpIcon className="nav-icon" sx={{ fontSize: 20, mr: 1, color: colors.dark, transition: "all 0.4s ease" }} />
+                  <NavText className="nav-text">Software Products</NavText>
                   <ArrowDropDownIcon className="nav-icon" sx={{ color: colors.dark, ml: 0.2, transition: "transform 0.4s ease" }} />
                 </NavItem>
 
-                <Fade in={fortuneOpen}>
+                <Fade in={productsOpen}>
                   <Paper
                     elevation={0}
                     sx={{
                       position: "absolute",
                       top: "100%",
                       left: 0,
-                      minWidth: "260px",
+                      minWidth: "220px",
                       mt: 1,
                       borderRadius: "20px",
                       overflow: "hidden",
@@ -615,9 +621,9 @@ const Navbar = () => {
                     }}
                   >
                     {[
-                      { icon: <SchoolIcon />, text: "Become an Instructor", path: "/become-instructor" },
-                      { icon: <WorkIcon />, text: "Career", path: "/career" },
-                      { icon: <EmojiEventsIcon />, text: "Placement", path: "/placement" },
+                      { icon: <DashboardIcon />, text: "Prithu", path: "/prithu.html" },
+                      { icon: <EditNoteIcon />, text: "Note Fort", path: "/notefort.html" },
+                      { icon: <DocumentScannerIcon />, text: "Scan pdf", path: "/scanpdf.html" },
                     ].map((item, index) => (
                       <ListItemButton
                         key={index}
@@ -658,9 +664,9 @@ const Navbar = () => {
                 sx={{ position: "relative" }}
                 onMouseEnter={() => {
                   setMediaOpen(true);
-                  setFortuneOpen(false);
                   setCourseOpen(false);
                   setResourcesOpen(false);
+                  setProductsOpen(false);
                 }}
                 onMouseLeave={() => setMediaOpen(false)}
               >
@@ -744,8 +750,8 @@ const Navbar = () => {
                 onMouseEnter={() => {
                   setResourcesOpen(true);
                   setMediaOpen(false);
-                  setFortuneOpen(false);
                   setCourseOpen(false);
+                  setProductsOpen(false);
                 }}
                 onMouseLeave={() => setResourcesOpen(false)}
               >
@@ -777,6 +783,9 @@ const Navbar = () => {
                     {[
                       { icon: <MapIcon />, text: "Roadmap", path: "/roadmap" },
                       { icon: <LocalOfferIcon />, text: "Offers", path: "/offers" },
+                      { icon: <SchoolIcon />, text: "Become an Instructor", path: "/become-instructor" },
+                      { icon: <WorkIcon />, text: "Career", path: "/career" },
+                      { icon: <EmojiEventsIcon />, text: "Placement", path: "/placement" },
                     ].map((item, index) => (
                       <ListItemButton
                         key={index}
@@ -812,13 +821,17 @@ const Navbar = () => {
                 </Fade>
               </Box>
 
+            </Stack>
+
+            {/* CTA BUTTON - Right */}
+            <Box sx={{ display: { xs: "none", md: "flex" }, flexShrink: 0 }}>
               <CTAGradientButton
                 onClick={() => navigate("/contact")}
                 startIcon={<RocketLaunchIcon />}
               >
                 Book Free Demo
               </CTAGradientButton>
-            </Stack>
+            </Box>
 
             {/* MOBILE MENU BUTTON */}
             <IconButton
@@ -998,10 +1011,10 @@ const Navbar = () => {
               </Collapse>
             </List>
 
-            {/* Fortune Mobile Section */}
+            {/* Our Software Products Mobile Section */}
             <List sx={{ width: "100%" }}>
               <MobileMenuItem
-                onClick={() => setMobileFortuneOpen(!mobileFortuneOpen)}
+                onClick={() => setMobileProductsOpen(!mobileProductsOpen)}
                 sx={{
                   backgroundColor: alpha(colors.primary, 0.04),
                   borderRadius: "16px",
@@ -1009,29 +1022,29 @@ const Navbar = () => {
                 }}
               >
                 <ListItemIcon sx={{ color: colors.primary, minWidth: 40 }}>
-                  <EmojiEventsIcon />
+                  <TrendingUpIcon />
                 </ListItemIcon>
                 <ListItemText
-                  primary="Fortune"
+                  primary="Our Software Products"
                   primaryTypographyProps={{
                     fontWeight: 700,
                     color: colors.dark,
                     fontSize: "1.05rem"
                   }}
                 />
-                {mobileFortuneOpen ? (
+                {mobileProductsOpen ? (
                   <ExpandLessIcon sx={{ color: colors.primary }} />
                 ) : (
                   <ExpandMoreIcon sx={{ color: colors.primary }} />
                 )}
               </MobileMenuItem>
 
-              <Collapse in={mobileFortuneOpen} timeout="auto" unmountOnExit>
+              <Collapse in={mobileProductsOpen} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding sx={{ pl: 4 }}>
                   {[
-                    { icon: <SchoolIcon />, text: "Become an Instructor", path: "/become-instructor" },
-                    { icon: <WorkIcon />, text: "Career", path: "/career" },
-                    { icon: <EmojiEventsIcon />, text: "Placement", path: "/placement" },
+                    { icon: <DashboardIcon />, text: "Prithu", path: "/prithu.html" },
+                    { icon: <EditNoteIcon />, text: "Note Fort", path: "/notefort.html" },
+                    { icon: <DocumentScannerIcon />, text: "Scan pdf", path: "/scanpdf.html" },
                   ].map((item, index) => (
                     <MobileMenuItem
                       key={index}
@@ -1190,6 +1203,9 @@ const Navbar = () => {
                   {[
                     { icon: <MapIcon />, text: "Roadmap", path: "/roadmap" },
                     { icon: <LocalOfferIcon />, text: "Offers", path: "/offers" },
+                    { icon: <SchoolIcon />, text: "Become an Instructor", path: "/become-instructor" },
+                    { icon: <WorkIcon />, text: "Career", path: "/career" },
+                    { icon: <EmojiEventsIcon />, text: "Placement", path: "/placement" },
                   ].map((item, index) => (
                     <MobileMenuItem
                       key={index}

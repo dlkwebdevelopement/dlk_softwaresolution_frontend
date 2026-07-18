@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prithu - AI-Powered Creative Platform</title>
+    <meta name="description" content="Prithu is an AI-powered creative platform where you can generate AI art, edit professional posters, discover inspiring content, and share your creations." />
+    <meta name="keywords" content="AI Poster Maker, AI Prompt Library, AI Image Generator, Creative Community, Graphic Design App, Canva Alternative, Poster Editor, Status Maker, Social Media Creator, Digital Content Platform, AI Art Generator, Video Editor, Creator Platform" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        :root {
+            --pri: #16A34A;
+            --sec: #2563EB;
+            --acc: #F97316;
+            --bg: #FAFAFA;
+            --card: #FFFFFF;
+            --dark: #111827;
+            --muted: #6B7280;
+            --sh-sm: 0 4px 20px rgba(0,0,0,0.03);
+            --sh-md: 0 12px 32px rgba(0,0,0,0.06);
+            --sh-lg: 0 24px 64px rgba(0,0,0,0.08);
+            --r: 24px;
+            --rl: 32px;
+            --font: 'Plus Jakarta Sans', sans-serif;
+            --border: rgba(17,24,39,0.06);
+            --grad-ai: linear-gradient(135deg, #2563EB 0%, #16A34A 100%);
+        }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: var(--font); background: var(--bg); color: var(--dark); line-height: 1.6; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+        ::selection { background: var(--pri); color: #fff; }
+        img { max-width: 100%; display: block; }
+
+        /* ─── GLOBAL UTILS ─── */
+        .ct { max-width: 1280px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 1; padding: 20px; }
+        .sec { padding: 7rem 0; position: relative; }
+        .sec-bg { background: #fff; }
+        .sh { font-size: clamp(2.4rem, 4.5vw, 4rem); font-weight: 800; letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 1.25rem; color: var(--dark); text-align: center; }
+        .sub { font-size: 1.15rem; color: var(--muted); line-height: 1.7;   }
+        .grad-txt { background: var(--grad-ai); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .chip { display: inline-flex; align-items: center; gap: 8px; background: rgba(37,99,235,0.08); color: var(--sec); font-size: 0.85rem; font-weight: 700; padding: 0.5rem 1.25rem; border-radius: 50px; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid rgba(37,99,235,0.15); }
+        
+        /* ─── BUTTONS ─── */
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-family: inherit; font-weight: 700; border: none; cursor: pointer; text-decoration: none; border-radius: 50px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
+        .btn-pri { background: var(--dark); color: #fff; box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+        .btn-pri:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.25); background: #000; }
+        .btn-sec { background: var(--card); color: var(--dark); border: 1px solid var(--border); box-shadow: var(--sh-sm); }
+        .btn-sec:hover { background: var(--bg); border-color: rgba(0,0,0,0.15); transform: translateY(-3px); box-shadow: var(--sh-md); }
+        .btn-acc { background: var(--pri); color: #fff; box-shadow: 0 8px 24px rgba(22,163,74,0.3); }
+        .btn-acc:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(22,163,74,0.4); }
+        .btn-lg { font-size: 1.1rem; padding: 1.1rem 2.6rem; }
+        .btn-md { font-size: 0.95rem; padding: 0.85rem 2rem; }
+        
+        /* ─── BLOB BG ─── */
+        .bg-blob { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.15; z-index: 0; pointer-events: none; }
+        
+        /* ─── NAVBAR ─── */
+        #nav { position: sticky; top: 0; z-index: 80; height: 76px; display: flex; align-items: center; padding: 0 2rem; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); background: rgba(250,250,250,0.85); transition: box-shadow 0.3s; border-bottom: 1px solid var(--border); }
+        #nav.scrolled { box-shadow: 0 10px 30px rgba(0,0,0,0.04); }
+        .nav-in { max-width: 1280px; width: 100%; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+.nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: #87CEEB;
+    font-size: 24px;
+    font-weight: 700;
+}
+.nav-logo img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+}
+        .nav-logo i { color: var(--pri); }
+        .nav-links { display: flex; align-items: center; gap: 0.5rem; }
+        .nav-links a { font-size: 0.95rem; font-weight: 600; color: var(--muted); text-decoration: none; padding: 0.5rem 1rem; border-radius: 12px; transition: all 0.2s; }
+        .nav-links a:hover { color: var(--dark); background: rgba(0,0,0,0.04); }
+
+        /* ─── HERO ─── */
+        #hero { min-height: 100vh; display: flex; align-items: center; overflow: hidden; padding-top: 4rem; padding-bottom: 4rem; position: relative; }
+        .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+        .hh { font-size: clamp(3rem, 6vw, 5.5rem); font-weight: 800; line-height: 1.05; letter-spacing: -0.05em; color: var(--dark); margin-bottom: 1.5rem; }
+        .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 2.5rem; }
+        
+        .hero-r { position: relative; height: 600px; display: flex; align-items: center; justify-content: center; perspective: 1000px; }
+        .h-ph { position: relative; z-index: 10; width: 280px; background: #fff; border-radius: 46px; padding: 12px; box-shadow: var(--sh-lg); border: 1px solid var(--border); animation: floatPh 6s ease-in-out infinite; transform-style: preserve-3d; }
+        .h-ph-sc { border-radius: 34px; overflow: hidden; aspect-ratio: 9/19; background: var(--bg); }
+        .h-ph-sc img { width: 100%; height: 100%; object-fit: cover; }
+        @keyframes floatPh { 0%, 100% { transform: translateY(0) rotateX(2deg) rotateY(-5deg); } 50% { transform: translateY(-20px) rotateX(2deg) rotateY(-5deg); } }
+        
+        .h-fc { position: absolute; background: rgba(255,255,255,0.9); backdrop-filter: blur(12px); border: 1px solid var(--border); box-shadow: var(--sh-md); border-radius: 16px; padding: 12px 20px; font-weight: 700; font-size: 0.9rem; color: var(--dark); display: flex; align-items: center; gap: 10px; z-index: 5; animation: floatFc 5s ease-in-out infinite alternate; }
+        .h-fc i { color: var(--sec); font-size: 1.2rem; }
+        .hf-1 { top: 10%; left: -5%; animation-delay: 0s; }
+        .hf-2 { top: 30%; right: -15%; animation-delay: 1s; }
+        .hf-3 { bottom: 25%; left: -10%; animation-delay: 0.5s; }
+        .hf-4 { bottom: 10%; right: 0%; animation-delay: 1.5s; }
+        @keyframes floatFc { 0% { transform: translateY(0); } 100% { transform: translateY(-15px); } }
+
+        /* ─── TRUST STATS ─── */
+        #trust { padding: 4rem 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: #fff; }
+        .tr-wrap { display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 2rem; text-align: center; }
+        .tr-num { font-size: 3rem; font-weight: 800; color: var(--dark); line-height: 1; letter-spacing: -0.04em; }
+        .tr-lbl { font-size: 0.95rem; font-weight: 600; color: var(--muted); margin-top: 0.5rem; }
+
+        /* ─── FEATURES ─── */
+        #features { background: var(--bg); }
+        .f-hd { text-align: center; margin-bottom: 4rem; max-width: 700px; margin-inline: auto; }
+        .f-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+        .fc { background: var(--card); border-radius: var(--r); padding: 2.5rem; border: 1px solid var(--border); box-shadow: var(--sh-sm); transition: all 0.4s ease; position: relative; overflow: hidden; }
+        .fc:hover { transform: translateY(-8px); box-shadow: var(--sh-lg); border-color: rgba(37,99,235,0.15); }
+        .fc-ico { width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; margin-bottom: 1.5rem; background: rgba(37,99,235,0.06); color: var(--sec); transition: transform 0.3s; }
+        .fc:hover .fc-ico { transform: scale(1.1) rotate(5deg); background: var(--sec); color: #fff; }
+        .fc h4 { font-size: 1.25rem; font-weight: 800; color: var(--dark); margin-bottom: 0.75rem; }
+        .fc p { font-size: 0.95rem; color: var(--muted); line-height: 1.6; }
+
+        /* ─── SHOWCASE MOCKUPS ─── */
+        #showcase { background: #fff; }
+        .sc-grid { display: flex; overflow-x: auto; gap: 2rem; margin-top: 4rem; padding-bottom: 2rem; scroll-snap-type: x mandatory; scroll-padding: 2rem; -webkit-overflow-scrolling: touch; }
+        .sc-grid::-webkit-scrollbar { height: 8px; }
+        .sc-grid::-webkit-scrollbar-track { background: var(--bg); border-radius: 10px; }
+        .sc-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        .sc-grid::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+        .sc-item { flex: 0 0 280px; scroll-snap-align: start; }
+        .sc-ph { background: var(--bg); border-radius: 32px; padding: 10px; border: 1px solid var(--border); box-shadow: var(--sh-sm); transition: all 0.4s; }
+        .sc-ph:hover { transform: translateY(-10px); box-shadow: var(--sh-md); }
+        .sc-sc { border-radius: 22px; overflow: hidden; aspect-ratio: 9/19; }
+        .sc-sc img { width: 100%; height: 100%; object-fit: cover; }
+        .sc-lbl { text-align: center; margin-top: 1.5rem; }
+        .sc-lbl h4 { font-size: 1.1rem; font-weight: 800; color: var(--dark); margin-bottom: 0.25rem; }
+        .sc-lbl p { font-size: 0.9rem; color: var(--muted); line-height: 1.4; }
+
+        /* ─── HOW IT WORKS ─── */
+        #steps { background: var(--bg); }
+        .st-flex { display: flex; justify-content: space-between; align-items: flex-start; margin-top: 4rem; position: relative; }
+        .st-flex::before { content: ''; position: absolute; top: 32px; left: 5%; right: 5%; height: 2px; background: var(--border); z-index: 0; }
+        .step { text-align: center; position: relative; z-index: 1; width: 18%; }
+        .st-n { width: 64px; height: 64px; border-radius: 50%; background: #fff; border: 2px solid var(--border); color: var(--muted); font-size: 1.25rem; font-weight: 800; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; transition: all 0.3s; }
+        .step:hover .st-n { background: var(--dark); color: #fff; border-color: var(--dark); transform: scale(1.1); }
+        .step h4 { font-size: 1.1rem; font-weight: 800; margin-bottom: 0.5rem; }
+
+        /* ─── WHY PRITHU (COMPARISON) ─── */
+        #why { background: #fff; }
+        .why-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-top: 3rem; }
+        .w-col { background: var(--bg); border: 1px solid var(--border); border-radius: var(--rl); padding: 3rem; }
+        .w-col.pro { background: var(--dark); color: #fff; border-color: var(--dark); box-shadow: var(--sh-lg); }
+        .w-col h3 { font-size: 1.5rem; font-weight: 800; margin-bottom: 2rem; }
+        .w-col.pro h3 { color: #fff; }
+        .w-list { list-style: none; }
+        .w-list li { display: flex; align-items: center; gap: 12px; margin-bottom: 1.25rem; font-size: 1.1rem; font-weight: 600; }
+        .w-list i.fa-xmark { color: #EF4444; font-size: 1.4rem; }
+        .w-list i.fa-check { color: var(--pri); font-size: 1.4rem; }
+
+        /* ─── FOR WHO (TAGS) ─── */
+        #forwho { background: var(--bg); padding: 5rem 0; text-align: center; border-top: 1px solid var(--border); }
+        .tag-wrap { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin-top: 2rem; max-width: 900px; margin-inline: auto; }
+        .t-tag { background: #fff; border: 1px solid var(--border); padding: 0.75rem 1.5rem; border-radius: 50px; font-weight: 700; color: var(--dark); box-shadow: var(--sh-sm); transition: all 0.3s; cursor: default; }
+        .t-tag:hover { transform: translateY(-3px); border-color: var(--sec); color: var(--sec); box-shadow: var(--sh-md); }
+
+        /* ─── PRICING ─── */
+        #pricing { background: #fff; }
+        .p-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 3rem; align-items: center; }
+        .p-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--rl); padding: 3rem 2rem; text-align: left; transition: all 0.3s; position: relative; }
+        .p-card.feat { background: #fff; border: 2px solid var(--sec); box-shadow: var(--sh-lg); padding: 4rem 2rem; transform: scale(1.02); }
+        .p-card.feat .p-lbl { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); background: var(--sec); color: #fff; padding: 0.3rem 1rem; border-radius: 50px; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; }
+        .p-card h3 { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem; }
+        .p-card .price { font-size: 3rem; font-weight: 800; color: var(--dark); margin-bottom: 2rem; line-height: 1; }
+        .p-card .price span { font-size: 1rem; color: var(--muted); font-weight: 600; }
+        .p-list { list-style: none; margin-bottom: 2.5rem; }
+        .p-list li { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; font-size: 0.95rem; color: var(--dark); font-weight: 500; }
+        .p-list i { color: var(--pri); }
+        .p-card .btn { width: 100%; }
+
+        /* ─── TESTIMONIALS ─── */
+        #test { background: var(--bg); }
+        .t-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 3rem; }
+        .tc { background: #fff; padding: 2.5rem; border-radius: var(--r); box-shadow: var(--sh-sm); border: 1px solid var(--border); transition: transform 0.3s; }
+        .tc:hover { transform: translateY(-8px); box-shadow: var(--sh-md); }
+        .t-stars { color: #F59E0B; font-size: 1.1rem; letter-spacing: 2px; margin-bottom: 1rem; }
+        .tc p { font-size: 1.05rem; font-weight: 500; line-height: 1.7; margin-bottom: 1.5rem; color: var(--dark); }
+        .t-u { display: flex; align-items: center; gap: 12px; }
+        .t-u img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
+        .t-ui h5 { font-size: 1rem; font-weight: 800; color: var(--dark); }
+        .t-ui span { font-size: 0.85rem; color: var(--muted); }
+
+        /* ─── DOWNLOAD CTA ─── */
+        #cta { background: var(--dark); color: #fff; text-align: center; overflow: hidden; position: relative; padding: 8rem 0; }
+        .cta-in { position: relative; z-index: 1; max-width: 800px; margin: 0 auto; }
+        .cta-in h2 { font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 800; line-height: 1.1; letter-spacing: -0.04em; margin-bottom: 1.5rem; color: #fff; }
+        .cta-btns { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-top: 2.5rem; }
+        
+        /* ─── FOOTER ─── */
+        footer { background: #fff; padding: 5rem 0 2rem; border-top: 1px solid var(--border); }
+        .ft-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 3rem; margin-bottom: 4rem; }
+        .ft-logo { font-size: 1.5rem; font-weight: 800; color: var(--dark); text-decoration: none; display: flex; align-items: center; gap: 8px; margin-bottom: 1rem; }
+        .ft-logo i { color: var(--pri); }
+        .ft-desc { font-size: 0.95rem; color: var(--muted); max-width: 300px; margin-bottom: 1.5rem; line-height: 1.6; }
+        .ft-soc { display: flex; gap: 10px; }
+        .ft-soc a { width: 40px; height: 40px; border-radius: 50%; background: var(--bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--dark); font-size: 1.1rem; text-decoration: none; transition: all 0.2s; }
+        .ft-soc a:hover { background: var(--dark); color: #fff; border-color: var(--dark); }
+        .ft-col h4 { font-size: 0.9rem; font-weight: 800; color: var(--dark); margin-bottom: 1.25rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .ft-col a { display: block; color: var(--muted); text-decoration: none; font-size: 0.95rem; margin-bottom: 0.8rem; font-weight: 500; transition: color 0.2s; }
+        .ft-col a:hover { color: var(--dark); }
+        .ft-bot { display: flex; justify-content: space-between; align-items: center; padding-top: 2rem; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 1rem; }
+        .ft-bot p { font-size: 0.9rem; color: var(--muted); font-weight: 500; }
+
+        /* ─── SCROLL REVEAL ─── */
+        .rv { opacity: 0; transform: translateY(36px); transition: opacity 0.85s ease, transform 0.85s cubic-bezier(0.4, 0, 0.2, 1); }
+        .rv.in { opacity: 1; transform: translateY(0); }
+        .rv.d1 { transition-delay: 0.1s; } .rv.d2 { transition-delay: 0.2s; } .rv.d3 { transition-delay: 0.3s; }
+        .rv.from-left  { transform: translateX(-40px) translateY(0); } .rv.from-left.in  { transform: translateX(0); }
+        .rv.from-right { transform: translateX(40px)  translateY(0); } .rv.from-right.in { transform: translateX(0); }
+        .rv.scale-in   { transform: scale(0.92); } .rv.scale-in.in { transform: scale(1); }
+
+        /* ─── KEYFRAMES ─── */
+        @keyframes gradShift { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+        @keyframes shimmerBtn { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+        @keyframes pulseGlow { 0%,100% { box-shadow: 0 8px 24px rgba(22,163,74,0.3); } 50% { box-shadow: 0 8px 48px rgba(22,163,74,0.6); } }
+        @keyframes floatFc { 0% { transform: translateY(0); } 100% { transform: translateY(-15px); } }
+        @keyframes floatPh { 0%,100% { transform: translateY(0) rotateX(2deg) rotateY(-5deg); } 50% { transform: translateY(-20px) rotateX(2deg) rotateY(-5deg); } }
+        @keyframes navIn { from { transform: translateY(-100%); opacity:0; } to { transform: translateY(0); opacity:1; } }
+        @keyframes blobPulse { 0%{transform:translate(0,0) scale(1);} 100%{transform:translate(30px,20px) scale(1.12);} }
+        @keyframes countPop { from { opacity:0; transform:scale(0.7); } to { opacity:1; transform:scale(1); } }
+        @keyframes borderPulse { 0%,100%{border-color:rgba(37,99,235,0.08);} 50%{border-color:rgba(37,99,235,0.3);} }
+        @keyframes tagPop { from{opacity:0;transform:scale(0.8);} to{opacity:1;transform:scale(1);} }
+
+        /* ─── ANIMATED GRADIENT TEXT ─── */
+        .grad-txt { background: linear-gradient(270deg,#16A34A,#2563EB,#F97316,#16A34A); background-size:400% 400%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:gradShift 6s ease infinite; }
+
+        /* ─── BUTTON SHIMMER ─── */
+        .btn-pri, .btn-acc { position:relative; overflow:hidden; }
+        .btn-pri::before, .btn-acc::before { content:''; position:absolute; inset:0; background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,0.22) 50%,transparent 60%); background-size:200% 100%; animation:shimmerBtn 3s infinite; border-radius:inherit; pointer-events:none; }
+
+        /* ─── SCROLL PROGRESS ─── */
+        #scroll-progress { position:fixed; top:0; left:0; height:3px; background:linear-gradient(90deg,#16A34A,#2563EB,#F97316); z-index:9999; width:0%; transition:width 0.1s linear; }
+
+        /* ─── PRICING PULSE ─── */
+        .p-card.feat { animation:pulseGlow 3s ease-in-out infinite; }
+        .p-card.feat:hover { animation:none; }
+
+        /* ─── NAV ENTRANCE ─── */
+        #nav { animation:navIn 0.6s ease both; }
+
+        /* ─── TAG ENTRANCE ─── */
+        .t-tag { transition:all 0.35s cubic-bezier(0.34,1.56,0.64,1); }
+        .t-tag:hover { transform:translateY(-5px) scale(1.06); box-shadow:0 12px 32px rgba(0,0,0,0.08); }
+
+        /* ─── FEATURE CARD BORDER ─── */
+        .fc:hover { animation:borderPulse 1.5s ease infinite; }
+
+        /* ─── STEP GLOW ─── */
+        .step:hover .st-n { box-shadow:0 0 0 8px rgba(22,163,74,0.12),0 8px 24px rgba(22,163,74,0.2); }
+
+        /* ─── FLOATING CHIP HOVER ─── */
+        .h-fc { transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1) !important; }
+        .h-fc:hover { box-shadow:0 16px 40px rgba(37,99,235,0.25); transform:translateY(-6px) scale(1.04) !important; }
+
+        /* ─── RESPONSIVE ─── */
+        @media(max-width: 1100px) {
+            .hero-grid { gap: 2rem; }
+            .f-grid, .t-grid { grid-template-columns: repeat(2, 1fr); }
+            .p-grid { grid-template-columns: 1fr; max-width: 500px; margin-inline: auto;  }
+            .p-card.feat { transform: scale(1); }
+            .st-flex { flex-wrap: wrap; gap: 2rem; justify-content: center; }
+            .st-flex::before { display: none; }
+            .step { width: 40%; }
+        }
+        @media(max-width: 900px) {
+            .hero-grid { grid-template-columns: 1fr; text-align: center; }
+            .hero-btns { justify-content: center; }
+            .hero-r { height: 500px; margin-top: 2rem; }
+            .why-wrap { grid-template-columns: 1fr; }
+            .ft-grid { grid-template-columns: 1fr 1fr; }
+            .nav-links { display: none; }
+            .sc-grid { animation: none !important; width: 100% !important; overflow-x: auto !important; transform: none !important; }
+        }
+        @media(max-width: 600px) {
+            .hh { font-size: 2.8rem; }
+            .f-grid, .t-grid, .p-grid { grid-template-columns: 1fr; }
+            .step { width: 100%; }
+            .ft-grid { grid-template-columns: 1fr; }
+            .ct { padding: 0 1.25rem; }
+            .sec { padding: 5rem 0; }
+        }
+    </style>
+</head>
+<body>
+
+<nav id="nav">
+    <div class="nav-in">
+      <a href="#" class="nav-logo">
+    <img src="images/prithulogo-vGOePwP-.png" alt="Prithu Logo" width="30" height="30">
+    <span>Prithu</span>
+</a>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#showcase">Showcase</a>
+            <a href="#pricing">Pricing</a>
+            <a href="#why">Why Prithu</a>
+        </div>
+        <div>
+            <a href="https://play.google.com/store/apps/details?id=com.dlktechnologies.Prithu" class="btn btn-pri btn-md" target="_blank">Download App</a>
+        </div>
+    </div>
+</nav>
+
+<section id="hero">
+    <div class="bg-blob" style="width: 500px; height: 500px; background: var(--sec); top: -10%; left: -10%;"></div>
+    <div class="bg-blob" style="width: 400px; height: 400px; background: var(--pri); bottom: 10%; right: -5%;"></div>
+    <div class="ct">
+        <div class="hero-grid">
+            <div class="rv">
+                <div class="chip"><i class="fas fa-sparkles"></i> The Premium AI Ecosystem</div>
+                <h1 class="hh">Create. Inspire. Share. <br /><span class="grad-txt">Everything Creative</span> <br />In One App.</h1>
+                <p class="sub" style="max-width: 540px;">
+                    Prithu is an AI-powered creative platform where you can generate AI art, edit professional posters, discover inspiring content, share your creations, and grow your audience—all from one beautiful app.
+                </p>
+                <div class="hero-btns">
+                    <a href="https://play.google.com/store/apps/details?id=com.dlktechnologies.Prithu" class="btn btn-pri btn-lg" target="_blank">Download App</a>
+                    <a href="#features" class="btn btn-sec btn-lg">Explore Features</a>
+                </div>
+            </div>
+            
+            <div class="hero-r rv d2">
+                <!-- Floating Feature Cards -->
+                <div class="h-fc hf-1"><i class="fas fa-robot"></i> AI Prompt Library</div>
+                <div class="h-fc hf-2"><i class="fas fa-pen-nib"></i> Poster Editor</div>
+                <div class="h-fc hf-3"><i class="fas fa-image"></i> AI Images</div>
+                <div class="h-fc hf-4"><i class="fas fa-crown"></i> Premium Access</div>
+                
+                <div class="h-ph">
+                    <div class="h-ph-sc"><img src="images/WhatsApp%20Image%202026-07-17%20at%2011.59.40%20(1).jpeg" alt="Prithu App" /></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div id="trust">
+    <div class="ct">
+        <div class="tr-wrap">
+            <div class="rv"><div class="tr-num" data-to="100" data-sfx="K+">0</div><div class="tr-lbl">Creators</div></div>
+            <div class="rv d1"><div class="tr-num" data-to="1" data-sfx="M+">0</div><div class="tr-lbl">Designs Created</div></div>
+            <div class="rv d2"><div class="tr-num" data-to="500" data-sfx="K+">0</div><div class="tr-lbl">AI Prompts</div></div>
+            <div class="rv d3"><div class="tr-num" data-to="50" data-sfx="+">0</div><div class="tr-lbl">Categories</div></div>
+        </div>
+    </div>
+</div>
+
+<!-- ─── UPDATED FEATURES SECTION ─── -->
+<section id="features" class="sec">
+    <div class="ct">
+        <div class="f-hd rv">
+            <h2 class="sh">Not just a poster maker. <br />An <span class="grad-txt">AI Ecosystem.</span></h2>
+            <p class="sub">Everything you need to create, manage, and share professional digital content.</p>
+        </div>
+        <div class="f-grid">
+            <div class="fc rv"><div class="fc-ico"><i class="fas fa-robot"></i></div><h4>AI Prompt Library</h4><p>Access thousands of curated AI prompts for Midjourney, ChatGPT, and Dall-E.</p></div>
+            
+            <div class="fc rv d1"><div class="fc-ico"><i class="fas fa-pen-nib"></i></div><h4>Professional Editor</h4><p>A full-featured poster and image editor with layers, filters, and precise controls.</p></div>
+            
+            
+            <!-- REPLACED: Video Export → Download Feed with Picture & Name -->
+            <div class="fc rv"><div class="fc-ico"><i class="fas fa-download"></i></div><h4>Download Feed</h4><p>Save any feed post with the creator's picture and name — perfect for inspiration boards.</p></div>
+            
+            <div class="fc rv d1"><div class="fc-ico"><i class="fas fa-layer-group"></i></div><h4>Premium Templates</h4><p>Thousands of professionally designed templates for every category and niche.</p></div>
+            
+            <div class="fc rv d2"><div class="fc-ico"><i class="fas fa-users"></i></div><h4>Creator Profiles</h4><p>Build your brand with a dedicated profile to showcase your best collections.</p></div>
+            
+            <!-- NEW: Category Feeds -->
+            <div class="fc rv"><div class="fc-ico"><i class="fas fa-fire"></i></div><h4>Trending Feed</h4><p>Discover what's hot right now and get inspired by the top creators globally.</p></div>
+            
+
+            
+            <!-- NEW: More Category Feeds -->
+            <div class="fc rv"><div class="fc-ico"><i class="fas fa-video"></i></div><h4>Video Reel Feed</h4><p>Watch short creative videos, reels, and motion graphics from top creators.</p></div>
+            
+            <div class="fc rv d1"><div class="fc-ico"><i class="fas fa-globe"></i></div><h4>Global Culture Feed</h4><p>Explore designs, posters, and creative work from cultures around the world.</p></div>
+            
+            
+            <!-- NEW: Fashion & Lifestyle Feed -->
+
+            
+            <div class="fc rv d2"><div class="fc-ico"><i class="fas fa-folder-open"></i></div><h4>Collections</h4><p>Organize your favorite prompts, templates, and designs into clean folders.</p></div>
+        </div>
+    </div>
+</section>
+
+<section id="showcase" class="sec sec-bg" style="padding:5rem 0; background:#fafaff; overflow:hidden;">
+    <div class="ct" style="max-width:1280px; margin:0 auto; padding:0 2rem;">
+        <div>
+        <div class="f-hd rv">
+            <h2 class="sh">Experience the <span class="grad-txt">Interface.</span></h2>
+            <p class="sub">Clean, modern, and built for speed.</p>
+        </div>   
+        
+        <!-- AUTO SCROLL CONTAINER -->
+        <div style="position:relative; overflow:hidden; width:100%;">
+            <div class="sc-grid rv d1" style="display:flex; gap:1.5rem; animation: scrollShowcase 30s linear infinite; width:max-content;">
+                <!-- DUPLICATE ITEMS FOR SEAMLESS LOOP -->
+                <!-- First set -->
+                <div class="sc-item" style="flex:0 0 220px; background:white; border-radius:24px; padding:1rem; box-shadow:0 12px 30px -12px rgba(0,0,0,0.06); border:1px solid #edeef6; transition:transform 0.3s ease;">
+                    <div class="sc-ph" style="background:#0e0e18; border-radius:20px; overflow:hidden; aspect-ratio:9/19; max-height:340px;">
+                        <div class="sc-sc" style="width:100%; height:100%;">
+                            <img src="images/WhatsApp%20Image%202026-07-17%20at%2011.59.40.jpeg" alt="Screen 1" style="width:100%; height:100%; object-fit:cover;" />
+                        </div>
+                    </div>
+                    <div class="sc-lbl" style="margin-top:0.8rem; text-align:center;">
+                        <h4 style="font-size:1rem; font-weight:600;">Home Feed</h4>
+                        <p style="font-size:0.85rem; color:#4a4a5a;">Discover trending content globally</p>
+                    </div>
+                </div>
+
+                <div class="sc-item" style="flex:0 0 220px; background:white; border-radius:24px; padding:1rem; box-shadow:0 12px 30px -12px rgba(0,0,0,0.06); border:1px solid #edeef6;">
+                    <div class="sc-ph" style="background:#0e0e18; border-radius:20px; overflow:hidden; aspect-ratio:9/19; max-height:340px;">
+                        <div class="sc-sc"><img src="images/WhatsApp%20Image%202026-07-17%20at%2011.59.32.jpeg" alt="Screen 2" style="width:100%; height:100%; object-fit:cover;" /></div>
+                    </div>
+                    <div class="sc-lbl" style="margin-top:0.8rem; text-align:center;">
+                        <h4 style="font-size:1rem; font-weight:600;">Poster Editor</h4>
+                        <p style="font-size:0.85rem; color:#4a4a5a;">Professional design tools</p>
+                    </div>
+                </div>
+
+                <div class="sc-item" style="flex:0 0 220px; background:white; border-radius:24px; padding:1rem; box-shadow:0 12px 30px -12px rgba(0,0,0,0.06); border:1px solid #edeef6;">
+                    <div class="sc-ph" style="background:#0e0e18; border-radius:20px; overflow:hidden; aspect-ratio:9/19; max-height:340px;">
+                        <div class="sc-sc"><img src="images/WhatsApp%20Image%202026-07-17%20at%2011.59.38.jpeg" alt="Screen 3" style="width:100%; height:100%; object-fit:cover;" /></div>
+                    </div>
+                    <div class="sc-lbl" style="margin-top:0.8rem; text-align:center;">
+                        <h4 style="font-size:1rem; font-weight:600;">Prompt Library</h4>
+                        <p style="font-size:0.85rem; color:#4a4a5a;">Curated AI prompts</p>
+                    </div>
+                </div>
+
+                <div class="sc-item" style="flex:0 0 220px; background:white; border-radius:24px; padding:1rem; box-shadow:0 12px 30px -12px rgba(0,0,0,0.06); border:1px solid #edeef6;">
+                    <div class="sc-ph" style="background:#0e0e18; border-radius:20px; overflow:hidden; aspect-ratio:9/19; max-height:340px;">
+                        <div class="sc-sc"><img src="images/WhatsApp%20Image%202026-07-17%20at%2011.59.34%20(1).jpeg" alt="Screen 4" style="width:100%; height:100%; object-fit:cover;" /></div>
+                    </div>
+                    <div class="sc-lbl" style="margin-top:0.8rem; text-align:center;">
+                        <h4 style="font-size:1rem; font-weight:600;">Creator Profile</h4>
+                        <p style="font-size:0.85rem; color:#4a4a5a;">Build your brand</p>
+                    </div>
+                </div>
+
+                <div class="sc-item" style="flex:0 0 220px; background:white; border-radius:24px; padding:1rem; box-shadow:0 12px 30px -12px rgba(0,0,0,0.06); border:1px solid #edeef6;">
+                    <div class="sc-ph" style="background:#0e0e18; border-radius:20px; overflow:hidden; aspect-ratio:9/19; max-height:340px;">
+                        <div class="sc-sc"><img src="images/WhatsApp%20Image%202026-07-17%20at%2011.59.39.jpeg" alt="Screen 5" style="width:100%; height:100%; object-fit:cover;" /></div>
+                    </div>
+                    <div class="sc-lbl" style="margin-top:0.8rem; text-align:center;">
+                        <h4 style="font-size:1rem; font-weight:600;">AI Generator</h4>
+                        <p style="font-size:0.85rem; color:#4a4a5a;">Create from text</p>
+                    </div>
+                </div>
+
+                <div class="sc-item" style="flex:0 0 220px; background:white; border-radius:24px; padding:1rem; box-shadow:0 12px 30px -12px rgba(0,0,0,0.06); border:1px solid #edeef6;">
+                    <div class="sc-ph" style="background:#0e0e18; border-radius:20px; overflow:hidden; aspect-ratio:9/19; max-height:340px;">
+                        <div class="sc-sc"><img src="images/WhatsApp%20Image%202026-07-17%20at%2011.59.19%20(1).jpeg" alt="Screen 7" style="width:100%; height:100%; object-fit:cover;" /></div>
+                    </div>
+                    <div class="sc-lbl" style="margin-top:0.8rem; text-align:center;">
+                        <h4 style="font-size:1rem; font-weight:600;">Social Sharing</h4>
+                        <p style="font-size:0.85rem; color:#4a4a5a;">One-tap export</p>
+                    </div>
+                </div>
+
+                <div class="sc-item" style="flex:0 0 220px; background:white; border-radius:24px; padding:1rem; box-shadow:0 12px 30px -12px rgba(0,0,0,0.06); border:1px solid #edeef6;">
+                    <div class="sc-ph" style="background:#0e0e18; border-radius:20px; overflow:hidden; aspect-ratio:9/19; max-height:340px;">
+                        <div class="sc-sc"><img src="images/WhatsApp%20Image%202026-07-17%20at%2011.59.35%20(1).jpeg" alt="Screen 8" style="width:100%; height:100%; object-fit:cover;" /></div>
+                    </div>
+                    <div class="sc-lbl" style="margin-top:0.8rem; text-align:center;">
+                        <h4 style="font-size:1rem; font-weight:600;">Premium</h4>
+                        <p style="font-size:0.85rem; color:#4a4a5a;">Unlock pro features</p>
+                    </div>
+                </div>
+
+                <div class="sc-item" style="flex:0 0 220px; background:white; border-radius:24px; padding:1rem; box-shadow:0 12px 30px -12px rgba(0,0,0,0.06); border:1px solid #edeef6;">
+                    <div class="sc-ph" style="background:#0e0e18; border-radius:20px; overflow:hidden; aspect-ratio:9/19; max-height:340px;">
+                        <div class="sc-sc"><img src="images/WhatsApp%20Image%202026-07-17%20at%2011.59.34.jpeg" alt="Screen 9" style="width:100%; height:100%; object-fit:cover;" /></div>
+                    </div>
+                    <div class="sc-lbl" style="margin-top:0.8rem; text-align:center;">
+                        <h4 style="font-size:1rem; font-weight:600;">Rewards</h4>
+                        <p style="font-size:0.85rem; color:#4a4a5a;">Earn by inviting</p>
+                    </div>
+                </div>
+
+                <div class="sc-item" style="flex:0 0 220px; background:white; border-radius:24px; padding:1rem; box-shadow:0 12px 30px -12px rgba(0,0,0,0.06); border:1px solid #edeef6;">
+                    <div class="sc-ph" style="background:#0e0e18; border-radius:20px; overflow:hidden; aspect-ratio:9/19; max-height:340px;">
+                        <div class="sc-sc"><img src="images/WhatsApp%20Image%202026-07-17%20at%2011.59.39%20(2).jpeg" alt="Screen 10" style="width:100%; height:100%; object-fit:cover;" /></div>
+                    </div>
+                    <div class="sc-lbl" style="margin-top:0.8rem; text-align:center;">
+                        <h4 style="font-size:1rem; font-weight:600;">Categories</h4>
+                        <p style="font-size:0.85rem; color:#4a4a5a;">Find what you need</p>
+                    </div>
+                </div>
+
+                <div class="sc-item" style="flex:0 0 220px; background:white; border-radius:24px; padding:1rem; box-shadow:0 12px 30px -12px rgba(0,0,0,0.06); border:1px solid #edeef6;">
+                    <div class="sc-ph" style="background:#0e0e18; border-radius:20px; overflow:hidden; aspect-ratio:9/19; max-height:340px;">
+                        <div class="sc-sc"><img src="images/WhatsApp%20Image%202026-07-17%20at%2011.59.35.jpeg" alt="Screen 11" style="width:100%; height:100%; object-fit:cover;" /></div>
+                    </div>
+                    <div class="sc-lbl" style="margin-top:0.8rem; text-align:center;">
+                        <h4 style="font-size:1rem; font-weight:600;">Settings</h4>
+                        <p style="font-size:0.85rem; color:#4a4a5a;">Customize experience</p>
+                    </div>
+                </div>
+
+                <div class="sc-item" style="flex:0 0 220px; background:white; border-radius:24px; padding:1rem; box-shadow:0 12px 30px -12px rgba(0,0,0,0.06); border:1px solid #edeef6;">
+                    <div class="sc-ph" style="background:#0e0e18; border-radius:20px; overflow:hidden; aspect-ratio:9/19; max-height:340px;">
+                        <div class="sc-sc"><img src="images/WhatsApp%20Image%202026-07-17%20at%2011.59.39%20(1).jpeg" alt="Screen 15" style="width:100%; height:100%; object-fit:cover;" /></div>
+                    </div>
+                    <div class="sc-lbl" style="margin-top:0.8rem; text-align:center;">
+                        <h4 style="font-size:1rem; font-weight:600;">Analytics</h4>
+                        <p style="font-size:0.85rem; color:#4a4a5a;">Track your success</p>
+                    </div>
+                </div>
+
+                <div class="sc-item" style="flex:0 0 220px; background:white; border-radius:24px; padding:1rem; box-shadow:0 12px 30px -12px rgba(0,0,0,0.06); border:1px solid #edeef6;">
+                    <div class="sc-ph" style="background:#0e0e18; border-radius:20px; overflow:hidden; aspect-ratio:9/19; max-height:340px;">
+                        <div class="sc-sc"><img src="images/WhatsApp%20Image%202026-07-17%20at%2011.59.40%20(1).jpeg" alt="Screen 19" style="width:100%; height:100%; object-fit:cover;" /></div>
+                    </div>
+                    <div class="sc-lbl" style="margin-top:0.8rem; text-align:center;">
+                        <h4 style="font-size:1rem; font-weight:600;">Onboarding</h4>
+                        <p style="font-size:0.85rem; color:#4a4a5a;">Welcome to Prithu</p>
+                    </div>
+                </div>
+
+                <!-- DUPLICATE SET FOR SEAMLESS LOOP -->
+                <div class="sc-item" style="flex:0 0 220px; background:white; border-radius:24px; padding:1rem; box-shadow:0 12px 30px -12px rgba(0,0,0,0.06); border:1px solid #edeef6;">
+                    <div class="sc-ph" style="background:#0e0e18; border-radius:20px; overflow:hidden; aspect-ratio:9/19; max-height:340px;">
+                        <div class="sc-sc"><img src="images/WhatsApp%20Image%202026-07-17%20at%2011.59.40.jpeg" alt="Screen 1" style="width:100%; height:100%; object-fit:cover;" /></div>
+                    </div>
+                    <div class="sc-lbl" style="margin-top:0.8rem; text-align:center;">
+                        <h4 style="font-size:1rem; font-weight:600;">Home Feed</h4>
+                        <p style="font-size:0.85rem; color:#4a4a5a;">Discover trending content globally</p>
+                    </div>
+                </div>
+
+                <div class="sc-item" style="flex:0 0 220px; background:white; border-radius:24px; padding:1rem; box-shadow:0 12px 30px -12px rgba(0,0,0,0.06); border:1px solid #edeef6;">
+                    <div class="sc-ph" style="background:#0e0e18; border-radius:20px; overflow:hidden; aspect-ratio:9/19; max-height:340px;">
+                        <div class="sc-sc"><img src="images/WhatsApp%20Image%202026-07-17%20at%2011.59.32.jpeg" alt="Screen 2" style="width:100%; height:100%; object-fit:cover;" /></div>
+                    </div>
+                    <div class="sc-lbl" style="margin-top:0.8rem; text-align:center;">
+                        <h4 style="font-size:1rem; font-weight:600;">Poster Editor</h4>
+                        <p style="font-size:0.85rem; color:#4a4a5a;">Professional design tools</p>
+                    </div>
+                </div>
+
+                <div class="sc-item" style="flex:0 0 220px; background:white; border-radius:24px; padding:1rem; box-shadow:0 12px 30px -12px rgba(0,0,0,0.06); border:1px solid #edeef6;">
+                    <div class="sc-ph" style="background:#0e0e18; border-radius:20px; overflow:hidden; aspect-ratio:9/19; max-height:340px;">
+                        <div class="sc-sc"><img src="images/WhatsApp%20Image%202026-07-17%20at%2011.59.38.jpeg" alt="Screen 3" style="width:100%; height:100%; object-fit:cover;" /></div>
+                    </div>
+                    <div class="sc-lbl" style="margin-top:0.8rem; text-align:center;">
+                        <h4 style="font-size:1rem; font-weight:600;">Prompt Library</h4>
+                        <p style="font-size:0.85rem; color:#4a4a5a;">Curated AI prompts</p>
+                    </div>
+                </div>
+
+                <div class="sc-item" style="flex:0 0 220px; background:white; border-radius:24px; padding:1rem; box-shadow:0 12px 30px -12px rgba(0,0,0,0.06); border:1px solid #edeef6;">
+                    <div class="sc-ph" style="background:#0e0e18; border-radius:20px; overflow:hidden; aspect-ratio:9/19; max-height:340px;">
+                        <div class="sc-sc"><img src="images/WhatsApp%20Image%202026-07-17%20at%2011.59.34%20(1).jpeg" alt="Screen 4" style="width:100%; height:100%; object-fit:cover;" /></div>
+                    </div>
+                    <div class="sc-lbl" style="margin-top:0.8rem; text-align:center;">
+                        <h4 style="font-size:1rem; font-weight:600;">Creator Profile</h4>
+                        <p style="font-size:0.85rem; color:#4a4a5a;">Build your brand</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    /* AUTO SCROLL ANIMATION */
+    @keyframes scrollShowcase {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+    }
+
+    /* PAUSE ON HOVER */
+    .sc-grid:hover {
+        animation-play-state: paused !important;
+    }
+
+    /* HOVER EFFECT ON INDIVIDUAL CARDS */
+    .sc-item:hover {
+        transform: translateY(-6px) scale(1.02);
+        box-shadow: 0 20px 40px -16px rgba(99,102,241,0.15);
+        border-color: #6366F1;
+        transition: all 0.3s ease;
+    }
+</style>
+
+<section id="steps" class="sec">
+    <div class="ct">
+        <div class="f-hd rv">
+            <h2 class="sh">How it <span class="grad-txt">Works.</span></h2>
+        </div>
+        <div class="st-flex rv d1">
+            <div class="step"><div class="st-n">1</div><h4>Browse Templates</h4></div>
+            <div class="step"><div class="st-n">2</div><h4>Customize with Editor</h4></div>
+            <div class="step"><div class="st-n">3</div><h4>Generate AI Images</h4></div>
+            <div class="step"><div class="st-n">4</div><h4>Export</h4></div>
+            <div class="step"><div class="st-n">5</div><h4>Share Everywhere</h4></div>
+        </div>
+    </div>
+</section>
+
+<section id="why" class="sec sec-bg">
+    <div class="ct">
+        <div class="f-hd rv">
+            <h2 class="sh">Why <span class="grad-txt">Prithu?</span></h2>
+            <p class="sub">Stop juggling between 5 different apps.</p>
+        </div>
+        <div class="why-wrap rv d1">
+            <div class="w-col">
+                <h3>Traditional Tools</h3>
+                <ul class="w-list">
+                    <li><i class="fa-solid fa-xmark"></i> Multiple Apps Required</li>
+                    <li><i class="fa-solid fa-xmark"></i> Complex Software</li>
+                    <li><i class="fa-solid fa-xmark"></i> Expensive Subscriptions</li>
+                    <li><i class="fa-solid fa-xmark"></i> Steep Learning Curve</li>
+                    <li><i class="fa-solid fa-xmark"></i> No Built-in Community</li>
+                </ul>
+            </div>
+            <div class="w-col pro">
+                <h3>With Prithu</h3>
+                <ul class="w-list">
+                    <li><i class="fa-solid fa-check"></i> AI Generation Included</li>
+                    <li><i class="fa-solid fa-check"></i> Professional Editing</li>
+                    <li><i class="fa-solid fa-check"></i> Premium Templates</li>
+                    <li><i class="fa-solid fa-check"></i> Active Creator Community</li>
+                    <li><i class="fa-solid fa-check"></i> Everything in One Place</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="ct">
+    <h2 class="sh" style="margin-bottom: 0;">
+        Your Daily <span class="grad-txt">Status Hub.</span>
+    </h2>
+
+    <p class="section-desc" style="text-align: center;">
+        Discover and download high-quality WhatsApp status images for every mood, occasion, and moment. Share instantly with just one tap.
+    </p>
+
+    <div class="tag-wrap rv d1">
+        <div class="t-tag">🔥 Trending</div>
+        <div class="t-tag">😊 Happy</div>
+        <div class="t-tag">💔 Sad</div>
+        <div class="t-tag">❤️ Love</div>
+        <div class="t-tag">🎉 Celebration</div>
+        <div class="t-tag">💪 Motivation</div>
+        <div class="t-tag">🙏 Devotional</div>
+        <div class="t-tag">🌅 Good Morning</div>
+        <div class="t-tag">🌙 Good Night</div>
+        <div class="t-tag">🎂 Birthday</div>
+        <div class="t-tag">🎊 Festival</div>
+        <div class="t-tag">😂 Funny</div>
+        <div class="t-tag">💡 Quotes</div>
+        <div class="t-tag">🎬 Movie Dialogues</div>
+        <div class="t-tag">🎵 Music</div>
+        <div class="t-tag">💖 Friendship</div>
+        <div class="t-tag">🏆 Success</div>
+        <div class="t-tag">✨ Inspirational</div>
+        <div class="t-tag">📸 Photography</div>
+    </div>
+</div>
+
+<section id="pricing" class="sec">
+    <div class="ct">
+        <div class="f-hd rv">
+            <h2 class="sh">Premium <span class="grad-txt">Membership.</span></h2>
+            <p class="sub">Choose the plan that fits your creative journey.</p>
+        </div>
+        <div class="p-grid rv d1">
+            <div class="p-card">
+                <h3>Free</h3>
+                <div class="price">₹0<span>/mo</span></div>
+                <ul class="p-list">
+                    <li><i class="fa-solid fa-check"></i> Basic Templates</li>
+                    <li><i class="fa-solid fa-check"></i> Standard Editor</li>
+                    <li><i class="fa-solid fa-check"></i> Export in HD</li>
+                </ul>
+                <a href="#" class="btn btn-sec">Get Started</a>
+            </div>
+            <div class="p-card feat">
+                <div class="p-lbl">Most Popular</div>
+                <h3>Premium</h3>
+                <div class="price">₹599<span>/mo</span></div>
+                <ul class="p-list">
+                    <li><i class="fa-solid fa-check"></i> All Premium Templates</li>
+                    <li><i class="fa-solid fa-check"></i> AI Image Generation (200/mo)</li>
+                    <li><i class="fa-solid fa-check"></i> Full Prompt Library</li>
+                    <li><i class="fa-solid fa-check"></i> Remove Watermarks</li>
+                </ul>
+                <a href="#" class="btn btn-pri">Upgrade to Premium</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<section id="cta">
+    <div class="bg-blob" style="width: 800px; height: 800px; background: var(--sec); top: 50%; left: 50%; transform: translate(-50%,-50%); opacity: 0.25;"></div>
+    <div class="ct">
+        <div class="cta-in rv">
+            <h2>Start Creating Amazing <br />Content Today.</h2>
+            <div class="cta-btns">
+                <a href="https://play.google.com/store/apps/details?id=com.dlktechnologies.Prithu" class="btn btn-acc btn-lg" target="_blank"><i class="fab fa-android"></i> Download for Android</a>
+                <a href="#" class="btn btn-sec btn-lg" style="background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.2);"><i class="fab fa-apple"></i> Coming Soon on iOS</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<script>
+(function() {
+    // ─── SCROLL PROGRESS BAR ───
+    var prog = document.createElement('div');
+    prog.id = 'scroll-progress';
+    document.body.prepend(prog);
+    window.addEventListener('scroll', function() {
+        var scrollTop = window.scrollY;
+        var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        prog.style.width = (docHeight > 0 ? (scrollTop / docHeight) * 100 : 0) + '%';
+    }, { passive: true });
+
+    // ─── NAVBAR SCROLL EFFECT ───
+    var nav = document.getElementById("nav");
+    window.addEventListener("scroll", function() {
+        if(nav) nav.classList.toggle("scrolled", window.scrollY > 20);
+    }, { passive: true });
+
+    // ─── SCROLL REVEAL ───
+    var rvEls = document.querySelectorAll(".rv");
+    var rvObs = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
+            if (e.isIntersecting) {
+                e.target.classList.add("in");
+                rvObs.unobserve(e.target);
+            }
+        });
+    }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+    rvEls.forEach(function(el) { rvObs.observe(el); });
+
+    // ─── ANIMATED COUNTERS ───
+    function animateNum(el) {
+        var to = parseFloat(el.getAttribute("data-to"));
+        var sfx = el.getAttribute("data-sfx") || "";
+        var dec = parseInt(el.getAttribute("data-dec")) || 0;
+        var duration = 2200, current = 0, start = null;
+        function tick(ts) {
+            if (!start) start = ts;
+            var prog = Math.min((ts - start) / duration, 1);
+            var ease = 1 - Math.pow(1 - prog, 3);
+            current = to * ease;
+            el.textContent = current.toFixed(dec) + sfx;
+            if (prog < 1) requestAnimationFrame(tick);
+            else el.textContent = to.toFixed(dec) + sfx;
+        }
+        requestAnimationFrame(tick);
+    }
+    var ctrObs = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
+            if (e.isIntersecting) { animateNum(e.target); ctrObs.unobserve(e.target); }
+        });
+    }, { threshold: 0.5 });
+    document.querySelectorAll(".tr-num").forEach(function(el) { ctrObs.observe(el); });
+
+    // ─── PARALLAX BLOBS ───
+    var blobs = document.querySelectorAll('.bg-blob');
+    window.addEventListener('mousemove', function(e) {
+        var xPct = (e.clientX / window.innerWidth - 0.5) * 20;
+        var yPct = (e.clientY / window.innerHeight - 0.5) * 20;
+        blobs.forEach(function(b, i) {
+            var factor = (i % 2 === 0 ? 1 : -1) * 0.6;
+            b.style.transform = 'translate(' + (xPct * factor) + 'px,' + (yPct * factor) + 'px)';
+        });
+    }, { passive: true });
+
+    // ─── CARD MAGNETIC HOVER ───
+    document.querySelectorAll('.fc, .p-card').forEach(function(card) {
+        card.addEventListener('mousemove', function(e) {
+            var r = card.getBoundingClientRect();
+            var x = ((e.clientX - r.left) / r.width  - 0.5) * 8;
+            var y = ((e.clientY - r.top)  / r.height - 0.5) * 8;
+            card.style.transform = 'translateY(-8px) rotateX(' + (-y) + 'deg) rotateY(' + x + 'deg)';
+            card.style.transition = 'transform 0.1s ease';
+        });
+        card.addEventListener('mouseleave', function() {
+            card.style.transform = '';
+            card.style.transition = 'transform 0.6s cubic-bezier(0.4,0,0.2,1)';
+        });
+    });
+
+    // ─── SMOOTH SCROLL ───
+    document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+        a.addEventListener('click', function(e) {
+            var t = document.querySelector(this.getAttribute('href'));
+            if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        });
+    });
+})()
+</script>
+</body>
+</html>

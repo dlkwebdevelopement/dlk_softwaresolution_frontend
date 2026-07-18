@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NoteFort - Secure Notes App & Password Manager | AES-256 Encrypted</title>
+    <meta name="description" content="NoteFort is the best secure notes app and password manager with AES-256 encryption, offline access, cloud sync, and a stunning UI. Trusted by 50K+ users." />
+    <meta name="keywords" content="secure notes app, password manager, password vault, encrypted notes, private notes, offline notes, daily planner, personal diary, digital notebook, password locker, AES encryption" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        :root{--pri:#5B5FEF;--sec:#7C3AED;--acc:#00D4FF;--dark:#09090B;--bg:#F8FAFC;--txt:#1A1A2E;--muted:#64748B;--border:rgba(91,95,239,.1);--grad:linear-gradient(135deg,#5B5FEF 0%,#7C3AED 45%,#00D4FF 100%);--gd:linear-gradient(135deg,#050510 0%,#0C051A 60%,#05101A 100%);--sh1:0 2px 8px rgba(0,0,0,.05);--sh2:0 8px 24px rgba(91,95,239,.1);--sh3:0 24px 64px rgba(91,95,239,.16);--r:18px;--rl:28px;}
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+        html{scroll-behavior:smooth;}
+        body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;background:var(--bg);color:var(--txt);overflow-x:hidden;line-height:1.6;-webkit-font-smoothing:antialiased;}
+        ::selection{background:var(--pri);color:#fff;}
+        img{max-width:100%;display:block;}
+        /* LOADER */
+        #loader{position:fixed;inset:0;background:var(--dark);z-index:9999;display:flex;align-items:center;justify-content:center;transition:opacity .6s,visibility .6s;}
+        #loader.hide{opacity:0;visibility:hidden;}
+        .ring{width:52px;height:52px;border-radius:50%;border:3px solid rgba(91,95,239,.2);border-top-color:var(--pri);animation:spin .8s linear infinite;}
+        @keyframes spin{to{transform:rotate(360deg);}}
+        /* ANN */
+        #ann{background:var(--grad);color:#fff;text-align:center;padding:.6rem 3.5rem;font-size:.82rem;font-weight:700;position:relative;z-index:90;letter-spacing:.01em;}
+        #ann a{color:#fff;border-bottom:1px solid rgba(255,255,255,.5);text-decoration:none;margin-left:.5rem;}
+        #ann a:hover{border-color:#fff;}
+        #ann-close{position:absolute;right:1.25rem;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,.8);font-size:1.1rem;cursor:pointer;padding:4px 8px;}
+        /* NAV */
+        #nav{position:sticky;top:0;z-index:80;height:68px;display:flex;align-items:center;padding:0 2rem;backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);background:rgba(248,250,252,.88);border-bottom:1px solid rgba(0,0,0,.05);transition:box-shadow .3s;}
+        #nav.scrolled{box-shadow:0 4px 24px rgba(0,0,0,.06);}
+        .nvi {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* replaces gap */
+    width: 100%;
+}
+        .nlo{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;}
+        .nlo img{width:34px;height:34px;border-radius:9px;object-fit:cover;}
+        .nlo span{font-size:1.15rem;font-weight:800;color:var(--txt);letter-spacing:-.03em;}
+        .nls{display:flex;align-items:center;gap:.15rem;margin-left:1.25rem;flex:1;}
+        .nls a{font-size:.875rem;font-weight:600;color:var(--muted);text-decoration:none;padding:.45rem .85rem;border-radius:10px;transition:color .2s,background .2s;}
+        .nls a:hover{color:var(--pri);background:rgba(91,95,239,.07);}
+        /* BTNS */
+        .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:inherit;font-weight:700;letter-spacing:-.01em;border:none;cursor:pointer;text-decoration:none;border-radius:50px;transition:all .25s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;white-space:nowrap;}
+        .btn::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at center,rgba(255,255,255,.18) 0%,transparent 70%);opacity:0;transition:opacity .3s;}
+        .btn:hover::after{opacity:1;}
+        .btn i{display:inline-flex;align-items:center;justify-content:center;font-size:1.2em;line-height:1;margin-top:-2px;}
+        .bp{background:var(--grad);color:#fff;font-size:.92rem;padding:.72rem 1.7rem;box-shadow:0 4px 18px rgba(91,95,239,.3);}
+        .bp:hover{transform:translateY(-2px) scale(1.01);box-shadow:0 12px 36px rgba(91,95,239,.4);}
+        .bd{background:var(--dark);color:#fff;font-size:.92rem;padding:.72rem 1.7rem;box-shadow:0 4px 18px rgba(0,0,0,.25);}
+        .bd:hover{transform:translateY(-2px);box-shadow:0 12px 36px rgba(0,0,0,.4);}
+        .bg2{background:rgba(255,255,255,.07);color:rgba(255,255,255,.75);border:1.5px solid rgba(255,255,255,.13);font-size:.92rem;padding:.72rem 1.7rem;}
+        .bg2:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.26);transform:translateY(-1px);}
+        .bsm{font-size:.82rem;padding:.52rem 1.2rem;}
+        .blg{font-size:1.04rem;padding:.98rem 2.2rem;}
+        .bxl{font-size:1.1rem;padding:1.08rem 2.45rem;}
+        .btn .rpl{position:absolute;border-radius:50%;transform:scale(0);animation:rplA .55s linear;background:rgba(255,255,255,.28);pointer-events:none;}
+        @keyframes rplA{to{transform:scale(4);opacity:0;}}
+        /* LAYOUT */
+        .ct{max-width:1280px;margin:0 auto;padding:0 2rem;}
+        .sec{padding:7rem 0;}
+        /* CHIP */
+        .chip{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--pri);background:rgba(91,95,239,.08);border:1px solid rgba(91,95,239,.14);padding:.3rem 1rem;border-radius:50px;margin-bottom:1.1rem;}
+        .chipw{background:rgba(91,95,239,.18);border-color:rgba(91,95,239,.25);color:#A5B4FC;}
+        h2.sh{font-size:clamp(2rem,4.2vw,3.35rem);font-weight:800;letter-spacing:-.045em;line-height:1.08;margin-bottom:1rem;}
+        .gt{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .sub{font-size:1.08rem;color:var(--muted);line-height:1.75;}
+        /* HERO */
+        #hero{min-height:100vh;background:var(--dark);position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;}
+        .sbg{position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(1.5px 1.5px at 15% 25%,rgba(255,255,255,.45) 0,transparent 100%),radial-gradient(1px 1px at 75% 12%,rgba(255,255,255,.35) 0,transparent 100%),radial-gradient(2px 2px at 55% 65%,rgba(255,255,255,.2) 0,transparent 100%),radial-gradient(1px 1px at 35% 80%,rgba(255,255,255,.3) 0,transparent 100%),radial-gradient(1.5px 1.5px at 88% 45%,rgba(255,255,255,.25) 0,transparent 100%),radial-gradient(1px 1px at 8% 58%,rgba(255,255,255,.2) 0,transparent 100%),radial-gradient(2px 2px at 48% 18%,rgba(255,255,255,.15) 0,transparent 100%),radial-gradient(1px 1px at 68% 88%,rgba(255,255,255,.18) 0,transparent 100%);}
+        .blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:.32;animation:bpulse 9s ease-in-out infinite alternate;}
+        .b1{width:560px;height:560px;background:radial-gradient(circle,#5B5FEF,#7C3AED);top:-180px;left:-180px;animation-delay:0s;}
+        .b2{width:480px;height:480px;background:radial-gradient(circle,#7C3AED,#00D4FF);bottom:-130px;right:-80px;animation-delay:3.5s;}
+        .b3{width:280px;height:280px;background:radial-gradient(circle,#00D4FF,#5B5FEF);top:38%;left:42%;animation-delay:1.8s;}
+        @keyframes bpulse{0%{transform:translate(0,0) scale(1);}100%{transform:translate(35px,25px) scale(1.12);}}
+        .hin{position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;padding:5.5rem 0 4rem;}
+        .hlbl{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.11);color:rgba(255,255,255,.82);font-size:.76rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase;padding:.38rem 1.1rem;border-radius:50px;margin-bottom:1.4rem;backdrop-filter:blur(10px);}
+        .hlbl i{color:var(--acc);}
+        h1.hh{font-size:clamp(2.8rem,5.8vw,5.2rem);font-weight:900;letter-spacing:-.055em;line-height:1.03;color:#fff;margin-bottom:1.4rem;}
+        h1.hh .hl{display:block;background:linear-gradient(135deg,#A5B4FC,#C4B5FD,#67E8F9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .hd{font-size:1.1rem;color:rgba(255,255,255,.58);line-height:1.8;margin-bottom:2.2rem;max-width:450px;}
+        .hbr{display:flex;flex-wrap:wrap;gap:.875rem;margin-bottom:1.7rem;}
+        .str{display:flex;flex-wrap:wrap;gap:.75rem;margin-bottom:2.2rem;}
+        .sbdg{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.11);border-radius:13px;padding:.65rem 1.15rem;text-decoration:none;color:#fff;transition:all .25s;backdrop-filter:blur(10px);}
+        .sbdg:hover{background:rgba(255,255,255,.11);border-color:rgba(255,255,255,.2);transform:translateY(-2px);}
+        .sbdg i{font-size:1.5rem;}
+        .sbdg-t small{display:block;font-size:.6rem;opacity:.65;text-transform:uppercase;letter-spacing:.05em;}
+        .sbdg-t b{font-size:.9rem;font-weight:700;}
+        .hrt{display:flex;align-items:center;gap:9px;color:rgba(255,255,255,.5);font-size:.84rem;}
+        .hst{color:#FBBF24;}
+        /* PHONES */
+        .hr{position:relative;display:flex;justify-content:center;align-items:center;height:640px;}
+        .pm{position:absolute;display:flex;flex-direction:column;align-items:center;}
+        .pb{background:linear-gradient(145deg,#1C1C2E,#12121E);border-radius:46px;padding:11px;box-shadow:0 0 0 1px rgba(255,255,255,.07),0 40px 80px -15px rgba(0,0,0,.65),0 0 60px rgba(91,95,239,.12);}
+        .pn{height:5px;width:55px;background:rgba(255,255,255,.12);border-radius:8px;margin:0 auto 7px;}
+        .psc{border-radius:34px;overflow:hidden;}
+        .psc img{width:100%;height:100%;object-fit:cover;object-position:top;display:block;}
+        .pgl{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);width:65%;height:35px;border-radius:50%;filter:blur(20px);opacity:.45;}
+        .pmc{width:220px;z-index:3;left:50%;animation:fc 5s ease-in-out infinite;}
+        .pmc .psc{height:440px;}
+        .pmc .pgl{background:var(--pri);}
+        @keyframes fc{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(-16px);}}
+        .plf{width:172px;left:0;top:50px;z-index:2;opacity:.82;animation:fl 5.8s ease-in-out .7s infinite;}
+        .plf .psc{height:344px;}
+        .plf .pgl{background:var(--sec);}
+        @keyframes fl{0%,100%{transform:rotate(-9deg) translateY(0);}50%{transform:rotate(-9deg) translateY(-12px);}}
+        .prt{width:172px;right:0;top:50px;z-index:2;opacity:.82;animation:fr 6.2s ease-in-out 1.4s infinite;}
+        .prt .psc{height:344px;}
+        .prt .pgl{background:var(--acc);opacity:.25;}
+        @keyframes fr{0%,100%{transform:rotate(9deg) translateY(0);}50%{transform:rotate(9deg) translateY(-12px);}}
+        .fb{position:absolute;z-index:10;background:rgba(255,255,255,.08);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.13);border-radius:14px;padding:9px 14px;display:flex;align-items:center;gap:9px;color:#fff;font-size:.78rem;font-weight:700;animation:bdf 4.2s ease-in-out infinite;}
+        .fb i{font-size:1.05rem;}
+        .f1{top:6%;right:2%;animation-delay:0s;}.f1 i{color:#34D399;}
+        .f2{top:33%;left:-4%;animation-delay:.9s;}.f2 i{color:#FBBF24;}
+        .f3{bottom:22%;right:1%;animation-delay:1.9s;}.f3 i{color:#67E8F9;}
+        .f4{bottom:6%;left:14%;animation-delay:.4s;}.f4 i{color:#F472B6;}
+        @keyframes bdf{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+        /* PROOF */
+        #proof{background:#fff;border-bottom:1px solid rgba(0,0,0,.045);padding:1.6rem 0;}
+        .pfi{display:flex;align-items:center;justify-content:center;gap:1.25rem;flex-wrap:wrap;}
+        .pavs{display:flex;}
+        .pav{width:32px;height:32px;border-radius:50%;border:2px solid #fff;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:800;color:#fff;margin-left:-7px;}
+        .pav:first-child{margin-left:0;}
+        .pst{color:#FBBF24;font-size:.875rem;letter-spacing:1px;}
+        .ptx{font-size:.8rem;font-weight:700;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;}
+        .pdv{width:1px;height:20px;background:rgba(0,0,0,.08);}
+        /* STATS */
+        #stats{background:var(--bg);padding:5rem 0;}
+        .sgr{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;}
+        .sc{background:#fff;border-radius:var(--rl);padding:2.2rem 1.75rem;text-align:center;border:1px solid rgba(0,0,0,.04);box-shadow:var(--sh1);transition:all .35s ease;position:relative;overflow:hidden;}
+        .sc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--grad);transform:scaleX(0);transition:transform .35s ease;}
+        .sc:hover{transform:translateY(-6px);box-shadow:var(--sh3);}
+        .sc:hover::before{transform:scaleX(1);}
+        .sn{font-size:2.85rem;font-weight:900;letter-spacing:-.04em;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:.4rem;}
+        .sl{font-size:.8rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+        .ss{font-size:.72rem;color:var(--muted);margin-top:.25rem;opacity:.65;}
+        /* FEATURES */
+        #features{background:#fff;}
+        .fhd{text-align:center;margin-bottom:3.5rem;}
+        .fgr{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;}
+        .fc{background:#FAFAFE;border-radius:var(--r);padding:1.75rem 1.5rem;border:1px solid rgba(91,95,239,.07);transition:all .35s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;}
+        .fc::after{content:'';position:absolute;inset:0;border-radius:var(--r);padding:1px;background:var(--grad);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .35s;}
+        .fc:hover::after{opacity:1;}
+        .fc:hover{transform:translateY(-8px);background:#fff;box-shadow:var(--sh3);}
+        .fi{width:48px;height:48px;border-radius:14px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:1.25rem;color:#fff;margin-bottom:1.1rem;box-shadow:0 6px 18px rgba(91,95,239,.22);}
+        .fc h4{font-size:1rem;font-weight:700;margin-bottom:.4rem;letter-spacing:-.02em;}
+        .fc p{font-size:.86rem;color:var(--muted);line-height:1.65;}
+        /* SHOWCASE */
+        #showcase{background:var(--bg);}
+        .shd{text-align:center;margin-bottom:.75rem;}
+        .sw{margin-top:2.5rem;overflow-x:auto;padding:1.5rem 0 3rem;scrollbar-width:none;cursor:grab;user-select:none;}
+        .sw::-webkit-scrollbar{display:none;}
+        .sw:active{cursor:grabbing;}
+        .st{display:flex;gap:1.75rem;padding:0 2rem;width:max-content;}
+        .si{flex-shrink:0;width:190px;display:flex;flex-direction:column;align-items:center;}
+        .sp{width:100%;background:#141420;border-radius:34px;padding:9px;box-shadow:0 0 0 1px rgba(255,255,255,.05),0 28px 55px -14px rgba(0,0,0,.28),0 0 35px rgba(91,95,239,.08);transition:transform .35s cubic-bezier(.4,0,.2,1),box-shadow .35s;}
+        .sp::before{content:'';display:block;height:4px;width:46px;background:rgba(255,255,255,.1);border-radius:8px;margin:0 auto 5px;}
+        .sp:hover{transform:translateY(-16px) scale(1.03);box-shadow:0 0 0 1px rgba(91,95,239,.18),0 48px 75px -18px rgba(0,0,0,.32),0 0 55px rgba(91,95,239,.18);}
+        .ss2{width:100%;aspect-ratio:9/19;border-radius:25px;overflow:hidden;}
+        .ss2 img{width:100%;height:100%;object-fit:cover;object-position:top;}
+        .sl2{margin-top:1.1rem;font-size:.84rem;font-weight:700;color:var(--txt);}
+        .sd{margin-top:.2rem;font-size:.74rem;color:var(--muted);text-align:center;}
+        /* WHY */
+        #why{background:#fff;}
+        .wg{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;}
+        .wpw{display:flex;justify-content:center;position:relative;}
+        .wp{width:250px;background:linear-gradient(145deg,#1A1A2E,#0D0D1A);border-radius:52px;padding:13px;box-shadow:0 0 0 1px rgba(255,255,255,.05),0 55px 110px -18px rgba(0,0,0,.45),0 0 80px rgba(91,95,239,.18);transform:rotate(-3deg);transition:transform .5s ease;}
+        .wp:hover{transform:rotate(0deg) scale(1.02);}
+        .wp::before{content:'';display:block;height:5px;width:55px;background:rgba(255,255,255,.1);border-radius:8px;margin:0 auto 9px;}
+        .ws{width:100%;aspect-ratio:9/19;border-radius:38px;overflow:hidden;}
+        .ws img{width:100%;height:100%;object-fit:cover;object-position:top;}
+        .wgl{position:absolute;bottom:-35px;left:50%;transform:translateX(-50%);width:180px;height:55px;background:var(--pri);border-radius:50%;filter:blur(38px);opacity:.25;}
+        .bls{display:grid;grid-template-columns:1fr 1fr;gap:.875rem;margin-top:1.75rem;}
+        .bit{display:flex;align-items:flex-start;gap:11px;padding:.875rem 1rem;border-radius:14px;background:#FAFAFE;border:1px solid rgba(91,95,239,.06);transition:all .25s;}
+        .bit:hover{background:#fff;border-color:rgba(91,95,239,.16);box-shadow:var(--sh2);transform:translateX(3px);}
+        .bic{width:34px;height:34px;border-radius:10px;flex-shrink:0;background:rgba(91,95,239,.1);display:flex;align-items:center;justify-content:center;color:var(--pri);font-size:.95rem;}
+        .btx{font-size:.85rem;font-weight:700;color:var(--txt);}
+        .bsb{font-size:.74rem;color:var(--muted);margin-top:1px;}
+        /* STEPS */
+        #steps{background:var(--bg);}
+        .stg{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem;position:relative;}
+        .stg::before{content:'';position:absolute;top:40px;left:12%;right:12%;height:2px;background:linear-gradient(90deg,var(--pri),var(--acc));z-index:0;}
+        .stc{background:#fff;border-radius:var(--rl);padding:2.25rem 1.4rem;text-align:center;border:1px solid rgba(0,0,0,.04);box-shadow:var(--sh1);position:relative;z-index:1;transition:all .3s ease;}
+        .stc:hover{transform:translateY(-7px);box-shadow:var(--sh3);}
+        .stn{width:52px;height:52px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.15rem;font-weight:900;margin:0 auto 1.25rem;box-shadow:0 6px 20px rgba(91,95,239,.28);}
+        .sti{font-size:1.4rem;color:var(--pri);margin-bottom:.875rem;}
+        .stc h4{font-size:1rem;font-weight:700;margin-bottom:.4rem;}
+        .stc p{font-size:.84rem;color:var(--muted);}
+        /* SECURE */
+        #secure{background:var(--gd);position:relative;overflow:hidden;}
+        .seb{position:absolute;inset:0;background:radial-gradient(ellipse 65% 55% at 18% 42%,rgba(91,95,239,.14) 0,transparent 70%),radial-gradient(ellipse 50% 45% at 82% 58%,rgba(124,58,237,.11) 0,transparent 70%),radial-gradient(ellipse 38% 28% at 52% 88%,rgba(0,212,255,.07) 0,transparent 70%);animation:sa 9s ease-in-out infinite alternate;}
+        @keyframes sa{0%{opacity:.7;}100%{opacity:1;transform:scale(1.04);}}
+        .ses{position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(1px 1px at 8% 18%,rgba(255,255,255,.55) 0,transparent 100%),radial-gradient(1.5px 1.5px at 28% 72%,rgba(255,255,255,.32) 0,transparent 100%),radial-gradient(1px 1px at 68% 14%,rgba(255,255,255,.42) 0,transparent 100%),radial-gradient(2px 2px at 82% 38%,rgba(255,255,255,.28) 0,transparent 100%),radial-gradient(1px 1px at 52% 82%,rgba(255,255,255,.38) 0,transparent 100%),radial-gradient(1.5px 1.5px at 94% 62%,rgba(255,255,255,.22) 0,transparent 100%),radial-gradient(1px 1px at 12% 55%,rgba(255,255,255,.3) 0,transparent 100%);}
+        #secure .ct{position:relative;z-index:1;}
+        .seh{text-align:center;margin-bottom:3.75rem;}
+        .seg{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem;}
+        .sec1{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:var(--r);padding:1.8rem 1.4rem;text-align:center;backdrop-filter:blur(12px);transition:all .35s ease;position:relative;overflow:hidden;}
+        .sec1::before{content:'';position:absolute;inset:0;background:var(--grad);opacity:0;transition:opacity .35s;}
+        .sec1:hover{transform:translateY(-6px);border-color:rgba(91,95,239,.28);}
+        .sec1:hover::before{opacity:.06;}
+        .sei{position:relative;z-index:1;}
+        .sic{width:52px;height:52px;border-radius:15px;background:rgba(91,95,239,.16);border:1px solid rgba(91,95,239,.22);display:flex;align-items:center;justify-content:center;margin:0 auto 1.1rem;font-size:1.4rem;color:#A5B4FC;}
+        .sec1 h4{font-size:.9rem;font-weight:700;color:#fff;margin-bottom:.35rem;}
+        .sec1 p{font-size:.78rem;color:rgba(255,255,255,.42);line-height:1.55;}
+        /* WHO IS FOR */
+        #who{background:#fff;}
+        .wfg{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem;margin-top:2.75rem;}
+        .wfu{background:#FAFAFE;border-radius:var(--r);padding:1.875rem 1.4rem;text-align:center;border:1px solid rgba(91,95,239,.06);transition:all .3s ease;}
+        .wfu:hover{transform:translateY(-6px);background:#fff;border-color:rgba(91,95,239,.18);box-shadow:var(--sh2);}
+        .wfe{font-size:2.4rem;display:block;margin-bottom:.875rem;}
+        .wfu h4{font-size:.96rem;font-weight:700;margin-bottom:.3rem;}
+        .wfu p{font-size:.8rem;color:var(--muted);line-height:1.55;}
+        /* TESTIMONIALS */
+        #test{background:var(--bg);}
+        .teg{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;}
+        .tec{background:#fff;border-radius:var(--rl);padding:2.1rem;border:1px solid rgba(0,0,0,.04);box-shadow:var(--sh1);transition:all .35s ease;position:relative;overflow:hidden;}
+        .tec::before{content:'"';position:absolute;top:-12px;right:20px;font-size:7.5rem;font-weight:900;font-family:Georgia,serif;color:rgba(91,95,239,.05);line-height:1;pointer-events:none;}
+        .tec:hover{transform:translateY(-8px);box-shadow:var(--sh3);}
+        .tes{color:#FBBF24;letter-spacing:2px;margin-bottom:.875rem;font-size:.875rem;}
+        .tet{font-size:.975rem;color:var(--txt);line-height:1.75;margin-bottom:1.4rem;font-style:italic;}
+        .tau{display:flex;align-items:center;gap:11px;}
+        .tav{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:800;color:#fff;flex-shrink:0;}
+        .tnm{font-size:.9rem;font-weight:700;color:var(--txt);}
+        .tro{font-size:.76rem;color:var(--muted);}
+        /* FAQ */
+        #faq{background:#fff;}
+        .fab{max-width:740px;margin:2.5rem auto 0;}
+        .fqi{border-bottom:1px solid rgba(0,0,0,.055);}
+        .fqq{display:flex;align-items:center;justify-content:space-between;padding:1.4rem 0;cursor:pointer;font-weight:700;font-size:1rem;color:var(--txt);gap:1rem;transition:color .2s;user-select:none;}
+        .fqq:hover{color:var(--pri);}
+        .fqc{width:26px;height:26px;border-radius:50%;background:rgba(91,95,239,.08);display:flex;align-items:center;justify-content:center;font-size:.8rem;color:var(--pri);flex-shrink:0;transition:all .3s ease;}
+        .fqi.op .fqc{background:var(--pri);color:#fff;transform:rotate(45deg);}
+        .fqa{overflow:hidden;max-height:0;transition:max-height .4s ease;}
+        .fqi.op .fqa{max-height:280px;}
+        .fqa i{display:block;padding-bottom:1.4rem;color:var(--muted);line-height:1.78;font-size:.945rem;font-style:normal;}
+        /* CTA */
+        #cta{background:var(--gd);position:relative;overflow:hidden;}
+        .ctb{position:absolute;inset:0;background:radial-gradient(ellipse 70% 70% at 50% 50%,rgba(91,95,239,.16) 0,transparent 70%);}
+        .cti{position:relative;z-index:1;text-align:center;}
+        .cti h2{font-size:clamp(2.4rem,5.2vw,4.5rem);font-weight:900;letter-spacing:-.055em;color:#fff;margin-bottom:1.1rem;line-height:1.04;}
+        .cti p{font-size:1.1rem;color:rgba(255,255,255,.5);max-width:480px;margin:0 auto 2.5rem;}
+        .ctbs{display:flex;gap:.875rem;justify-content:center;flex-wrap:wrap;}
+        /* FOOTER */
+        footer{background:var(--dark);color:rgba(255,255,255,.45);padding:4rem 0 2rem;}
+        .ftp{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr 1fr;gap:2.75rem;padding-bottom:2.75rem;border-bottom:1px solid rgba(255,255,255,.05);}
+        .flo{display:flex;align-items:center;gap:9px;margin-bottom:.9rem;}
+        .flo img{width:34px;height:34px;border-radius:9px;}
+        .flo span{font-size:1.15rem;font-weight:800;color:#fff;letter-spacing:-.03em;}
+        .ftg{font-size:.84rem;line-height:1.72;max-width:230px;margin-bottom:1.4rem;}
+        .fso{display:flex;gap:.65rem;}
+        .fsl{width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.45);text-decoration:none;font-size:.875rem;transition:all .2s;}
+        .fsl:hover{background:var(--pri);border-color:var(--pri);color:#fff;transform:translateY(-2px);}
+        .fco h5{font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#fff;margin-bottom:1.1rem;}
+        .fco a{display:block;color:rgba(255,255,255,.42);text-decoration:none;font-size:.84rem;margin-bottom:.65rem;transition:color .2s;}
+        .fco a:hover{color:rgba(255,255,255,.8);}
+        .fbo{padding-top:1.875rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;}
+        .fbo p{font-size:.78rem;}
+        .fbd{display:inline-flex;align-items:center;gap:5px;background:rgba(91,95,239,.16);border:1px solid rgba(91,95,239,.22);border-radius:50px;padding:.28rem .85rem;font-size:.74rem;font-weight:700;color:#A5B4FC;}
+        /* RV */
+        .rv{opacity:0;transform:translateY(32px);transition:opacity .85s ease,transform .85s cubic-bezier(.4,0,.2,1);}
+        .rv.in{opacity:1;transform:translateY(0);}
+        .rv.d1{transition-delay:.1s;} .rv.d2{transition-delay:.2s;} .rv.d3{transition-delay:.3s;} .rv.d4{transition-delay:.4s;}
+        .rvl{opacity:0;transform:translateX(-36px);transition:opacity .85s ease,transform .85s cubic-bezier(.4,0,.2,1);}
+        .rvl.in{opacity:1;transform:translateX(0);}
+        .rvr{opacity:0;transform:translateX(36px);transition:opacity .85s ease,transform .85s cubic-bezier(.4,0,.2,1);}
+        .rvr.in{opacity:1;transform:translateX(0);}
+        /* ─── PREMIUM ANIMATIONS ─── */
+        @keyframes gradShiftNF{0%,100%{background-position:0% 50%;}50%{background-position:100% 50%;}}
+        @keyframes shimmerNF{0%{background-position:-200% center;}100%{background-position:200% center;}}
+        @keyframes pulseGlowNF{0%,100%{box-shadow:0 8px 24px rgba(91,95,239,0.3);}50%{box-shadow:0 8px 48px rgba(91,95,239,0.6);}}
+        @keyframes blobPulseNF{0%{transform:translate(0,0) scale(1);}100%{transform:translate(30px,20px) scale(1.12);}}
+        @keyframes navInNF{from{transform:translateY(-100%);opacity:0;}to{transform:translateY(0);opacity:1;}}
+        @keyframes floatBadge{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
+        /* Animated gradient text */
+        .gt{background:linear-gradient(270deg,#5B5FEF,#7C3AED,#00D4FF,#5B5FEF);background-size:400% 400%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gradShiftNF 6s ease infinite;}
+        /* Button shimmer */
+        .bp{position:relative;overflow:hidden;}
+        .bp::before{content:'';position:absolute;inset:0;background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,0.22) 50%,transparent 60%);background-size:200% 100%;animation:shimmerNF 3s infinite;border-radius:inherit;pointer-events:none;}
+        /* Scroll progress */
+        #scroll-progress-nf{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,#5B5FEF,#7C3AED,#00D4FF);z-index:9999;width:0%;transition:width 0.1s linear;}
+        /* Nav entrance */
+        #nav{animation:navInNF 0.6s ease both;}
+        /* Blob parallax */
+        .blob{transition:transform 0.3s ease;}
+        /* Badge float */
+        .hlbl,.sbdg{animation:floatBadge 4s ease-in-out infinite;}
+        /* Feature card magnetic */
+        .fcd,.sec-card{transition:transform 0.4s cubic-bezier(0.4,0,0.2,1),box-shadow 0.4s ease;}
+        @media(max-width:1100px){.fgr,.seg{grid-template-columns:repeat(2,1fr);}.ftp{grid-template-columns:1fr 1fr;}}
+        @media(max-width:900px){.hin,.wg,.teg{grid-template-columns:1fr;gap:3rem;}.hr{height:440px;}.pmc{width:170px;}.pmc .psc{height:340px;}.plf,.prt{width:135px;}.plf .psc,.prt .psc{height:270px;}.sgr,.stg,.wfg{grid-template-columns:repeat(2,1fr);}.stg::before{display:none;}.nls{display:none;}}
+        @media(max-width:600px){.ct{padding:0 1.2rem;}.sec{padding:5rem 0;}h1.hh{font-size:2.5rem;}h2.sh{font-size:2rem;}.sgr,.wfg,.ftp,.fgr,.seg,.stg{grid-template-columns:1fr;gap:1.5rem;}.cti h2{font-size:2.4rem;}}
+    </style>
+</head>
+<body>
+
+<div id="loader"><div class="ring"></div></div>
+
+<div id="ann">
+    &#11088; New Version Available &nbsp;&mdash;&nbsp;
+    <strong>Private. Encrypted. Beautiful.</strong>
+    <a href="#cta">Download NoteFort &rarr;</a>
+    <button id="ann-close" aria-label="Close">&#215;</button>
+</div>
+
+<nav id="nav">
+    <div class="nvi">
+        <a href="#" class="nlo">
+            <img src="images/ChatGPT Image Jul 7, 2026, 10_09_15 AM.png" alt="NoteFort" />
+            <span>NoteFort</span>
+        </a>
+        <div class="nls">
+            <a href="#features">Features</a>
+            <a href="#showcase">Screenshots</a>
+            <a href="#secure">Security</a>
+            <a href="#cta">Download</a>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+    <a href="#cta" class="btn bp bsm"><i class="fab fa-android"></i> Download App</a>
+</div>
+    </div>
+</nav>
+
+<section id="hero">
+    <div class="sbg"></div>
+    <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+    <div class="ct">
+        <div class="hin">
+            <div>
+                <div class="hlbl"><i class="fas fa-shield-halved"></i> Military-Grade Encryption</div>
+                <h1 class="hh">Your Second Brain.<span class="hl">Protected Forever.</span></h1>
+                <p class="hd">Capture ideas, save passwords, organize your life, and protect your personal information with AES-256 encryption. The smartest way to secure notes and passwords.</p>
+                <div class="hbr">
+                    <a href="#cta" class="btn bp blg"><i class="fab fa-android"></i> Download for Android</a>
+                    <a href="#showcase" class="btn bg2 blg"><i class="fas fa-circle-play"></i> See Screenshots</a>
+                </div>
+                <div class="str">
+                    <a href="#" class="sbdg"><i class="fab fa-google-play"></i><div class="sbdg-t"><small>Get it on</small><b>Google Play</b></div></a>
+                    <a href="#" class="sbdg"><i class="fab fa-app-store-ios"></i><div class="sbdg-t"><small>Download on</small><b>App Store</b></div></a>
+                </div>
+                <div class="hrt"><span class="hst">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span>Trusted by <strong style="color:rgba(255,255,255,.8)">50,000+</strong> users worldwide</span></div>
+            </div>
+            <div class="hr">
+                <div class="pm plf"><div class="pb"><div class="pn"></div><div class="psc"><img src="images/Screenshot_20260709-111653.png" alt="Login" /></div></div><div class="pgl"></div></div>
+                <div class="pm pmc"><div class="pb"><div class="pn"></div><div class="psc"><img src="images/Screenshot_20260709-140325.png" alt="Notes" /></div></div><div class="pgl"></div></div>
+                <div class="pm prt"><div class="pb"><div class="pn"></div><div class="psc"><img src="images/Screenshot_20260709-140453.png" alt="Vault" /></div></div><div class="pgl"></div></div>
+                <div class="fb f1"><i class="fas fa-shield-alt"></i><span>AES-256 Secure</span></div>
+                <div class="fb f2"><i class="fas fa-fingerprint"></i><span>Biometric Lock</span></div>
+                <div class="fb f3"><i class="fas fa-cloud-arrow-up"></i><span>Cloud Synced</span></div>
+                <div class="fb f4"><i class="fas fa-key"></i><span>Password Vault</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div id="proof">
+    <div class="ct">
+        <div class="pfi">
+            <div class="pavs"><div class="pav">SK</div><div class="pav">AR</div><div class="pav">PM</div><div class="pav">MR</div><div class="pav">JD</div></div>
+            <div class="pst">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+            <span class="ptx">Trusted by Students, Developers, Business Owners &amp; Professionals</span>
+            <div class="pdv"></div><span class="ptx">150+ Countries</span>
+        </div>
+    </div>
+</div>
+
+<section id="stats" class="sec" style="padding:4.5rem 0;">
+    <div class="ct">
+        <div class="sgr">
+            <div class="sc rv d1"><div class="sn" data-to="50" data-sfx="K+">50K+</div><div class="sl">Downloads</div><div class="ss">Across Android &amp; iOS</div></div>
+            <div class="sc rv d2"><div class="sn" data-to="500" data-sfx="K+">500K+</div><div class="sl">Notes Saved</div><div class="ss">Securely encrypted</div></div>
+            <div class="sc rv d3"><div class="sn" data-to="99.99" data-sfx="%" data-dec="2">99.99%</div><div class="sl">Security Rating</div><div class="ss">Zero breaches reported</div></div>
+            <div class="sc rv d4"><div class="sn" data-to="150" data-sfx="+">150+</div><div class="sl">Countries</div><div class="ss">Global user base</div></div>
+        </div>
+    </div>
+</section>
+
+<section id="features" class="sec">
+    <div class="ct">
+        <div class="fhd rv">
+            <div class="chip"><i class="fas fa-star"></i> Features</div>
+            <h2 class="sh">Everything you need, <span class="gt">nothing you don&rsquo;t.</span></h2>
+            <p class="sub" style="max-width:520px;margin:0 auto">A comprehensive secure notes app and password manager built for people who value privacy and simplicity.</p>
+        </div>
+        <div class="fgr">
+            <div class="fc rv d1"><div class="fi"><i class="fas fa-lock"></i></div><h4>Secure Notes</h4><p>Lock individual notes with a password. Personal thoughts stay private with end-to-end encryption.</p></div>
+            <div class="fc rv d2"><div class="fi"><i class="fas fa-key"></i></div><h4>Password Manager</h4><p>Save and organize all your credentials. Never forget a password with the secure password vault.</p></div>
+            <div class="fc rv d3"><div class="fi"><i class="fas fa-vault"></i></div><h4>Encrypted Vault</h4><p>A protected space for your most sensitive data. Unlock with master password or PIN code.</p></div>
+            <div class="fc rv d1"><div class="fi"><i class="fas fa-book-open"></i></div><h4>Private Diary</h4><p>Write daily entries in a secure digital notebook. Your personal journal, always protected.</p></div>
+            <div class="fc rv d2"><div class="fi"><i class="fas fa-cloud-arrow-up"></i></div><h4>Cloud Sync</h4><p>Seamlessly sync notes and passwords across all your devices in real time without hassle.</p></div>
+            <div class="fc rv d3"><div class="fi"><i class="fas fa-wifi-slash"></i></div><h4>Offline Notes</h4><p>Access all your notes and passwords without internet. Sync automatically when back online.</p></div>
+            <div class="fc rv d1"><div class="fi"><i class="fas fa-tags"></i></div><h4>Smart Categories</h4><p>Organize notes with custom categories and labels. Find everything instantly with fast search.</p></div>
+            <div class="fc rv d2"><div class="fi"><i class="fas fa-magnifying-glass"></i></div><h4>Powerful Search</h4><p>Instantly search through all your notes and passwords with lightning-fast smart search.</p></div>
+            <div class="fc rv d3"><div class="fi"><i class="fas fa-floppy-disk"></i></div><h4>Auto Save</h4><p>Never lose a thought. Notes are auto-saved as you type, every single second.</p></div>
+            <div class="fc rv d1"><div class="fi"><i class="fas fa-file-pdf"></i></div><h4>PDF &amp; TXT Export</h4><p>Export any note as a beautifully formatted PDF or plain text file with one tap.</p></div>
+            <div class="fc rv d2"><div class="fi"><i class="fas fa-share-nodes"></i></div><h4>Share as Image</h4><p>Share notes as stunning image cards or plain text. Choose your preferred format easily.</p></div>
+            <div class="fc rv d3"><div class="fi"><i class="fas fa-fingerprint"></i></div><h4>Biometric Auth</h4><p>Unlock with your fingerprint or Face ID. Premium security that adapts to you.</p></div>
+            <div class="fc rv d1"><div class="fi"><i class="fas fa-shuffle"></i></div><h4>Password Generator</h4><p>Generate strong, random passwords instantly. Never use a weak password again.</p></div>
+            <div class="fc rv d2"><div class="fi"><i class="fas fa-hashtag"></i></div><h4>PIN Protection</h4><p>Add a PIN code to the app or individual notes for an extra layer of security.</p></div>
+            <div class="fc rv d3"><div class="fi"><i class="fas fa-moon"></i></div><h4>Dark Mode &amp; Themes</h4><p>A stunning dark theme and beautiful note color themes designed for every taste.</p></div>
+        </div>
+    </div>
+</section>
+
+<section id="showcase" class="sec">
+    <div class="ct">
+        <div class="shd rv">
+            <div class="chip"><i class="fas fa-mobile-screen"></i> App Showcase</div>
+            <h2 class="sh">Every screen, <span class="gt">beautifully designed.</span></h2>
+            <p class="sub" style="max-width:480px;margin:0 auto">Real screenshots from the live app. Drag to explore every feature from login to vault.</p>
+        </div>
+    </div>
+    <div class="sw" id="scrl">
+        <div class="st">
+            <div class="si"><div class="sp"><div class="ss2"><img src="images/Screenshot_20260709-111653.png" alt="Login"/></div></div><div class="sl2">Login</div><div class="sd">Secure sign-in with Google</div></div>
+            <div class="si"><div class="sp"><div class="ss2"><img src="images/Screenshot_20260709-140325.png" alt="Notes"/></div></div><div class="sl2">Notes Dashboard</div><div class="sd">All notes at a glance</div></div>
+            <div class="si"><div class="sp"><div class="ss2"><img src="images/Screenshot_20260709-140337.png" alt="Editor"/></div></div><div class="sl2">Note Editor</div><div class="sd">Clean writing experience</div></div>
+            <div class="si"><div class="sp"><div class="ss2"><img src="images/Screenshot_20260709-140346.png" alt="Info"/></div></div><div class="sl2">Note Info</div><div class="sd">Creation &amp; edit timestamps</div></div>
+            <div class="si"><div class="sp"><div class="ss2"><img src="images/Screenshot_20260709-140356.png" alt="Share"/></div></div><div class="sl2">Share Note</div><div class="sd">Share as text or image card</div></div>
+            <div class="si"><div class="sp"><div class="ss2"><img src="images/Screenshot_20260709-140405.png" alt="Export"/></div></div><div class="sl2">Export Note</div><div class="sd">Download as PDF or TXT</div></div>
+            <div class="si"><div class="sp"><div class="ss2"><img src="images/Screenshot_20260709-140417.png" alt="Unlock Vault"/></div></div><div class="sl2">Unlock Vault</div><div class="sd">Password or PIN access</div></div>
+            <div class="si"><div class="sp"><div class="ss2"><img src="images/Screenshot_20260709-140426.png" alt="Note Colors"/></div></div><div class="sl2">Note Colors</div><div class="sd">Beautiful custom themes</div></div>
+            <div class="si"><div class="sp"><div class="ss2"><img src="images/Screenshot_20260709-140434.png" alt="Categories"/></div></div><div class="sl2">Categories</div><div class="sd">Assign smart labels</div></div>
+            <div class="si"><div class="sp"><div class="ss2"><img src="images/Screenshot_20260709-140443.png" alt="Manage Labels"/></div></div><div class="sl2">Manage Labels</div><div class="sd">Create custom categories</div></div>
+            <div class="si"><div class="sp"><div class="ss2"><img src="images/Screenshot_20260709-140453.png" alt="Vault"/></div></div><div class="sl2">Vault</div><div class="sd">Your secrets, safely locked</div></div>
+            <div class="si"><div class="sp"><div class="ss2"><img src="images/Screenshot_20260709-140232.png" alt="Add Password"/></div></div><div class="sl2">Add Password</div><div class="sd">Save credentials easily</div></div>
+            <div class="si"><div class="sp"><div class="ss2"><img src="images/Screenshot_20260709-140508.png" alt="Profile"/></div></div><div class="sl2">Profile</div><div class="sd">Manage your account</div></div>
+        </div>
+    </div>
+</section>
+
+<section id="why" class="sec">
+    <div class="ct">
+        <div class="wg">
+            <div class="wpw rvl">
+                <div class="wp"><div class="ws"><img src="images/Screenshot_20260709-140325.png" alt="NoteFort" /></div></div><div class="wgl"></div>
+            </div>
+            <div class="rvr">
+                <div class="chip"><i class="fas fa-check-double"></i> Why NoteFort</div>
+                <h2 class="sh">Privacy &amp; performance, <span class="gt">in perfect harmony.</span></h2>
+                <p class="sub">The best encrypted notes app combines military-grade security with a beautiful interface you will love using every day.</p>
+                <div class="bls">
+                    <div class="bit"><div class="bic"><i class="fas fa-shield-alt"></i></div><div><div class="btx">Military-Grade Encryption</div><div class="bsb">AES-256 end-to-end</div></div></div>
+                    <div class="bit"><div class="bic"><i class="fas fa-bolt"></i></div><div><div class="btx">Lightning Fast</div><div class="bsb">Instant search &amp; load</div></div></div>
+                    <div class="bit"><div class="bic"><i class="fas fa-wifi-slash"></i></div><div><div class="btx">Offline Access</div><div class="bsb">Works without internet</div></div></div>
+                    <div class="bit"><div class="bic"><i class="fas fa-palette"></i></div><div><div class="btx">Beautiful UI</div><div class="bsb">Designed with love</div></div></div>
+                    <div class="bit"><div class="bic"><i class="fas fa-vault"></i></div><div><div class="btx">Password Vault</div><div class="bsb">All credentials safe</div></div></div>
+                    <div class="bit"><div class="bic"><i class="fas fa-cloud-arrow-up"></i></div><div><div class="btx">Auto Cloud Backup</div><div class="bsb">Never lose your data</div></div></div>
+                    <div class="bit"><div class="bic"><i class="fas fa-shuffle"></i></div><div><div class="btx">Password Generator</div><div class="bsb">Create strong passwords</div></div></div>
+                    <div class="bit"><div class="bic"><i class="fas fa-fingerprint"></i></div><div><div class="btx">PIN &amp; Biometrics</div><div class="bsb">Multi-layer protection</div></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="steps" class="sec">
+    <div class="ct">
+        <div class="rv" style="text-align:center;margin-bottom:3.5rem;">
+            <div class="chip"><i class="fas fa-list-ol"></i> How It Works</div>
+            <h2 class="sh">Get started in <span class="gt">4 simple steps.</span></h2>
+            <p class="sub" style="max-width:440px;margin:0 auto">From download to fully secured in under 2 minutes.</p>
+        </div>
+        <div class="stg">
+            <div class="stc rv d1"><div class="stn">1</div><div class="sti"><i class="fab fa-android"></i></div><h4>Download App</h4><p>Get NoteFort free from Google Play or the App Store</p></div>
+            <div class="stc rv d2"><div class="stn">2</div><div class="sti"><i class="fas fa-pen-to-square"></i></div><h4>Create Notes</h4><p>Write, organize, and color-code your digital notes</p></div>
+            <div class="stc rv d3"><div class="stn">3</div><div class="sti"><i class="fas fa-shield-halved"></i></div><h4>Secure Everything</h4><p>Lock notes and save passwords with AES encryption</p></div>
+            <div class="stc rv d4"><div class="stn">4</div><div class="sti"><i class="fas fa-globe"></i></div><h4>Access Anywhere</h4><p>Sync across all your devices, online or offline</p></div>
+        </div>
+    </div>
+</section>
+
+<section id="secure" class="sec">
+    <div class="seb"></div><div class="ses"></div>
+    <div class="ct">
+        <div class="seh rv">
+            <div class="chip chipw"><i class="fas fa-shield-halved"></i> Privacy First</div>
+            <h2 class="sh" style="color:#fff">Bank-grade security, <span style="background:linear-gradient(135deg,#A5B4FC,#67E8F9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">for everyone.</span></h2>
+            <p class="sub" style="color:rgba(255,255,255,.46);max-width:510px;margin:0 auto">Your data is encrypted before it leaves your device. Zero-knowledge architecture means even we cannot read your notes.</p>
+        </div>
+        <div class="seg">
+            <div class="sec1 rv d1"><div class="sei"><div class="sic"><i class="fas fa-lock"></i></div><h4>AES-256 Encryption</h4><p>Military-grade encryption protects every note and password you store</p></div></div>
+            <div class="sec1 rv d2"><div class="sei"><div class="sic"><i class="fas fa-eye-slash"></i></div><h4>Zero Knowledge</h4><p>We cannot read your data. Your privacy is absolute and guaranteed</p></div></div>
+            <div class="sec1 rv d3"><div class="sei"><div class="sic"><i class="fas fa-hashtag"></i></div><h4>PIN Lock</h4><p>Add a PIN code for an extra layer of app or individual note protection</p></div></div>
+            <div class="sec1 rv d4"><div class="sei"><div class="sic"><i class="fas fa-fingerprint"></i></div><h4>Biometric Login</h4><p>Unlock instantly with fingerprint or Face ID biometric authentication</p></div></div>
+            <div class="sec1 rv d1"><div class="sei"><div class="sic"><i class="fab fa-google"></i></div><h4>Google Auth</h4><p>Sign in securely with your existing Google account credentials</p></div></div>
+            <div class="sec1 rv d2"><div class="sei"><div class="sic"><i class="fas fa-cloud-arrow-up"></i></div><h4>Encrypted Backup</h4><p>Automatic encrypted cloud backup so you never lose important data</p></div></div>
+            <div class="sec1 rv d3"><div class="sei"><div class="sic"><i class="fas fa-vault"></i></div><h4>Password Vault</h4><p>Dedicated encrypted vault for all your login credentials and secrets</p></div></div>
+            <div class="sec1 rv d4"><div class="sei"><div class="sic"><i class="fas fa-share-from-square"></i></div><h4>Secure Sharing</h4><p>Share notes securely without ever exposing your sensitive information</p></div></div>
+        </div>
+    </div>
+</section>
+
+<section id="who" class="sec">
+    <div class="ct">
+        <div class="whd rv">
+            <div class="chip"><i class="fas fa-users"></i> Who Is It For</div>
+            <h2 class="sh">Built for <span class="gt">everyone who values privacy.</span></h2>
+        </div>
+        <div class="wfg">
+            <div class="wfu rv d1"><span class="wfe">&#127891;</span><h4>Students</h4><p>Organize class notes, assignments, and study materials securely</p></div>
+            <div class="wfu rv d2"><span class="wfe">&#128188;</span><h4>Professionals</h4><p>Manage work notes, credentials, and sensitive client data safely</p></div>
+            <div class="wfu rv d3"><span class="wfe">&#128187;</span><h4>Developers</h4><p>Save API keys, tokens, server passwords, and code snippets</p></div>
+            <div class="wfu rv d4"><span class="wfe">&#128736;</span><h4>Freelancers</h4><p>Track client passwords, project notes, and key documents</p></div>
+            <div class="wfu rv d1"><span class="wfe">&#127970;</span><h4>Business Owners</h4><p>Secure business credentials, documents, and sensitive records</p></div>
+            <div class="wfu rv d2"><span class="wfe">&#128240;</span><h4>Journalists</h4><p>Protect sources, investigation notes, and sensitive information</p></div>
+            <div class="wfu rv d3"><span class="wfe">&#127775;</span><h4>Content Creators</h4><p>Organize ideas, scripts, brand passwords, and schedules</p></div>
+            <div class="wfu rv d4"><span class="wfe">&#128214;</span><h4>Personal Journals</h4><p>Keep a private encrypted diary of your daily thoughts and memories</p></div>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+<section id="cta" class="sec">
+    <div class="ctb"></div>
+    <div class="ct">
+        <div class="cti rv">
+            <div class="chip chipw" style="margin-bottom:1.5rem"><i class="fas fa-download"></i> Start Today &mdash; It&rsquo;s Free</div>
+            <h2>Your Ideas Deserve<br />Better Protection.</h2>
+            <p>Stop worrying about losing passwords and private notes. Start using NoteFort today and take full control of your digital life.</p>
+            <div class="ctbs">
+                <a href="#" class="btn bp bxl"><i class="fab fa-android"></i> Download for Android</a>
+                <a href="#" class="btn bg2 bxl" style="background:var(--dark);border:none;color:#fff;box-shadow:0 4px 18px rgba(0,0,0,.25);"><i class="fab fa-apple"></i> Download for iOS</a>
+                <a href="#showcase" class="btn bg2 bxl"><i class="fas fa-images"></i> See Screenshots</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<script>
+(function(){
+    // Scroll progress bar
+    var spb=document.createElement('div');spb.id='scroll-progress-nf';document.body.prepend(spb);
+    window.addEventListener('scroll',function(){var s=window.scrollY,d=document.documentElement.scrollHeight-window.innerHeight;spb.style.width=(d>0?(s/d)*100:0)+'%';},{passive:true});
+
+    window.addEventListener("load",function(){setTimeout(function(){var l=document.getElementById("loader");if(l)l.classList.add("hide");},500);});
+    var ac=document.getElementById("ann-close");
+    if(ac)ac.addEventListener("click",function(){document.getElementById("ann").style.display="none";});
+    var nv=document.getElementById("nav");
+    window.addEventListener("scroll",function(){nv.classList.toggle("scrolled",window.scrollY>20);},{passive:true});
+
+    // Enhanced scroll reveal with stagger
+    var ro=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add("in");ro.unobserve(e.target);}});},{threshold:0.12,rootMargin:'0px 0px -60px 0px'});
+    document.querySelectorAll(".rv,.rvl,.rvr").forEach(function(el){ro.observe(el);});
+
+    // Smooth eased counter animation
+    function an(el){
+        var to=parseFloat(el.getAttribute("data-to")),sfx=el.getAttribute("data-sfx")||"",dec=parseInt(el.getAttribute("data-dec"))||0,dur=2200,start=null;
+        function tick(ts){if(!start)start=ts;var p=Math.min((ts-start)/dur,1),ease=1-Math.pow(1-p,3);el.textContent=(to*ease).toFixed(dec)+sfx;if(p<1)requestAnimationFrame(tick);else el.textContent=to.toFixed(dec)+sfx;}
+        requestAnimationFrame(tick);
+    }
+    var co=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){an(e.target);co.unobserve(e.target);}});},{threshold:0.5});
+    document.querySelectorAll(".sn[data-to]").forEach(function(el){co.observe(el);});
+
+    // Parallax blobs on mouse move
+    var blobs=document.querySelectorAll('.blob');
+    window.addEventListener('mousemove',function(e){
+        var xP=(e.clientX/window.innerWidth-0.5)*24,yP=(e.clientY/window.innerHeight-0.5)*24;
+        blobs.forEach(function(b,i){var f=(i%2===0?1:-1)*0.5;b.style.transform='translate('+(xP*f)+'px,'+(yP*f)+'px) scale(1)';});
+    },{passive:true});
+
+    // Magnetic card hover
+    document.querySelectorAll('.fcd,[class*="card"]').forEach(function(card){
+        card.addEventListener('mousemove',function(e){
+            var r=card.getBoundingClientRect(),x=((e.clientX-r.left)/r.width-0.5)*10,y=((e.clientY-r.top)/r.height-0.5)*10;
+            card.style.transform='translateY(-8px) rotateX('+(-y)+'deg) rotateY('+x+'deg)';
+            card.style.transition='transform 0.1s ease';
+        });
+        card.addEventListener('mouseleave',function(){
+            card.style.transform='';
+            card.style.transition='transform 0.6s cubic-bezier(0.4,0,0.2,1)';
+        });
+    });
+
+    document.querySelectorAll(".fqq").forEach(function(q){
+        q.addEventListener("click",function(){
+            var it=this.parentElement,wo=it.classList.contains("op");
+            document.querySelectorAll(".fqi.op").forEach(function(i){i.classList.remove("op");});
+            if(!wo)it.classList.add("op");
+        });
+    });
+    document.querySelectorAll("a[href^=\"#\"]").forEach(function(a){
+        a.addEventListener("click",function(e){var t=document.querySelector(this.getAttribute("href"));if(t){e.preventDefault();t.scrollIntoView({behavior:"smooth",block:"start"});}});
+    });
+    document.querySelectorAll(".btn").forEach(function(b){
+        b.addEventListener("click",function(e){
+            var r=document.createElement("span");r.className="rpl";
+            var rc=this.getBoundingClientRect(),s=Math.max(rc.width,rc.height);
+            r.style.cssText="width:"+s+"px;height:"+s+"px;left:"+(e.clientX-rc.left-s/2)+"px;top:"+(e.clientY-rc.top-s/2)+"px";
+            this.appendChild(r);setTimeout(function(){r.remove();},600);
+        });
+    });
+    var sc=document.getElementById("scrl");
+    if(sc){
+        var dn=false,sx,sl;
+        sc.addEventListener("mousedown",function(e){dn=true;sx=e.pageX-sc.offsetLeft;sl=sc.scrollLeft;sc.style.cursor="grabbing";});
+        sc.addEventListener("mouseleave",function(){dn=false;sc.style.cursor="grab";});
+        sc.addEventListener("mouseup",function(){dn=false;sc.style.cursor="grab";});
+        sc.addEventListener("mousemove",function(e){if(!dn)return;e.preventDefault();sc.scrollLeft=sl-(e.pageX-sc.offsetLeft-sx)*1.4;});
+    }
+})()
+</script>
+</body>
+</html>
