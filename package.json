@@ -16,7 +16,6 @@
     "@mui/material": "^7.3.6",
     "aos": "^2.3.4",
     "axios": "^1.13.2",
-    "boostrap": "^2.0.0",
     "dayjs": "^1.11.19",
     "html2canvas": "^1.4.1",
     "jspdf": "^4.2.1",
