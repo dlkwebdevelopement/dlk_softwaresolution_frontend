@@ -528,7 +528,7 @@ const Navbar = () => {
 
   return (
     <>
-      <GlassAppBar position="fixed" elevation={0}>
+      <GlassAppBar position="sticky" elevation={0} sx={{ top: 0, zIndex: 1200, width: "100%" }}>
         <Container maxWidth="xl" disableGutters sx={{ px: { xs: "8px", md: "12px" } }}>
           <Toolbar
             sx={{

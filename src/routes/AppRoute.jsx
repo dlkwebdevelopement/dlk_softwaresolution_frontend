@@ -59,7 +59,6 @@ const AppRoute = () => {
             element={
               <>
                 <Navbar />
-                <Box sx={{ mt: 10 }}></Box>
                 <Banner />
                 <LiveClass />
 

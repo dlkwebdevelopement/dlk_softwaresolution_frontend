@@ -114,7 +114,7 @@ const FloatingImage = styled(Box)({
 
 const NavigationArrow = styled(({ $direction, ...other }) => <Box {...other} />)(({ $direction }) => ({
   position: 'absolute',
-  top: 'calc(50% - 20px)',
+  top: '50%',
   [$direction]: 20,
   transform: 'translateY(-50%)',
   width: 44,
@@ -398,11 +398,11 @@ export default function Banner() {
       <Box
         sx={{
           width: "100%",
-          height: { xs: "190px", sm: "260px", md: "340px", lg: "420px" },
+          aspectRatio: "16 / 9",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: '#f8fafc',
+          background: "#f8fafc",
         }}
       >
         <Box sx={{ textAlign: 'center' }}>
@@ -462,221 +462,88 @@ export default function Banner() {
 
 
 
-      {/* Navigation Arrows - Only show if multiple slides */}
-      {list.length > 1 && isHovering && (
-        <>
-          <NavigationArrow $direction="left" onClick={handlePrevious}>
-            <ChevronLeftIcon sx={{ fontSize: 32 }} />
-          </NavigationArrow>
-          <NavigationArrow $direction="right" onClick={handleNext}>
-            <ChevronRightIcon sx={{ fontSize: 32 }} />
-          </NavigationArrow>
-        </>
-      )}
-
-      {/* SLIDER */}
+      {/* 2. HERO BANNER SLIDER (Full 16:9 Aspect Ratio) */}
       <Box
-        ref={sliderRef}
         sx={{
-          display: "flex",
-          width: `${loopSlides.length * 100}%`,
-          transform: `translateX(-${index * (100 / loopSlides.length)}%)`,
-          transition: transition ? "transform 1s cubic-bezier(0.4, 0, 0.2, 1)" : "none",
-          height: { xs: "190px", sm: "260px", md: "340px", lg: "420px" },
-          position: 'relative',
-          zIndex: 1,
+          position: "relative",
+          width: "100%",
+          aspectRatio: "16 / 9",
+          overflow: "hidden",
+          background: "#ffffff",
         }}
       >
-        {loopSlides.map((slide, i) => {
-          // Force full-width image mode for uploaded banner graphics
-          slide.isContentActive = false;
-          
-          const isActive = i === index;
-          return (
+        {/* Navigation Arrows - Only show if multiple slides */}
+        {list.length > 1 && isHovering && (
+          <>
+            <NavigationArrow $direction="left" onClick={handlePrevious}>
+              <ChevronLeftIcon sx={{ fontSize: 32 }} />
+            </NavigationArrow>
+            <NavigationArrow $direction="right" onClick={handleNext}>
+              <ChevronRightIcon sx={{ fontSize: 32 }} />
+            </NavigationArrow>
+          </>
+        )}
+
+        {/* SLIDER TRACK */}
+        <Box
+          ref={sliderRef}
+          sx={{
+            display: "flex",
+            width: `${loopSlides.length * 100}%`,
+            height: "100%",
+            transform: `translateX(-${index * (100 / loopSlides.length)}%)`,
+            transition: transition ? "transform 1s cubic-bezier(0.4, 0, 0.2, 1)" : "none",
+            position: "relative",
+            zIndex: 1,
+          }}
+        >
+          {loopSlides.map((slide, i) => (
             <Box
               key={i}
               sx={{
                 width: `${100 / loopSlides.length}%`,
+                height: "100%",
                 flexShrink: 0,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                height: { xs: "190px", sm: "260px", md: "340px", lg: "420px" },
-                position: 'relative',
-                overflow: 'hidden',
+                position: "relative",
+                overflow: "hidden",
+                background: "#ffffff",
               }}
             >
-              <Container
-                maxWidth={slide.isContentActive === false ? false : "xl"}
-                disableGutters={slide.isContentActive === false}
+              <Box
+                component="img"
+                src={getImgUrl(slide.photoUrl)}
+                alt={slide.title || "DLK Hero Banner"}
                 sx={{
-                  height: { xs: "190px", sm: "260px", md: "340px", lg: "420px" },
-                  minHeight: { xs: "190px", sm: "260px", md: "340px", lg: "420px" },
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  p: slide.isContentActive === false ? 0 : undefined,
-                  m: slide.isContentActive === false ? 0 : undefined,
-                  width: '100%',
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "contain",
+                  objectPosition: "center",
+                  display: "block",
                 }}
-              >
-                <Box
-                  sx={{
-                    display: 'grid',
-                    gridTemplateColumns: {
-                      xs: '1fr',
-                      md: slide.isContentActive === false ? '1fr' : '1fr 1fr'
-                    },
-                    gap: slide.isContentActive === false ? 0 : { xs: 4, md: 10 },
-                    width: '100%',
-                    height: '100%',
-                    alignItems: 'stretch',
-                  }}
-                >
-                  {/* Text Content */}
-                  {slide.isContentActive !== false && (
-                    <SlideContent
-                      $isActive={isActive}
-                    >
-                      {/* New Redesign Layout */}
-                      <EyebrowBox>
-                        <EyebrowPill>{slide.tagline || "Chennai #1"}</EyebrowPill>
-                        IT Training & Placement Institute
-                      </EyebrowBox>
-
-                      <MainHeading variant="h1">
-                        {slide.title}<br /><br />
-                        <UnderlineAccent>{slide.highlight}</UnderlineAccent><br />
-                        <TextAccent>{slide.subtitle}</TextAccent>
-                      </MainHeading>
-
-                      <HeroSub>
-                        {slide.description}
-                      </HeroSub>
-
-                      <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', mb: 4 }}>
-                        <Button
-                          variant="contained"
-                          onClick={() => setEnquiryOpen(true)}
-                          sx={{
-                            background: '#3DB843',
-                            color: 'white',
-                            px: 4,
-                            py: 1.5,
-                            borderRadius: '100px',
-                            fontSize: '0.9rem',
-                            fontWeight: 700,
-                            textTransform: 'none',
-                            fontFamily: 'inherit',
-                            '&:hover': {
-                              background: '#2e9133',
-                              transform: 'translateY(-2px)',
-                              boxShadow: '0 12px 32px rgba(61,184,67,0.35)',
-                            },
-                            transition: 'all 0.25s',
-                          }}
-                        >
-                          {slide.button || "Enroll Now — It's Free"} →
-                        </Button>
-                        <Button
-                          variant="contained"
-                          component="a"
-                          href="https://www.youtube.com/@StudentsLearningplatform2026"
-                          target="_blank"
-                          sx={{
-                            background: `linear-gradient(135deg, #1a4718 0%, #3DB843 100%)`,
-                            color: 'white',
-                            px: 4,
-                            py: 1.5,
-                            borderRadius: '100px',
-                            fontSize: '0.9rem',
-                            fontWeight: 600,
-                            textTransform: 'none',
-                            fontFamily: 'inherit',
-                            '&:hover': {
-                              transform: 'translateY(-2px)',
-                              boxShadow: '0 8px 24px rgba(61,184,67,0.3)',
-                              background: `linear-gradient(135deg, #1a4718 0%, #3DB843 100%)`, // Keep gradient on hover
-                              opacity: 0.9
-                            },
-                            transition: 'all 0.25s',
-                          }}
-                        >
-                          ▶ Watch How It Works
-                        </Button>
-                      </Box>
-
-
-
-
-
-
-
-
-                    </SlideContent>
-                  )}
-
-                  {/* Image Container - Hidden on mobile if text exists */}
-                  <SlideImage
-                    $isActive={isActive}
-                    sx={{
-                      display: { xs: slide.isContentActive === false ? 'flex' : 'none', md: 'flex' },
-                      width: '100%',
-                      height: { xs: "190px", sm: "260px", md: "340px", lg: "420px" },
-                    }}
-                  >
-                    <FloatingImage sx={{ width: '100%', height: '100%' }}>
-                      <Box
-                        sx={{
-                          position: 'relative',
-                          display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          width: '100%',
-                          height: '100%',
-                        }}
-                      >
-                        {/* Main Image */}
-                        <Box
-                          component="img"
-                          src={getImgUrl(slide.photoUrl)}
-                          alt={slide.title || "DLK Hero Banner"}
-                          sx={{
-                            width: '100%',
-                            maxWidth: '100%',
-                            height: { xs: "190px", sm: "260px", md: "340px", lg: "420px" },
-                            objectFit: 'cover',
-                            objectPosition: 'center',
-                            display: 'block',
-                          }}
-                        />
-                      </Box>
-                    </FloatingImage>
-                  </SlideImage>
-                </Box>
-              </Container>
+              />
             </Box>
-          );
-        })}
-      </Box >
+          ))}
+        </Box>
 
-      {/* DOTS NAVIGATION - Show only if multiple slides */}
-      {
-        list.length > 1 && (
+        {/* DOTS NAVIGATION */}
+        {list.length > 1 && (
           <Box
             sx={{
               position: "absolute",
-              bottom: { xs: 45, md: 52 },
+              bottom: { xs: 8, sm: 12, md: 16 },
               left: "50%",
               transform: "translateX(-50%)",
               display: "flex",
               gap: 1.2,
               zIndex: 10,
-              background: 'rgba(0, 0, 0, 0.35)',
-              backdropFilter: 'blur(12px)',
-              padding: { xs: '5px 12px', md: '6px 16px' },
-              borderRadius: '40px',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+              background: "rgba(0, 0, 0, 0.35)",
+              backdropFilter: "blur(12px)",
+              padding: { xs: "4px 10px", md: "6px 16px" },
+              borderRadius: "40px",
+              border: "1px solid rgba(255, 255, 255, 0.2)",
             }}
           >
             {list.map((_, i) => (
@@ -687,8 +554,8 @@ export default function Banner() {
               />
             ))}
           </Box>
-        )
-      }
+        )}
+      </Box>
 
       {/* TICKER */}
       <Box
