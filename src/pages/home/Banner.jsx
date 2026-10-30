@@ -398,7 +398,8 @@ export default function Banner() {
       <Box
         sx={{
           width: "100%",
-          aspectRatio: "16 / 9",
+          aspectRatio: { xs: "16 / 9", sm: "16 / 8", md: "16 / 7", lg: "21 / 9" },
+          maxHeight: { xs: "240px", sm: "340px", md: "440px", lg: "480px", xl: "520px" },
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -462,12 +463,13 @@ export default function Banner() {
 
 
 
-      {/* 2. HERO BANNER SLIDER (Full 16:9 Aspect Ratio) */}
+      {/* 2. HERO BANNER SLIDER (Reduced Height & Sleek Aspect Ratio) */}
       <Box
         sx={{
           position: "relative",
           width: "100%",
-          aspectRatio: "16 / 9",
+          aspectRatio: { xs: "16 / 9", sm: "16 / 8", md: "16 / 7", lg: "21 / 9" },
+          maxHeight: { xs: "240px", sm: "340px", md: "440px", lg: "480px", xl: "520px" },
           overflow: "hidden",
           background: "#ffffff",
         }}
