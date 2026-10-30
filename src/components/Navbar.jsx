@@ -198,18 +198,19 @@ const MegaMenuContainer = styled(Paper)({
   top: "80px",
   left: "50vw",
   transform: "translateX(-50%)",
-  width: "850px",
+  width: "640px",
   maxWidth: "95vw",
-  height: "450px",
+  maxHeight: "520px",
   borderRadius: "24px",
   zIndex: 9999,
   display: "flex",
+  flexDirection: "column",
   overflow: "hidden",
   background: 'rgba(255, 255, 255, 0.98)',
   backdropFilter: 'blur(20px)',
   WebkitBackdropFilter: 'blur(20px)',
-  border: `1px solid ${alpha(colors.primary, 0.1)}`,
-  boxShadow: '0 30px 60px rgba(0, 0, 0, 0.12)',
+  border: `1px solid ${alpha(colors.primary, 0.12)}`,
+  boxShadow: '0 30px 60px rgba(0, 0, 0, 0.14)',
   transition: 'opacity 0.2s ease, transform 0.2s ease',
   pointerEvents: 'auto',
 });
@@ -310,16 +311,12 @@ const MobileMenuItem = styled(ListItemButton)({
 const MegaMenu = ({ open, onClose, onKeepOpen, handleCardClick }) => {
   const navigate = useNavigate();
   const [cats, setCats] = useState([]);
-  const [activeCat, setActiveCat] = useState(null);
 
   useEffect(() => {
     const fetchCats = async () => {
       try {
         const data = await GetRequest(ADMIN_GET_ALL_CATEGORIES_WITH_SUB);
-        setCats(data);
-        if (data?.length > 0) {
-          setActiveCat(data[0]);
-        }
+        setCats(data || []);
       } catch (err) {
         console.error("Failed to fetch Categories", err);
       }
@@ -327,7 +324,15 @@ const MegaMenu = ({ open, onClose, onKeepOpen, handleCardClick }) => {
     fetchCats();
   }, []);
 
-  // Always render — use CSS so mouse events work smoothly
+  const handleCategoryClick = (item) => {
+    if (item.subcategories && item.subcategories.length > 0) {
+      navigate(`/course/${item.subcategories[0].slug}`);
+    } else {
+      navigate(`/category/${item._id || item.id}`);
+    }
+    onClose();
+  };
+
   return (
     <MegaMenuContainer
       elevation={0}
@@ -341,116 +346,113 @@ const MegaMenu = ({ open, onClose, onKeepOpen, handleCardClick }) => {
           : 'translateX(-50%) translateY(-10px)',
       }}
     >
-      {/* LEFT COLUMN - Categories */}
+      {/* HEADER */}
       <Box
         sx={{
-          width: "280px",
-          background: alpha(colors.primary, 0.02),
-          borderRight: `1px solid ${alpha(colors.primary, 0.08)}`,
-          overflowY: "auto",
-          p: 1.5,
+          px: 3,
+          py: 2,
+          borderBottom: `1px solid ${alpha(colors.primary, 0.08)}`,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          background: alpha(colors.primary, 0.03),
         }}
       >
-        <Typography
-          sx={{
-            color: '#111c12',
-            fontSize: "0.75rem",
-            fontWeight: 700,
-            letterSpacing: "1.2px",
-            mb: 2,
-            px: 1,
-            textTransform: "uppercase",
-          }}
-        >
-          Course Categories
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+          <SchoolIcon sx={{ color: colors.primary, fontSize: 24 }} />
+          <Typography
+            sx={{
+              color: colors.dark,
+              fontSize: "0.95rem",
+              fontWeight: 700,
+              letterSpacing: "0.5px",
+            }}
+          >
+            All Course Programs
+          </Typography>
+        </Box>
+        <Typography sx={{ color: colors.text.secondary, fontSize: "0.82rem", fontWeight: 600 }}>
+          {cats.length} Domains Available
         </Typography>
-        <Stack spacing={0.5}>
-          {cats.map((item, index) => (
-            <CategoryItem
-              key={item.id || index}
-              active={activeCat?.id === item.id}
-              onMouseEnter={() => setActiveCat(item)}
-            >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <MenuBookIcon sx={{ fontSize: 18, color: colors.primary }} />
-                {item.categoryName}
-              </Box>
-            </CategoryItem>
-          ))}
-        </Stack>
       </Box>
 
-      {/* RIGHT COLUMN - Subcategories */}
+      {/* CATEGORIES GRID */}
       <Box
         sx={{
-          flex: 1,
-          p: 4,
+          p: 2,
           overflowY: "auto",
-          background: 'white',
+          maxHeight: "440px",
+          "&::-webkit-scrollbar": { width: "6px" },
+          "&::-webkit-scrollbar-thumb": {
+            backgroundColor: alpha(colors.primary, 0.2),
+            borderRadius: "4px",
+          },
         }}
       >
-        {activeCat ? (
-          <>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2.5, mb: 4 }}>
-              <Avatar
-                sx={{
-                  bgcolor: alpha(colors.primary, 0.1),
-                  color: colors.primary,
-                  width: 56,
-                  height: 56,
-                }}
-              >
-                <SchoolIcon sx={{ fontSize: 28 }} />
-              </Avatar>
-              <Box>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)" },
+            gap: 1,
+          }}
+        >
+          {cats.map((item, index) => (
+            <Box
+              key={item.id || item._id || index}
+              onClick={() => handleCategoryClick(item)}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                px: 2,
+                py: 1.4,
+                borderRadius: "12px",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+                border: "1px solid transparent",
+                "&:hover": {
+                  backgroundColor: alpha(colors.primary, 0.07),
+                  borderColor: alpha(colors.primary, 0.2),
+                  transform: "translateX(4px)",
+                  "& .cat-text": {
+                    color: colors.primary,
+                  },
+                  "& .cat-arrow": {
+                    color: colors.primary,
+                    transform: "translateX(3px)",
+                  },
+                },
+              }}
+            >
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1.2, minWidth: 0 }}>
+                <MenuBookIcon sx={{ fontSize: 18, color: colors.primary, flexShrink: 0 }} />
                 <Typography
-                  variant="h5"
+                  className="cat-text"
                   sx={{
+                    fontSize: "0.88rem",
                     fontWeight: 600,
-                    color: colors.dark,
-                    mb: 0.5,
-                    fontSize: '1.4rem'
+                    color: "#1e293b",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    transition: "color 0.2s ease",
                   }}
                 >
-                  {activeCat.categoryName}
-                </Typography>
-                <Typography sx={{ color: colors.text.secondary, fontSize: "0.95rem", fontWeight: 500 }}>
-                  Discover {activeCat?.subcategories?.length || 0} expert-led specializations
+                  {item.categoryName}
                 </Typography>
               </Box>
+              <ChevronRightIcon
+                className="cat-arrow"
+                sx={{
+                  fontSize: 18,
+                  color: "#94a3b8",
+                  transition: "all 0.2s ease",
+                  flexShrink: 0,
+                }}
+              />
             </Box>
-
-            <Divider sx={{ borderColor: alpha(colors.primary, 0.08), mb: 4 }} />
-
-            {activeCat?.subcategories?.length > 0 ? (
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5 }}>
-                {activeCat.subcategories.map((sub, index) => (
-                  <SubCategoryChip
-                    key={sub.id}
-                    label={sub.subcategory}
-                    onClick={() => {
-                      navigate(`/course/${sub.slug}`);
-                      onClose();
-                    }}
-                    icon={<ChevronRightIcon />}
-                  />
-                ))}
-              </Box>
-            ) : (
-              <Box sx={{ textAlign: "center", py: 6 }}>
-                <Typography sx={{ color: colors.text.secondary, fontStyle: "italic", fontSize: '1rem' }}>
-                  New courses coming soon for this category
-                </Typography>
-              </Box>
-            )}
-          </>
-        ) : (
-          <Box sx={{ textAlign: "center", mt: 6 }}>
-            <Typography sx={{ color: colors.text.secondary, fontWeight: 500 }}>
-              Explore our catalog by selecting a category
-            </Typography>
-          </Box>
-        )}
+          ))}
+        </Box>
       </Box>
     </MegaMenuContainer>
   );
@@ -948,64 +950,30 @@ const Navbar = () => {
               <Collapse in={mobileAllCoursesOpen} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding sx={{ pl: 2 }}>
                   {cats.map((cat) => (
-                    <Box key={cat.id}>
-                      <MobileMenuItem
-                        onClick={() => toggleMobileCat(cat.id)}
-                        sx={{ pl: 3 }}
-                      >
-                        <ListItemText
-                          primary={cat.categoryName}
-                          primaryTypographyProps={{
-                            fontWeight: 500,
-                            color: "black",
-                            fontSize: "0.95rem"
-                          }}
-                        />
-                        {mobileCatOpen === cat.id ? (
-                          <ExpandLessIcon sx={{ color: colors.primary, fontSize: 20 }} />
-                        ) : (
-                          <ExpandMoreIcon sx={{ color: colors.primary, fontSize: 20 }} />
-                        )}
-                      </MobileMenuItem>
-
-                      <Collapse in={mobileCatOpen === cat.id} timeout="auto" unmountOnExit>
-                        <List component="div" disablePadding sx={{ pl: 4 }}>
-                          {cat.subcategories?.length > 0 ? (
-                            cat.subcategories.map((sub) => (
-                              <MobileMenuItem
-                                key={sub.id}
-                                sx={{ py: 0.8 }}
-                                onClick={() => {
-                                  navigate(`/course/${sub.slug}`);
-                                  setOpen(false);
-                                }}
-                              >
-                                <ListItemIcon sx={{ minWidth: 32 }}>
-                                  <ChevronRightIcon sx={{ color: alpha(colors.primary, 0.4), fontSize: 18 }} />
-                                </ListItemIcon>
-                                <ListItemText
-                                  primary={sub.subcategory}
-                                  primaryTypographyProps={{
-                                    color: colors.text.secondary,
-                                    fontSize: "0.9rem",
-                                    fontWeight: 500
-                                  }}
-                                />
-                              </MobileMenuItem>
-                            ))
-                          ) : (
-                            <ListItemText
-                              primary="No subcategories available"
-                              sx={{
-                                pl: 2,
-                                color: alpha(colors.light, 0.6),
-                                fontSize: "14px"
-                              }}
-                            />
-                          )}
-                        </List>
-                      </Collapse>
-                    </Box>
+                    <MobileMenuItem
+                      key={cat.id || cat._id}
+                      onClick={() => {
+                        if (cat.subcategories && cat.subcategories.length > 0) {
+                          handleNavigation(`/course/${cat.subcategories[0].slug}`);
+                        } else {
+                          handleNavigation(`/category/${cat._id || cat.id}`);
+                        }
+                      }}
+                      sx={{ pl: 3 }}
+                    >
+                      <ListItemIcon sx={{ minWidth: 32 }}>
+                        <MenuBookIcon sx={{ color: colors.primary, fontSize: 18 }} />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={cat.categoryName}
+                        primaryTypographyProps={{
+                          fontWeight: 600,
+                          fontSize: "0.88rem",
+                          color: colors.dark,
+                        }}
+                      />
+                      <ChevronRightIcon sx={{ color: colors.primary, fontSize: 18 }} />
+                    </MobileMenuItem>
                   ))}
                 </List>
               </Collapse>

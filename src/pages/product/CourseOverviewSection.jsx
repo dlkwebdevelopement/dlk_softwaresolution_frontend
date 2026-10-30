@@ -14,8 +14,11 @@ import {
   TextField,
   Rating,
   Avatar,
-  Button
+  Button,
+  Chip
 } from "@mui/material";
+import SchoolIcon from "@mui/icons-material/School";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import PlayCircleFilledIcon from "@mui/icons-material/PlayCircleFilled";
 import DownloadIcon from "@mui/icons-material/Download";
@@ -32,6 +35,7 @@ import { GetRequest, PostRequest } from "../../api/api";
 import {
   ADMIN_GET_CATEGORIES,
   ADMIN_GET_COURSE_SLUG,
+  ADMIN_GET_ALL_CATEGORIES_WITH_SUB,
 } from "../../api/endpoints";
 import { BASE_URL, getImgUrl } from "../../api/api";
 import toast from "react-hot-toast";
@@ -50,6 +54,7 @@ const CourseOverviewSection = () => {
 
   const { slug } = useParams();
   const [course, setCourse] = useState(null);
+  const [siblingCourses, setSiblingCourses] = useState([]);
 
   // Review Posting State
   const [openReviewModal, setOpenReviewModal] = useState(false);
@@ -131,7 +136,33 @@ const CourseOverviewSection = () => {
   const fetchCourse = async () => {
     try {
       const res = await GetRequest(ADMIN_GET_COURSE_SLUG(slug));
-      setCourse(res.data);
+      const courseData = res?.data;
+      setCourse(courseData);
+
+      if (courseData) {
+        const categoryId = courseData?.category_id?._id || courseData?.category_id?.id || courseData?.category_id;
+        if (categoryId) {
+          try {
+            const catRes = await GetRequest(`/admin/course/category/${categoryId}`);
+            if (catRes?.data && Array.isArray(catRes.data) && catRes.data.length > 0) {
+              setSiblingCourses(catRes.data);
+            } else {
+              const allCats = await GetRequest(ADMIN_GET_ALL_CATEGORIES_WITH_SUB);
+              const found = allCats?.find(c => String(c._id || c.id) === String(categoryId));
+              if (found?.subcategories) {
+                setSiblingCourses(found.subcategories.map(s => ({
+                  id: s.id,
+                  title: s.subcategory,
+                  slug: s.slug,
+                  duration: s.duration,
+                })));
+              }
+            }
+          } catch (err) {
+            console.error("Error fetching sibling courses:", err);
+          }
+        }
+      }
     } catch (err) {
       console.error(err);
     }
@@ -170,7 +201,10 @@ const CourseOverviewSection = () => {
   };
 
   useEffect(() => {
-    if (slug) fetchCourse();
+    if (slug) {
+      setValue(0);
+      fetchCourse();
+    }
   }, [slug]);
 
   // Dynamic Rating Calculations
@@ -831,6 +865,149 @@ const CourseOverviewSection = () => {
           </Tabs>
         </Box>
 
+        {/* Submenu / Specialization Tracks */}
+        {siblingCourses && siblingCourses.length > 0 && (
+          <Box
+            sx={{
+              mb: 4,
+              p: { xs: 2.2, sm: 2.8 },
+              backgroundColor: "#ffffff",
+              borderRadius: "20px",
+              border: "1px solid #e2e8f0",
+              boxShadow: "0 4px 12px -2px rgba(0, 0, 0, 0.05)",
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                flexWrap: "wrap",
+                gap: 1.5,
+                mb: 2,
+              }}
+            >
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                <Avatar
+                  sx={{
+                    bgcolor: "rgba(16, 185, 129, 0.1)",
+                    color: "#10b981",
+                    width: 36,
+                    height: 36,
+                  }}
+                >
+                  <SchoolIcon sx={{ fontSize: 20 }} />
+                </Avatar>
+                <Box>
+                  <Typography
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: { xs: "0.95rem", sm: "1.05rem" },
+                      color: "#0f172a",
+                      fontFamily: '"Poppins", sans-serif',
+                    }}
+                  >
+                    {course?.category_id?.categoryName
+                      ? `${course.category_id.categoryName} Specializations`
+                      : "Course Specializations & Tracks"}
+                  </Typography>
+                  <Typography sx={{ fontSize: "0.82rem", color: "#64748b", fontWeight: 500 }}>
+                    Select a specialization below to explore curriculum, projects, and duration
+                  </Typography>
+                </Box>
+              </Box>
+
+              <Chip
+                label={`${siblingCourses.length} ${siblingCourses.length === 1 ? 'Track' : 'Tracks'}`}
+                size="small"
+                sx={{
+                  backgroundColor: "rgba(16, 185, 129, 0.08)",
+                  color: "#059669",
+                  fontWeight: 700,
+                  fontSize: "0.75rem",
+                  borderRadius: "8px",
+                  border: "1px solid rgba(16, 185, 129, 0.2)",
+                }}
+              />
+            </Box>
+
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5 }}>
+              {siblingCourses.map((subCourse) => {
+                const isSelected = subCourse.slug === slug;
+                return (
+                  <Button
+                    key={subCourse.id || subCourse._id || subCourse.slug}
+                    onClick={() => {
+                      if (!isSelected) {
+                        navigate(`/course/${subCourse.slug}`);
+                      }
+                    }}
+                    variant={isSelected ? "contained" : "outlined"}
+                    startIcon={
+                      isSelected ? (
+                        <CheckCircleIcon sx={{ fontSize: "18px !important", color: "#fff" }} />
+                      ) : (
+                        <ChevronRightIcon sx={{ fontSize: "18px !important", color: "#10b981" }} />
+                      )
+                    }
+                    sx={{
+                      textTransform: "none",
+                      borderRadius: "14px",
+                      px: { xs: 2, sm: 2.5 },
+                      py: 1,
+                      fontWeight: 600,
+                      fontSize: "0.9rem",
+                      transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+                      ...(isSelected
+                        ? {
+                            backgroundColor: "#10b981",
+                            color: "#ffffff !important",
+                            borderColor: "#10b981",
+                            boxShadow: "0 4px 12px rgba(16, 185, 129, 0.25)",
+                            "&:hover": {
+                              backgroundColor: "#059669",
+                              borderColor: "#059669",
+                            },
+                          }
+                        : {
+                            backgroundColor: "#f8fafc",
+                            color: "#334155",
+                            borderColor: "#e2e8f0",
+                            "&:hover": {
+                              backgroundColor: "#ecfdf5",
+                              borderColor: "#10b981",
+                              color: "#065f46",
+                              transform: "translateY(-2px)",
+                              boxShadow: "0 4px 8px rgba(16, 185, 129, 0.12)",
+                            },
+                          }),
+                    }}
+                  >
+                    {subCourse.title || subCourse.subcategory}
+                    {subCourse.duration && (
+                      <Box
+                        component="span"
+                        sx={{
+                          ml: 1.2,
+                          px: 1,
+                          py: 0.2,
+                          borderRadius: "6px",
+                          fontSize: "0.75rem",
+                          fontWeight: 700,
+                          backgroundColor: isSelected ? "rgba(255,255,255,0.25)" : "rgba(16, 185, 129, 0.12)",
+                          color: isSelected ? "#ffffff" : "#059669",
+                        }}
+                      >
+                        {subCourse.duration}
+                      </Box>
+                    )}
+                  </Button>
+                );
+              })}
+            </Box>
+          </Box>
+        )}
+
         {/* 68 / 32 Layout */}
         <Box
           sx={{
@@ -946,7 +1123,7 @@ const CourseOverviewSection = () => {
                 </Typography>
               ) : (
                 cats
-                  .filter((cat) => cat.id !== course.category_id)
+                  .filter((cat) => String(cat.id || cat._id) !== String(course?.category_id?._id || course?.category_id?.id || course?.category_id))
                   .slice(0, 3)
                   .map((cat) => (
                     <Box
