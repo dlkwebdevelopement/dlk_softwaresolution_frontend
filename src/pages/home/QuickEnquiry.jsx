@@ -165,6 +165,7 @@ export default function QuickEnquiry() {
         inquiryType: "Quick Enquiry" 
       });
       setShowSuccess(true);
+      toast.success("Email sent successfully!");
       setTimeout(() => setShowSuccess(false), 2000);
       
       setFormData({
@@ -179,7 +180,7 @@ export default function QuickEnquiry() {
       if (captchaRef.current) captchaRef.current.reset();
 
     } catch (err) {
-      toast.error("Submission failed. Please try again.");
+      toast.error("Email not sent");
     } finally {
       setLoading(false);
     }

@@ -26,7 +26,7 @@ const StyledFloatingBtn = styled("a")(({ theme }) => ({
   textDecoration: "none",
   boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
   border: "1px solid #e0e0e0",
-  zIndex: 2000,
+  zIndex: 1100,
   animation: `${slideIn} 0.8s ease-out, ${pulse} 3s infinite`,
   transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
   "&:hover": {

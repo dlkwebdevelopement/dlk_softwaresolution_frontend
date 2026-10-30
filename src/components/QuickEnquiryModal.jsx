@@ -107,6 +107,7 @@ export default function QuickEnquiryModal({ open, onClose, initialCourse = "", i
         await PostRequest(ADMIN_POST_ENQUIRIES, { ...formData, inquiryType });
       }
       setShowSuccess(true);
+      toast.success("Email sent successfully!");
       setFormData({
         name: "",
         email: "",
@@ -123,7 +124,7 @@ export default function QuickEnquiryModal({ open, onClose, initialCourse = "", i
         onClose();
       }, 2000);
     } catch (err) {
-      toast.error("Failed to submit enquiry. Please try again.");
+      toast.error("Email not sent");
     } finally {
       setLoading(false);
     }

@@ -33,11 +33,7 @@ const COLORS = {
 };
 const colors = COLORS;
 
-const SAMPLE_IMAGES = [
-  "/photos/services.png",
-  "/photos/realestate.png",
-  "/photos/travel.png"
-];
+// Dummy sample images removed - using official uploaded pictures
 
 const getDailyRandomImage = (images, identifier) => {
   if (!images || images.length === 0) return null;
@@ -120,14 +116,18 @@ function AlbumCard({ album, onSelect }) {
   const [hovered, setHovered] = useState(false);
 
   const getAlbumCover = () => {
+    // 1. Highest priority: The official uploaded thumbnail
+    if (album.thumbnail) return getImgUrl(album.thumbnail);
+    // 2. Direct album images
+    if (Array.isArray(album.images) && album.images.length > 0) {
+      const first = album.images[0];
+      return getImgUrl(typeof first === 'string' ? first : first.url);
+    }
+    // 3. Batch images
     const allBatchImages = album.batches?.flatMap(batch => batch.images || []) || [];
     const randomImage = getDailyRandomImage(allBatchImages, album.id);
     if (randomImage) return getImgUrl(randomImage);
-    if (album.thumbnail) return getImgUrl(album.thumbnail);
-
-    // Pick a sample image based on album ID
-    const idHash = album.id?.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) || 0;
-    return SAMPLE_IMAGES[idHash % SAMPLE_IMAGES.length];
+    return "";
   };
 
   const coverImage = getAlbumCover();
@@ -367,6 +367,11 @@ export default function Gallery() {
   useEffect(() => {
     if (showLightbox) {
       setSliderIndex(0);
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
     }
   }, [showLightbox, activeEvent]);
 
@@ -642,38 +647,64 @@ export default function Gallery() {
         maxWidth="lg"
         fullWidth
         fullScreen={isMobile}
+        disableScrollLock={false}
         sx={{
-          zIndex: isMobile ? 9999 : 1300
+          zIndex: 99999,
+          overscrollBehavior: "contain",
+          "& .MuiBackdrop-root": {
+            zIndex: 99998,
+            backgroundColor: "rgba(0, 0, 0, 0.75)",
+            backdropFilter: "blur(6px)",
+          },
+          "& .MuiDialog-container": {
+            zIndex: 99999,
+            overscrollBehavior: "contain",
+          },
         }}
         PaperProps={{
           sx: {
             borderRadius: isMobile ? 0 : 4,
-            overflow: "hidden",
+            overflowY: isMobile ? "auto" : "hidden",
+            overflowX: "hidden",
             background: "white",
-            boxShadow: "0 24px 60px rgba(0,0,0,0.15)",
-            maxHeight: isMobile ? "100%" : "85vh"
+            boxShadow: "0 24px 60px rgba(0,0,0,0.3)",
+            maxHeight: isMobile ? "100%" : "88vh",
+            overscrollBehavior: "contain",
           }
         }}
       >
         {activeEvent && (
-          <Box sx={{
-            display: "flex",
-            flexDirection: { xs: "column-reverse", md: "row" },
-            minHeight: { md: 400 },
-            height: isMobile ? "100%" : "auto"
-          }}>
-            {/* Left Section: Information & Highlights */}
-            <Box sx={{
-              width: { xs: "100%", md: "340px" },
-              p: { xs: 2.5, md: 3.5 },
-              borderRight: { md: "1px solid rgba(0,0,0,0.06)" },
-              bgcolor: "white",
+          <Box
+            onWheel={(e) => e.stopPropagation()}
+            sx={{
               display: "flex",
-              flexDirection: "column",
-              maxHeight: { md: "85vh" },
-              overflowY: "auto",
-              flexShrink: 0
-            }}>
+              flexDirection: { xs: "column-reverse", md: "row" },
+              minHeight: { md: 400 },
+              height: isMobile ? "100%" : "auto",
+              overscrollBehavior: "contain",
+            }}
+          >
+            {/* Left Section: Information & Highlights */}
+            <Box
+              onWheel={(e) => e.stopPropagation()}
+              sx={{
+                width: { xs: "100%", md: "340px" },
+                p: { xs: 2.5, md: 3.5 },
+                borderRight: { md: "1px solid rgba(0,0,0,0.06)" },
+                bgcolor: "white",
+                display: "flex",
+                flexDirection: "column",
+                maxHeight: { xs: "none", md: "88vh" },
+                overflowY: "auto",
+                overscrollBehavior: "contain",
+                flexShrink: 0,
+                "&::-webkit-scrollbar": { width: 6 },
+                "&::-webkit-scrollbar-thumb": {
+                  bgcolor: "rgba(0,0,0,0.15)",
+                  borderRadius: 3,
+                },
+              }}
+            >
               <Box sx={{ mb: 3 }}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}>
                   <Chip
@@ -762,15 +793,28 @@ export default function Gallery() {
             </Box>
 
             {/* Right Section: Image Viewport */}
-            <Box sx={{
-              flex: 1,
-              bgcolor: "#0f172a",
-              position: "relative",
-              display: "flex",
-              flexDirection: "column",
-              height: { xs: "60vh", md: "85vh" },
-              minHeight: { xs: "400px", md: "auto" }
-            }}>
+            <Box
+              onWheel={(e) => {
+                e.stopPropagation();
+                if (total > 1) {
+                  if (e.deltaY > 30) {
+                    setSliderIndex((i) => (i + 1) % total);
+                  } else if (e.deltaY < -30) {
+                    setSliderIndex((i) => (i - 1 + total) % total);
+                  }
+                }
+              }}
+              sx={{
+                flex: 1,
+                bgcolor: "#0f172a",
+                position: "relative",
+                display: "flex",
+                flexDirection: "column",
+                height: { xs: "60vh", md: "88vh" },
+                minHeight: { xs: "400px", md: "auto" },
+                overscrollBehavior: "contain",
+              }}
+            >
               {/* Mobile Close Button */}
               {isMobile && (
                 <IconButton

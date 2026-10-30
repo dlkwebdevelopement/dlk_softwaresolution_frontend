@@ -342,12 +342,13 @@ const Footer = () => {
 
       await PostRequest(ADMIN_POST_CONTACT, payload);
       setShowSuccess(true);
+      toast.success("Email sent successfully!");
       setTimeout(() => setShowSuccess(false), 2000);
       
       setEmail("");
     } catch (err) {
       console.error("Newsletter Subscription Error:", err);
-      toast.error("Failed to subscribe. Please try again later.");
+      toast.error("Email not sent");
     } finally {
       setIsLoading(false);
     }

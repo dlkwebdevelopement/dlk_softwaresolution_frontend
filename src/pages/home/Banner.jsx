@@ -115,27 +115,27 @@ const FloatingImage = styled(Box)({
 
 const NavigationArrow = styled(({ $direction, ...other }) => <Box {...other} />)(({ $direction }) => ({
   position: 'absolute',
-  top: '50%',
-  [$direction]: 30,
+  top: 'calc(50% - 20px)',
+  [$direction]: 20,
   transform: 'translateY(-50%)',
-  width: 56,
-  height: 56,
+  width: 44,
+  height: 44,
   borderRadius: '50%',
-  background: 'rgba(255, 255, 255, 0.1)',
-  backdropFilter: 'blur(12px)',
-  border: '1px solid rgba(255, 255, 255, 0.1)',
+  background: 'rgba(0, 0, 0, 0.3)',
+  backdropFilter: 'blur(8px)',
+  border: '1px solid rgba(255, 255, 255, 0.25)',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   cursor: 'pointer',
   zIndex: 10,
-  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   color: '#ffffff',
   '&:hover': {
-    background: 'rgba(61, 184, 67, 0.2)',
+    background: 'rgba(61, 184, 67, 0.85)',
     borderColor: '#3DB843',
-    transform: 'translateY(-50%) scale(1.15)',
-    boxShadow: '0 10px 40px rgba(61, 184, 67, 0.2)',
+    transform: 'translateY(-50%) scale(1.1)',
+    boxShadow: '0 6px 20px rgba(61, 184, 67, 0.3)',
   },
 }));
 
@@ -399,11 +399,11 @@ export default function Banner() {
       <Box
         sx={{
           width: "100%",
-          height: "85vh",
+          height: { xs: "190px", sm: "260px", md: "340px", lg: "420px" },
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: '#c2eac4',
+          background: '#f8fafc',
         }}
       >
         <Box sx={{ textAlign: 'center' }}>
@@ -435,11 +435,11 @@ export default function Banner() {
     <Box
       sx={{
         width: "100%",
-        marginTop: { xs: "80px", md: "80px" },
+        marginTop: 0,
         display: "flex",
         flexDirection: "column",
         position: "relative",
-        background: '#c2eac4',
+        background: '#ffffff',
         maxWidth: "100vw",
         overflow: "hidden",
       }}
@@ -483,14 +483,13 @@ export default function Banner() {
           width: `${loopSlides.length * 100}%`,
           transform: `translateX(-${index * (100 / loopSlides.length)}%)`,
           transition: transition ? "transform 1s cubic-bezier(0.4, 0, 0.2, 1)" : "none",
-          height: "auto",
-          minHeight: "auto",
+          height: { xs: "190px", sm: "260px", md: "340px", lg: "420px" },
           position: 'relative',
           zIndex: 1,
         }}
       >
         {loopSlides.map((slide, i) => {
-          // TEMPORARY: Force full-width image mode to test banner size
+          // Force full-width image mode for uploaded banner graphics
           slide.isContentActive = false;
           
           const isActive = i === index;
@@ -503,17 +502,17 @@ export default function Banner() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                height: "auto",
-                minHeight: "100%",
+                height: { xs: "190px", sm: "260px", md: "340px", lg: "420px" },
                 position: 'relative',
+                overflow: 'hidden',
               }}
             >
               <Container
                 maxWidth={slide.isContentActive === false ? false : "xl"}
                 disableGutters={slide.isContentActive === false}
                 sx={{
-                  height: 'auto',
-                  minHeight: slide.isContentActive === false ? 'auto' : { xs: '600px', md: '560px' },
+                  height: { xs: "190px", sm: "260px", md: "340px", lg: "420px" },
+                  minHeight: { xs: "190px", sm: "260px", md: "340px", lg: "420px" },
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -624,10 +623,10 @@ export default function Banner() {
                     sx={{
                       display: { xs: slide.isContentActive === false ? 'flex' : 'none', md: 'flex' },
                       width: '100%',
-                      height: slide.isContentActive === false ? 'auto' : '100%',
+                      height: { xs: "190px", sm: "260px", md: "340px", lg: "420px" },
                     }}
                   >
-                    <FloatingImage sx={{ width: '100%', height: slide.isContentActive === false ? 'auto' : '100%' }}>
+                    <FloatingImage sx={{ width: '100%', height: '100%' }}>
                       <Box
                         sx={{
                           position: 'relative',
@@ -635,43 +634,21 @@ export default function Banner() {
                           justifyContent: 'center',
                           alignItems: 'center',
                           width: '100%',
-                          height: slide.isContentActive === false ? 'auto' : '100%',
+                          height: '100%',
                         }}
                       >
-                        {/* Glow Effect */}
-                        <Box
-                          sx={{
-                            position: 'absolute',
-                            width: '80%',
-                            height: '0%',
-                            background: 'radial-gradient(circle, rgba(191,219,129,0.3) 0%, transparent 70%)',
-                            filter: 'blur(40px)',
-                            zIndex: -1,
-                          }}
-                        />
-
                         {/* Main Image */}
                         <Box
                           component="img"
                           src={getImgUrl(slide.photoUrl)}
-                          alt={slide.title}
+                          alt={slide.title || "DLK Hero Banner"}
                           sx={{
                             width: '100%',
-                            maxWidth: slide.isContentActive === false ? '100%' : '700px',
-                            height: slide.isContentActive === false ? 'auto' : '100%',
-                            minHeight: slide.isContentActive === false ? 'auto' : '530px',
-                            objectFit: slide.isContentActive === false ? 'contain' : 'contain',
+                            maxWidth: '100%',
+                            height: { xs: "190px", sm: "260px", md: "340px", lg: "420px" },
+                            objectFit: 'cover',
+                            objectPosition: 'center',
                             display: 'block',
-                            filter: slide.isContentActive === false ? 'none' : 'drop-shadow(0 30px 50px rgba(0, 0, 0, 0.4))',
-                            WebkitMaskImage: {
-                              xs: 'none',
-                              md: slide.isContentActive === false ? 'none' : 'linear-gradient(to right, transparent, black 20%)'
-                            },
-                            maskImage: {
-                              xs: 'none',
-                              md: slide.isContentActive === false ? 'none' : 'linear-gradient(to right, transparent, black 20%)'
-                            },
-                            borderRadius: '0',
                           }}
                         />
                       </Box>
@@ -690,17 +667,17 @@ export default function Banner() {
           <Box
             sx={{
               position: "absolute",
-              bottom: 80, // Moved up to make room for ticker
+              bottom: { xs: 45, md: 52 },
               left: "50%",
               transform: "translateX(-50%)",
               display: "flex",
-              gap: 1.5,
+              gap: 1.2,
               zIndex: 10,
-              background: 'rgba(0, 0, 0, 0.3)',
-              backdropFilter: 'blur(16px)',
-              padding: '14px 28px',
-              borderRadius: '60px',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
+              background: 'rgba(0, 0, 0, 0.35)',
+              backdropFilter: 'blur(12px)',
+              padding: { xs: '5px 12px', md: '6px 16px' },
+              borderRadius: '40px',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
             }}
           >
             {list.map((_, i) => (
@@ -721,7 +698,7 @@ export default function Banner() {
           width: "100%",
           background: "var(--green, #3DB843)",
           overflow: "hidden",
-          padding: "13px 0",
+          padding: { xs: "8px 0", md: "10px 0" },
           zIndex: 20,
         }}
       >

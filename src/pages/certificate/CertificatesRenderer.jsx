@@ -118,7 +118,7 @@ const CertificatesRenderer = ({ data }) => {
       toast.success('Email sent successfully!', { id: toastId });
     } catch (error) {
       console.error(error);
-      toast.error('Failed to send email.', { id: toastId });
+      toast.error('Email not sent', { id: toastId });
     }
   };
 
@@ -219,7 +219,7 @@ const CertificatesRenderer = ({ data }) => {
       toast.success('Email sent successfully!');
     } catch (error) {
       console.error('Error sending email:', error);
-      toast.error('Failed to send email. Please check server logs.');
+      toast.error('Email not sent');
     } finally {
       setLoading(prev => ({ ...prev, [`email-${certId}`]: false }));
     }

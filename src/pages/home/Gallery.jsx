@@ -48,8 +48,8 @@ const gradientShift = keyframes`
 
 // Color Palette
 const colors = {
-  primary: "#4CAF50",
-  primaryDark: "#388E3C",
+  primary: "#3DB843",
+  primaryDark: "#2e9133",
   primaryLight: "#81C784",
   accent: "#2D3748",
   textPrimary: "#2D3748",
@@ -57,37 +57,37 @@ const colors = {
   white: "#ffffff",
 };
 
-const SAMPLE_IMAGES = [
-  "/photos/services.png",
-  "/photos/realestate.png",
-  "/photos/travel.png"
-];
-
-// Helper to get a deterministic "random" image for the day
-const getDailyCoverImage = (album) => {
-  const allImages = album.batches?.flatMap(batch => batch.images) || [];
-
-  const date = new Date();
-  const dateSeed = date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate();
-  const idHash = (album._id || album.id || "").split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-
-  if (allImages.length === 0) {
-    if (album.thumbnail) return getImgUrl(album.thumbnail);
-    return SAMPLE_IMAGES[idHash % SAMPLE_IMAGES.length];
+// Helper to get the official uploaded cover image for each album
+const getAlbumCoverImage = (album) => {
+  if (!album) return "";
+  // 1. Highest priority: The official uploaded thumbnail
+  if (album.thumbnail) {
+    return getImgUrl(album.thumbnail);
   }
-
-  const index = (dateSeed + idHash) % allImages.length;
-  const selectedImage = allImages[index];
-
-  const imgUrl = typeof selectedImage === 'string' ? selectedImage : selectedImage?.url;
-  return getImgUrl(imgUrl);
+  // 2. Direct album images
+  if (Array.isArray(album.images) && album.images.length > 0) {
+    const firstImg = album.images[0];
+    const url = typeof firstImg === 'string' ? firstImg : firstImg?.url;
+    if (url) return getImgUrl(url);
+  }
+  // 3. Batch images
+  if (Array.isArray(album.batches)) {
+    for (const b of album.batches) {
+      if (Array.isArray(b.images) && b.images.length > 0) {
+        const firstBatchImg = b.images[0];
+        const url = typeof firstBatchImg === 'string' ? firstBatchImg : firstBatchImg?.url;
+        if (url) return getImgUrl(url);
+      }
+    }
+  }
+  return "";
 };
 
 // Styled Components
 const GalleryItem = ({ album, onOpen, height = 300 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const navigate = useNavigate();
-  const coverImage = getDailyCoverImage(album);
+  const coverImage = getAlbumCoverImage(album);
 
   return (
     <Box
@@ -97,7 +97,7 @@ const GalleryItem = ({ album, onOpen, height = 300 }) => {
       sx={{
         position: 'relative',
         height: height,
-        borderRadius: '16px',
+        borderRadius: '20px',
         overflow: 'hidden',
         cursor: 'pointer',
         transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -438,63 +438,103 @@ const Gallery = () => {
           </Box>
         </Box>
 
-        {/* Gallery Grid Section */}
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "1fr 1fr",
-            gap: { xs: 1.5, md: 2 },
-          }}
-        >
-          {isMobile ? (
-            albums.map((album, idx) => (
-              <GalleryItem
-                key={album._id || idx}
-                album={album}
-                onOpen={() => handleOpenLightbox(album.images)}
-                height={260}
-              />
-            ))
-          ) : (
-            <>
-              {/* LEFT SECTION */}
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                {/* Top (Large) */}
-                {albums[0] && (
-                  <GalleryItem
-                    album={albums[0]}
-                    onOpen={() => handleOpenLightbox(albums[0].images)}
-                    height={460}
-                  />
-                )}
+        {/* Gallery Grid Section - Matches Live Site Reference Exactly */}
+        {(() => {
+          const findAlbum = (name) => albums.find((a) => a.albumName?.trim().toLowerCase() === name.toLowerCase());
 
-                {/* Bottom (Split) */}
-                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-                  {albums[2] && <GalleryItem album={albums[2]} onOpen={() => handleOpenLightbox(albums[2].images)} height={220} />}
-                  {albums[4] && <GalleryItem album={albums[4]} onOpen={() => handleOpenLightbox(albums[4].images)} height={220} />}
-                </Box>
-              </Box>
+          // Map albums by their exact names as on the live site
+          const certAlbum = findAlbum("Certification") || albums[4] || albums[0];
+          const trainingAlbum = findAlbum("Training") || albums[1];
+          const projectAlbum = findAlbum("Project") || albums[5] || albums[2];
+          const projectDiscAlbum = findAlbum("Project discussion") || albums[2] || albums[3];
+          const workshopAlbum = findAlbum("Workshop") || albums[3] || albums[4];
+          const internshipAlbum = findAlbum("Internship") || albums[0] || albums[5];
 
-              {/* RIGHT SECTION */}
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                {/* Top (Split) */}
-                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-                  {albums[3] && <GalleryItem album={albums[3]} onOpen={() => handleOpenLightbox(albums[3].images)} height={220} />}
-                  {albums[5] && <GalleryItem album={albums[5]} onOpen={() => handleOpenLightbox(albums[5].images)} height={220} />}
-                </Box>
+          return (
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "1fr 1fr",
+                gap: { xs: 1.5, md: 2.5 },
+              }}
+            >
+              {isMobile ? (
+                [certAlbum, internshipAlbum, trainingAlbum, projectAlbum, projectDiscAlbum, workshopAlbum]
+                  .filter(Boolean)
+                  .map((album, idx) => (
+                    <GalleryItem
+                      key={album._id || album.id || idx}
+                      album={album}
+                      onOpen={() => handleOpenLightbox(album.images)}
+                      height={220}
+                    />
+                  ))
+              ) : (
+                <>
+                  {/* LEFT SECTION: Top (Certification Large), Bottom (Training & Project) */}
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                    {/* Top (Large: Certification) */}
+                    {certAlbum && (
+                      <GalleryItem
+                        album={certAlbum}
+                        onOpen={() => handleOpenLightbox(certAlbum.images)}
+                        height={460}
+                      />
+                    )}
 
-                {/* Bottom (Large) */}
-                {albums[1] && (
-                  <GalleryItem
-                    album={albums[1]}
-                    onOpen={() => handleOpenLightbox(albums[1].images)}
-                    height={460}
-                  />
-                )}
-              </Box>
-            </>
-          )}
-        </Box>
+                    {/* Bottom (Split: Training & Project) */}
+                    <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2.5 }}>
+                      {trainingAlbum && (
+                        <GalleryItem
+                          album={trainingAlbum}
+                          onOpen={() => handleOpenLightbox(trainingAlbum.images)}
+                          height={220}
+                        />
+                      )}
+                      {projectAlbum && (
+                        <GalleryItem
+                          album={projectAlbum}
+                          onOpen={() => handleOpenLightbox(projectAlbum.images)}
+                          height={220}
+                        />
+                      )}
+                    </Box>
+                  </Box>
+
+                  {/* RIGHT SECTION: Top (Project discussion & Workshop), Bottom (Internship Large) */}
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                    {/* Top (Split: Project discussion & Workshop) */}
+                    <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2.5 }}>
+                      {projectDiscAlbum && (
+                        <GalleryItem
+                          album={projectDiscAlbum}
+                          onOpen={() => handleOpenLightbox(projectDiscAlbum.images)}
+                          height={220}
+                        />
+                      )}
+                      {workshopAlbum && (
+                        <GalleryItem
+                          album={workshopAlbum}
+                          onOpen={() => handleOpenLightbox(workshopAlbum.images)}
+                          height={220}
+                        />
+                      )}
+                    </Box>
+
+                    {/* Bottom (Large: Internship) */}
+                    {internshipAlbum && (
+                      <GalleryItem
+                        album={internshipAlbum}
+                        onOpen={() => handleOpenLightbox(internshipAlbum.images)}
+                        height={460}
+                      />
+                    )}
+                  </Box>
+                </>
+              )}
+            </Box>
+          );
+        })()}
 
         {albums.length === 0 && !loading && (
           <Box sx={{ py: 10, textAlign: "center", bgcolor: "#f8fafc", borderRadius: "24px" }}>

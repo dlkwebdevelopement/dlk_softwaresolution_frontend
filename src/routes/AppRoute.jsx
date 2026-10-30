@@ -40,6 +40,7 @@ import PrivacyPolicy from "../pages/legal/PrivacyPolicy";
 import TermsOfService from "../pages/legal/TermsOfService";
 import CategoryCourseList from "../pages/product/CategoryCourseList";
 import CertificatePage from "../pages/certificate/CertificatePage";
+import InternshipPage from "../pages/internship/InternshipPage";
 
 const AppRoute = () => {
   return (
@@ -189,6 +190,32 @@ const AppRoute = () => {
               <Navbar />
               <Box sx={{ mt: 10 }}></Box>
               <Placement />
+              <BottomInfo />
+              <Footer />
+            </>
+          }
+        />
+
+        {/* INTERNSHIP PAGE */}
+        <Route
+          path="/internship"
+          element={
+            <>
+              <Navbar />
+              <Box sx={{ mt: 10 }}></Box>
+              <InternshipPage />
+              <BottomInfo />
+              <Footer />
+            </>
+          }
+        />
+        <Route
+          path="/internships"
+          element={
+            <>
+              <Navbar />
+              <Box sx={{ mt: 10 }}></Box>
+              <InternshipPage />
               <BottomInfo />
               <Footer />
             </>

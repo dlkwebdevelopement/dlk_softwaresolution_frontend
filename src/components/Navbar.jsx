@@ -734,9 +734,9 @@ const Navbar = () => {
                 </Fade>
               </Box>
 
-              <NavItem onClick={() => handleNavigation("/workshop")}>
-                <EventIcon className="nav-icon" sx={{ fontSize: 20, mr: 1, color: colors.dark, transition: "all 0.4s ease" }} />
-                <NavText className="nav-text">Workshop</NavText>
+              <NavItem onClick={() => handleNavigation("/internship")}>
+                <SchoolIcon className="nav-icon" sx={{ fontSize: 20, mr: 1, color: colors.dark, transition: "all 0.4s ease" }} />
+                <NavText className="nav-text">Internship</NavText>
               </NavItem>
 
               <NavItem onClick={() => handleNavigation("https://dlksoftwaresolutions.co.in/projectblogs/")}>
@@ -1125,9 +1125,9 @@ const Navbar = () => {
               </Collapse>
             </List>
 
-            {/* Workshop Mobile Section */}
+            {/* Internship Mobile Section */}
             <MobileMenuItem
-              onClick={() => handleNavigation("/workshop")}
+              onClick={() => handleNavigation("/internship")}
               sx={{
                 backgroundColor: alpha(colors.primary, 0.04),
                 borderRadius: "16px",
@@ -1135,10 +1135,10 @@ const Navbar = () => {
               }}
             >
               <ListItemIcon sx={{ color: colors.primary, minWidth: 40 }}>
-                <EventIcon />
+                <SchoolIcon />
               </ListItemIcon>
               <ListItemText
-                primary="Workshop"
+                primary="Internship"
                 primaryTypographyProps={{
                   fontWeight: 700,
                   color: colors.dark,

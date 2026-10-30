@@ -262,14 +262,17 @@ export default function ContactForm() {
       if (response?.success || response?.message === "Message submitted successfully") {
         setShowSuccess(true);
         setTimeout(() => setShowSuccess(false), 2000);
+        toast.success("Email sent successfully!");
 
         setFormData({ firstName: "", lastName: "", email: "", phone: "", message: "", acceptTerms: true });
         setCaptchaToken(null);
         if (captchaRef.current) captchaRef.current.reset();
       } else {
+        toast.error("Email not sent");
         setSnackbar({ open: true, message: response?.message || response?.error || "Transmission failed", severity: "error" });
       }
     } catch (error) {
+      toast.error("Email not sent");
       setSnackbar({ open: true, message: error.response?.data?.message || error.response?.data?.error || "Connection lost with server", severity: "error" });
     } finally {
       setIsSubmitting(false);
