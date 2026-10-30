@@ -87,21 +87,31 @@ const theme = createTheme({
           scrollbar-width: thin;
           scrollbar-color: #c2eac4 #f7fdf7;
         }
-        html, body {
-          overflow-x: hidden !important;
+        html {
+          overflow-x: hidden;
+          width: 100%;
+          margin: 0;
+          padding: 0;
+          scroll-behavior: smooth;
+        }
+        body {
+          overflow-x: hidden;
           width: 100%;
           position: relative;
           margin: 0;
           padding: 0;
-        }
-        #root {
-          overflow-x: hidden !important;
-          width: 100%;
-        }
-        body {
           font-family: "Poppins", sans-serif !important;
           background-color: #ffffff;
           color: #1a2b1b;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+          text-rendering: optimizeLegibility;
+          -webkit-overflow-scrolling: touch;
+        }
+        #root {
+          overflow-x: clip;
+          width: 100%;
+          min-height: 100vh;
         }
         h1, h2, h3, h4, h5, h6 {
           font-family: "Poppins", sans-serif !important;

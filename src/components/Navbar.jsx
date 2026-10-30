@@ -133,9 +133,9 @@ const colors = {
 
 // Styled Components
 const GlassAppBar = styled(AppBar)({
-  background: 'rgba(255, 255, 255, 0.7)',
-  backdropFilter: 'blur(15px)',
-  WebkitBackdropFilter: 'blur(15px)',
+  background: 'rgba(255, 255, 255, 0.97)',
+  transform: 'translateZ(0)',
+  willChange: 'transform',
   borderBottom: `1px solid ${alpha(colors.primary, 0.1)}`,
   boxShadow: '0 4px 30px rgba(0, 0, 0, 0.05)',
   transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',

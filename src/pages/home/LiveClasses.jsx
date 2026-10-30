@@ -82,9 +82,8 @@ const colors = {
 const GlassCard = styled(Paper, {
   shouldForwardProp: (prop) => prop !== "$hovered",
 })(({ theme, $hovered }) => ({
-  background: 'rgba(255, 255, 255, 0.7)',
-  backdropFilter: 'blur(10px)',
-  WebkitBackdropFilter: 'blur(10px)',
+  background: '#ffffff',
+  
   border: '1px solid var(--green-dark)',
   borderRadius: '24px',
   overflow: 'hidden',
@@ -240,9 +239,25 @@ export default function LiveClass() {
     return () => { isMounted = false; };
   }, []);
 
+  const [isInView, setIsInView] = useState(false);
+
+  useEffect(() => {
+    const el = sliderRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") {
+      setIsInView(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsInView(entry.isIntersecting),
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [classes]);
+
   useEffect(() => {
     let interval;
-    if (isAutoScrolling && classes.length > 3) {
+    if (isInView && isAutoScrolling && classes.length > 3) {
       interval = setInterval(() => {
         if (sliderRef.current) {
           const { scrollLeft, scrollWidth, clientWidth } = sliderRef.current;
@@ -252,10 +267,10 @@ export default function LiveClass() {
             scroll("right");
           }
         }
-      }, 3500);
+      }, 4000);
     }
     return () => clearInterval(interval);
-  }, [isAutoScrolling, classes]);
+  }, [isInView, isAutoScrolling, classes]);
 
   const formatTime12 = (time) => {
     if (!time) return "";

@@ -89,8 +89,7 @@ const AnimatedGradientText = styled(Typography)({
 });
 
 const GlassCard = styled(Paper)(({ theme }) => ({
-  background: 'rgba(255, 255, 255, 0.4)',
-  backdropFilter: 'blur(20px)',
+  background: 'rgba(255, 255, 255, 0.92)',
   border: '1px solid rgba(26, 71, 24, 0.1)',
   borderRadius: '40px',
   padding: theme.spacing(3),

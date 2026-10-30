@@ -1,308 +1,309 @@
-import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import React, { Suspense, lazy } from "react";
+import { Routes, Route } from "react-router-dom";
+import { Box, CircularProgress } from "@mui/material";
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import BottomInfo from "../components/BottomInfo";
+import ScrollToTop from "../components/ScrollToTop";
+import GoogleReviewFloatingButton from "../components/GoogleReviewFloatingButton";
 
+// Direct imports for Home page components (immediate paint, zero flash)
 import Banner from "../pages/home/Banner";
 import Category from "../pages/home/Category";
 import Gallerys from "../pages/home/Gallery";
 import Ads from "../pages/home/Ads";
-import Product from "../pages/product/Product";
 import LogoCarousel from "../pages/home/LogoCarousel";
 import QuickEnquiry from "../pages/home/QuickEnquiry";
-import FAQSection from "../pages/home/FAQSection";
-import Companies from "../pages/home/Companies";
-import ContactForm from "../pages/contact/ContactForm";
 import LiveClass from "../pages/home/LiveClasses";
-import { Box } from "@mui/material";
-import BottomInfo from "../components/BottomInfo";
 import Comments from "../pages/home/Comments";
-import ServicesCards from "../pages/product/ServicesCards";
-import CourseTools from "../pages/product/CourseTools";
-import CareerSupport from "../pages/product/CareerSupport";
-import CourseFAQ from "../pages/product/CourseFAQ";
-import PricingPlans from "../pages/product/PricingPlans";
-import ScrollToTop from "../components/ScrollToTop";
-import OverviewSection from "../pages/product/CourseOverviewSection";
-import Career from "../pages/career/Career";
-import NotFound from "../pages/NotFound";
-
-import Help from "../pages/help/Help";
-import Videos from "../pages/videos/Videos";
-import Gallery from "../pages/gallery/Gallery";
-import OfficeGallery from "../pages/gallery/OfficeGallery";
-import Offers from "../pages/offers/Offers";
-import Placement from "../pages/placement/Placement";
-import GoogleReviewFloatingButton from "../components/GoogleReviewFloatingButton";
 import WorkshopPage from "../pages/workshop/WorkshopPage";
-import PrivacyPolicy from "../pages/legal/PrivacyPolicy";
-import TermsOfService from "../pages/legal/TermsOfService";
-import CategoryCourseList from "../pages/product/CategoryCourseList";
-import CertificatePage from "../pages/certificate/CertificatePage";
-import InternshipPage from "../pages/internship/InternshipPage";
+
+// Lazy-loaded routes for optimal initial bundle size and smooth execution
+const Product = lazy(() => import("../pages/product/Product"));
+const OverviewSection = lazy(() => import("../pages/product/CourseOverviewSection"));
+const ServicesCards = lazy(() => import("../pages/product/ServicesCards"));
+const CourseTools = lazy(() => import("../pages/product/CourseTools"));
+const CareerSupport = lazy(() => import("../pages/product/CareerSupport"));
+const CourseFAQ = lazy(() => import("../pages/product/CourseFAQ"));
+const ContactForm = lazy(() => import("../pages/contact/ContactForm"));
+const Videos = lazy(() => import("../pages/videos/Videos"));
+const Gallery = lazy(() => import("../pages/gallery/Gallery"));
+const OfficeGallery = lazy(() => import("../pages/gallery/OfficeGallery"));
+const Offers = lazy(() => import("../pages/offers/Offers"));
+const Career = lazy(() => import("../pages/career/Career"));
+const Placement = lazy(() => import("../pages/placement/Placement"));
+const InternshipPage = lazy(() => import("../pages/internship/InternshipPage"));
+const CategoryCourseList = lazy(() => import("../pages/product/CategoryCourseList"));
+const PrivacyPolicy = lazy(() => import("../pages/legal/PrivacyPolicy"));
+const TermsOfService = lazy(() => import("../pages/legal/TermsOfService"));
+const CertificatePage = lazy(() => import("../pages/certificate/CertificatePage"));
+const Help = lazy(() => import("../pages/help/Help"));
+const NotFound = lazy(() => import("../pages/NotFound"));
+
+const PageFallback = () => (
+  <Box sx={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+    <CircularProgress sx={{ color: "#3DB843" }} size={40} />
+  </Box>
+);
 
 const AppRoute = () => {
   return (
     <>
       <ScrollToTop />
-      <Routes>
-        {/* HOME PAGE */}
-        <Route
-          path="/"
-          element={
-            <>
-              <Navbar />
-              <Box sx={{ mt: 10 }}></Box>
-              <Banner />
-              <LiveClass />
+      <Suspense fallback={<PageFallback />}>
+        <Routes>
+          {/* HOME PAGE */}
+          <Route
+            path="/"
+            element={
+              <>
+                <Navbar />
+                <Box sx={{ mt: 10 }}></Box>
+                <Banner />
+                <LiveClass />
 
-              <WorkshopPage viewMode="scroll" />
-              <Gallerys />
-              <QuickEnquiry />
+                <WorkshopPage viewMode="scroll" />
+                <Gallerys />
+                <QuickEnquiry />
 
-              <Category />
-              <Ads />
-              {/* <Companies /> */}
-              <LogoCarousel />
-              <Comments />
+                <Category />
+                <Ads />
+                <LogoCarousel />
+                <Comments />
 
-              <BottomInfo />
-              <Footer />
-            </>
-          }
-        />
+                <BottomInfo />
+                <Footer />
+              </>
+            }
+          />
 
-        {/* HELP PAGE */}
-        <Route path="/help" element={<Help />} />
+          {/* HELP PAGE */}
+          <Route path="/help" element={<Help />} />
 
-        {/* PRODUCT/COURSE PAGE */}
-        <Route
-          path="/course/:slug"
-          element={
-            <>
-              <Navbar />
-              <Box sx={{ mt: 12 }}></Box>
-              <Product />
-              <OverviewSection />
-              <ServicesCards />
-              <CourseTools />
-              <CareerSupport />
-              <CourseFAQ />
-              {/* <PricingPlans /> */}
-              <BottomInfo />
-              <Footer />
-            </>
-          }
-        />
+          {/* PRODUCT/COURSE PAGE */}
+          <Route
+            path="/course/:slug"
+            element={
+              <>
+                <Navbar />
+                <Box sx={{ mt: 12 }}></Box>
+                <Product />
+                <OverviewSection />
+                <ServicesCards />
+                <CourseTools />
+                <CareerSupport />
+                <CourseFAQ />
+                <BottomInfo />
+                <Footer />
+              </>
+            }
+          />
 
-        {/* CONTACT PAGE */}
-        <Route
-          path="/contact"
-          element={
-            <>
-              <Navbar />
-              <Box sx={{ mt: 8 }}></Box>
-              <ContactForm />
-              <BottomInfo />
-              <Footer />
-            </>
-          }
-        />
+          {/* CONTACT PAGE */}
+          <Route
+            path="/contact"
+            element={
+              <>
+                <Navbar />
+                <Box sx={{ mt: 8 }}></Box>
+                <ContactForm />
+                <BottomInfo />
+                <Footer />
+              </>
+            }
+          />
 
+          {/* VIDEOS PAGE */}
+          <Route
+            path="/videos"
+            element={
+              <>
+                <Navbar />
+                <Videos />
+                <BottomInfo />
+                <Footer />
+              </>
+            }
+          />
 
+          {/* GALLERY PAGES */}
+          <Route
+            path="/gallery"
+            element={
+              <>
+                <Navbar />
+                <Box sx={{ mt: 10 }}></Box>
+                <Gallery />
+                <BottomInfo />
+                <Footer />
+              </>
+            }
+          />
 
+          <Route
+            path="/office-gallery"
+            element={
+              <>
+                <Navbar />
+                <Box sx={{ mt: 10 }}></Box>
+                <OfficeGallery />
+                <BottomInfo />
+                <Footer />
+              </>
+            }
+          />
 
+          {/* OFFERS PAGE */}
+          <Route
+            path="/offers"
+            element={
+              <>
+                <Navbar />
+                <Box sx={{ mt: 10 }}></Box>
+                <Offers />
+                <BottomInfo />
+                <Footer />
+              </>
+            }
+          />
 
-        {/* VIDEOS PAGE */}
-        <Route
-          path="/videos"
-          element={
-            <>
-              <Navbar />
-              <Videos />
-              <BottomInfo />
-              <Footer />
-            </>
-          }
-        />
+          {/* CAREER PAGE */}
+          <Route
+            path="/career"
+            element={
+              <>
+                <Navbar />
+                <Box sx={{ mt: { xs: 8, md: 10 } }}></Box>
+                <Career />
+                <BottomInfo />
+                <Footer />
+              </>
+            }
+          />
 
-        {/* GALLERY PAGES */}
-        <Route
-          path="/gallery"
-          element={
-            <>
-              <Navbar />
-              <Box sx={{ mt: 10 }}></Box>
-              <Gallery />
-              <BottomInfo />
-              <Footer />
-            </>
-          }
-        />
+          {/* PLACEMENT PAGE */}
+          <Route
+            path="/placement"
+            element={
+              <>
+                <Navbar />
+                <Box sx={{ mt: 10 }}></Box>
+                <Placement />
+                <BottomInfo />
+                <Footer />
+              </>
+            }
+          />
 
-        <Route
-          path="/office-gallery"
-          element={
-            <>
-              <Navbar />
-              <Box sx={{ mt: 10 }}></Box>
-              <OfficeGallery />
-              <BottomInfo />
-              <Footer />
-            </>
-          }
-        />
+          {/* INTERNSHIP PAGE */}
+          <Route
+            path="/internship"
+            element={
+              <>
+                <Navbar />
+                <Box sx={{ mt: 10 }}></Box>
+                <InternshipPage />
+                <BottomInfo />
+                <Footer />
+              </>
+            }
+          />
+          <Route
+            path="/internships"
+            element={
+              <>
+                <Navbar />
+                <Box sx={{ mt: 10 }}></Box>
+                <InternshipPage />
+                <BottomInfo />
+                <Footer />
+              </>
+            }
+          />
 
-        {/* OFFERS PAGE */}
-        <Route
-          path="/offers"
-          element={
-            <>
-              <Navbar />
-              <Box sx={{ mt: 10 }}></Box>
-              <Offers />
-              <BottomInfo />
-              <Footer />
-            </>
-          }
-        />
+          {/* WORKSHOP PAGE - Grid View Only */}
+          <Route
+            path="/workshop"
+            element={
+              <>
+                <Navbar />
+                <Box sx={{ mt: 10 }}></Box>
+                <WorkshopPage viewMode="grid" />
+                <BottomInfo />
+                <Footer />
+              </>
+            }
+          />
 
-        {/* CAREER PAGE */}
-        <Route
-          path="/career"
-          element={
-            <>
-              <Navbar />
-              <Box sx={{ mt: { xs: 8, md: 10 } }}></Box>
-              <Career />
-              <BottomInfo />
-              <Footer />
-            </>
-          }
-        />
+          {/* CATEGORY COURSE LIST PAGE */}
+          <Route
+            path="/category/:id"
+            element={
+              <>
+                <Navbar />
+                <Box sx={{ mt: 10 }}></Box>
+                <CategoryCourseList />
+                <BottomInfo />
+                <Footer />
+              </>
+            }
+          />
 
-        {/* PLACEMENT PAGE */}
-        <Route
-          path="/placement"
-          element={
-            <>
-              <Navbar />
-              <Box sx={{ mt: 10 }}></Box>
-              <Placement />
-              <BottomInfo />
-              <Footer />
-            </>
-          }
-        />
+          {/* LEGAL PAGES */}
+          <Route
+            path="/privacy-policy"
+            element={
+              <>
+                <Navbar />
+                <Box sx={{ mt: 10 }}></Box>
+                <PrivacyPolicy />
+                <BottomInfo />
+                <Footer />
+              </>
+            }
+          />
 
-        {/* INTERNSHIP PAGE */}
-        <Route
-          path="/internship"
-          element={
-            <>
-              <Navbar />
-              <Box sx={{ mt: 10 }}></Box>
-              <InternshipPage />
-              <BottomInfo />
-              <Footer />
-            </>
-          }
-        />
-        <Route
-          path="/internships"
-          element={
-            <>
-              <Navbar />
-              <Box sx={{ mt: 10 }}></Box>
-              <InternshipPage />
-              <BottomInfo />
-              <Footer />
-            </>
-          }
-        />
+          <Route
+            path="/terms-of-service"
+            element={
+              <>
+                <Navbar />
+                <Box sx={{ mt: 10 }}></Box>
+                <TermsOfService />
+                <BottomInfo />
+                <Footer />
+              </>
+            }
+          />
 
-        {/* WORKSHOP PAGE - Grid View Only */}
-        <Route
-          path="/workshop"
-          element={
-            <>
-              <Navbar />
-              <Box sx={{ mt: 10 }}></Box>
-              <WorkshopPage viewMode="grid" />
-              <BottomInfo />
-              <Footer />
-            </>
-          }
-        />
+          <Route
+            path="/certificate"
+            element={
+              <>
+                <Navbar />
+                <Box sx={{ mt: { xs: 8, md: 10 } }}></Box>
+                <CertificatePage />
+                <BottomInfo />
+                <Footer />
+              </>
+            }
+          />
 
-        {/* CATEGORY COURSE LIST PAGE */}
-        <Route
-          path="/category/:id"
-          element={
-            <>
-              <Navbar />
-              <Box sx={{ mt: 10 }}></Box>
-              <CategoryCourseList />
-              <BottomInfo />
-              <Footer />
-            </>
-          }
-        />
-
-        {/* LEGAL PAGES */}
-        <Route
-          path="/privacy-policy"
-          element={
-            <>
-              <Navbar />
-              <Box sx={{ mt: 10 }}></Box>
-              <PrivacyPolicy />
-              <BottomInfo />
-              <Footer />
-            </>
-          }
-        />
-
-        <Route
-          path="/terms-of-service"
-          element={
-            <>
-              <Navbar />
-              <Box sx={{ mt: 10 }}></Box>
-              <TermsOfService />
-              <BottomInfo />
-              <Footer />
-            </>
-          }
-        />
-
-        <Route
-          path="/certificate"
-          element={
-            <>
-              <Navbar />
-              <Box sx={{ mt: { xs: 8, md: 10 } }}></Box>
-              <CertificatePage />
-              <BottomInfo />
-              <Footer />
-            </>
-          }
-        />
-
-        {/* 404 NOT FOUND PAGE */}
-        <Route
-          path="*"
-          element={
-            <>
-              <Navbar />
-              <NotFound />
-              <BottomInfo />
-              <Footer />
-            </>
-          }
-        />
-      </Routes>
+          {/* 404 NOT FOUND PAGE */}
+          <Route
+            path="*"
+            element={
+              <>
+                <Navbar />
+                <NotFound />
+                <BottomInfo />
+                <Footer />
+              </>
+            }
+          />
+        </Routes>
+      </Suspense>
       <GoogleReviewFloatingButton />
     </>
   );

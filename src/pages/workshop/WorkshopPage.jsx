@@ -74,9 +74,8 @@ const colors = {
 const GlassCard = styled(Paper, {
   shouldForwardProp: (prop) => prop !== "$hovered",
 })(({ theme, $hovered }) => ({
-  background: colors.background.card,
-  backdropFilter: "blur(10px)",
-  WebkitBackdropFilter: "blur(10px)",
+  background: '#ffffff',
+  
   borderRadius: "24px",
   overflow: "hidden",
   position: "relative",
@@ -350,9 +349,25 @@ export default function WorkshopPage({ viewMode = "grid" }) {
 
   const [isAutoScrolling, setIsAutoScrolling] = useState(true);
 
+  const [isInView, setIsInView] = useState(false);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") {
+      setIsInView(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsInView(entry.isIntersecting),
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [workshops, currentViewMode]);
+
   useEffect(() => {
     let interval;
-    if (isAutoScrolling && currentViewMode === "scroll" && workshops.length > 3) {
+    if (isInView && isAutoScrolling && currentViewMode === "scroll" && workshops.length > 3) {
       interval = setInterval(() => {
         if (scrollRef.current) {
           const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
@@ -362,10 +377,10 @@ export default function WorkshopPage({ viewMode = "grid" }) {
             scroll("right");
           }
         }
-      }, 3500);
+      }, 4000);
     }
     return () => clearInterval(interval);
-  }, [isAutoScrolling, currentViewMode, workshops]);
+  }, [isInView, isAutoScrolling, currentViewMode, workshops]);
 
   const formatTime12 = (time) => {
     if (!time) return "";

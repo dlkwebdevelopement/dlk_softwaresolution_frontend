@@ -116,6 +116,8 @@ const GalleryItem = ({ album, onOpen, height = 300 }) => {
       <Box
         component="img"
         src={coverImage}
+        loading="lazy"
+        decoding="async"
         sx={{
           width: '100%',
           height: '100%',

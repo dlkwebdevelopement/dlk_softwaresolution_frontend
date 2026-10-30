@@ -88,9 +88,7 @@ const colors = {
 
 // Styled Components
 const GlassSection = styled(Paper)(({ theme }) => ({
-  background: 'rgba(255, 255, 255, 0.1)',
-  backdropFilter: 'blur(20px)',
-  WebkitBackdropFilter: 'blur(20px)',
+  background: 'rgba(255, 255, 255, 0.12)',
   border: '1px solid rgba(255, 255, 255, 0.2)',
   borderRadius: '30px',
   padding: theme.spacing(3),

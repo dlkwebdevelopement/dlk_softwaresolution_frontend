@@ -81,8 +81,8 @@ const GlassBar = styled(Box)(({ theme }) => ({
   minHeight: "40px",
   height: "auto",
   background: 'rgba(255, 255, 255, 0.98)',
-  backdropFilter: 'blur(20px)',
-  WebkitBackdropFilter: 'blur(20px)',
+  transform: 'translateZ(0)',
+  willChange: 'transform',
   borderTop: `1px solid ${alpha(colors.primary, 0.1)}`,
   zIndex: 1400,
   display: "flex",
@@ -105,9 +105,7 @@ const GlassBar = styled(Box)(({ theme }) => ({
 }));
 
 const ContactChip = styled(Chip)({
-  background: 'rgba(255, 255, 255, 0.9)',
-  backdropFilter: 'blur(10px)',
-  WebkitBackdropFilter: 'blur(10px)',
+  background: 'rgba(255, 255, 255, 0.95)',
   border: '1px solid rgba(255, 255, 255, 0.5)',
   borderRadius: '30px',
   padding: '4px 8px',
