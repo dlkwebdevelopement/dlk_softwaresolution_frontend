@@ -12,12 +12,15 @@ import {
   X, Image as ImgIcon, Calendar as CalIcon, Building2 as CollegeIcon,
   ArrowRight as RightIcon, ArrowLeft as LeftIcon,
   FolderOpen as FolderIcon, ChevronRight as ChevronIcon,
-  Clock, Share2
+  Clock, Share2,
+  Award, Presentation, GraduationCap, Users, Briefcase, Code2,
+  Library as PhotoLibraryIcon
 } from "lucide-react";
 import { GetRequest } from "../../api/api";
 import { GET_ALL_GALLERY, GET_ALL_GALLERY_EVENTS } from "../../api/endpoints";
 import dayjs from "dayjs";
 import { getImgUrl } from "../../api/api";
+import { isAiDemoOrDummyImage, getLatestAlbumImage } from "../home/Gallery";
 
 // Animations
 const shimmer = keyframes`0%{transform:translateX(-100%)}100%{transform:translateX(100%)}`;
@@ -111,26 +114,25 @@ const ScrollButton = styled(IconButton, {
   [theme.breakpoints.down('lg')]: { display: 'none' },
 }));
 
+const getSectionIcon = (name = "") => {
+  const n = String(name).trim().toLowerCase();
+  if (n.includes("certif")) return Award;
+  if (n.includes("workshop")) return Presentation;
+  if (n.includes("training")) return GraduationCap;
+  if (n.includes("intern")) return Briefcase;
+  if (n.includes("disc") || n.includes("meet") || n.includes("group")) return Users;
+  if (n.includes("project")) return Code2;
+  return PhotoLibraryIcon;
+};
+
 // ─── Album Card ────────────────────────────────────────────────────────────────
-function AlbumCard({ album, onSelect }) {
+function AlbumCard({ album, events = [], onSelect }) {
   const [hovered, setHovered] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
-  const getAlbumCover = () => {
-    // 1. Highest priority: The official uploaded thumbnail
-    if (album.thumbnail) return getImgUrl(album.thumbnail);
-    // 2. Direct album images
-    if (Array.isArray(album.images) && album.images.length > 0) {
-      const first = album.images[0];
-      return getImgUrl(typeof first === 'string' ? first : first.url);
-    }
-    // 3. Batch images
-    const allBatchImages = album.batches?.flatMap(batch => batch.images || []) || [];
-    const randomImage = getDailyRandomImage(allBatchImages, album.id);
-    if (randomImage) return getImgUrl(randomImage);
-    return "";
-  };
-
-  const coverImage = getAlbumCover();
+  const coverImage = getLatestAlbumImage(album, events);
+  const SectionIcon = getSectionIcon(album?.albumName);
+  const hasValidImage = Boolean(coverImage) && !imgError;
 
   return (
     <GlassCard
@@ -140,46 +142,106 @@ function AlbumCard({ album, onSelect }) {
       onClick={() => onSelect(album)}
       sx={{ cursor: "pointer" }}
     >
-      <Box sx={{ position: "relative", overflow: "hidden", height: 280 }}>
-        <CardMedia
-          component="img"
-          image={coverImage}
-          alt={album.albumName}
-          sx={{
-            width: "100%", height: "100%", objectFit: "cover",
-            transition: "transform 0.6s cubic-bezier(0.4,0,0.2,1)",
-            transform: hovered ? "scale(1.1)" : "scale(1)",
-          }}
-        />
-        <Box sx={{
-          position: "absolute", inset: 0,
-          background: "linear-gradient(180deg,transparent 30%,rgba(20,53,18,0.85) 100%)",
-          opacity: hovered ? 1 : 0.75, transition: "opacity 0.4s ease",
-        }} />
-        <Box sx={{ position: "absolute", bottom: 24, left: 24, right: 24 }}>
-          {album.batches?.length > 0 && (
-            <Chip
-              label={`${album.batches.length} Batches`}
-              size="small"
+      <Box sx={{ position: "relative", overflow: "hidden", height: 280, display: "flex", flexDirection: "column" }}>
+        {hasValidImage ? (
+          <>
+            <CardMedia
+              component="img"
+              image={coverImage}
+              alt={album.albumName}
+              onError={() => setImgError(true)}
               sx={{
-                bgcolor: alpha(COLORS.primary, 0.9),
-                color: "white",
-                fontWeight: 800,
-                fontSize: "0.65rem",
-                height: 20,
-                mb: 1,
-                borderRadius: 1,
+                width: "100%", height: "100%", objectFit: "cover",
+                transition: "transform 0.6s cubic-bezier(0.4,0,0.2,1)",
+                transform: hovered ? "scale(1.08)" : "scale(1)",
               }}
             />
-          )}
-          <Typography variant="h5" sx={{ color: "white", fontWeight: 800, mb: 0.5, letterSpacing: "-0.5px" }}>
-            {album.albumName}
-          </Typography>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1, color: "rgba(255,255,255,0.85)" }}>
-            <Typography variant="body2" sx={{ fontWeight: 600 }}>View Events</Typography>
-            <RightIcon size={16} />
+            <Box sx={{
+              position: "absolute", inset: 0,
+              background: "linear-gradient(180deg,transparent 30%,rgba(20,53,18,0.85) 100%)",
+              opacity: hovered ? 1 : 0.75, transition: "opacity 0.4s ease",
+            }} />
+            <Box sx={{ position: "absolute", bottom: 24, left: 24, right: 24 }}>
+              {album.batches?.length > 0 && (
+                <Chip
+                  label={`${album.batches.length} Batches`}
+                  size="small"
+                  sx={{
+                    bgcolor: alpha(COLORS.primary, 0.9),
+                    color: "white",
+                    fontWeight: 800,
+                    fontSize: "0.65rem",
+                    height: 20,
+                    mb: 1,
+                    borderRadius: 1,
+                  }}
+                />
+              )}
+              <Typography variant="h5" sx={{ color: "white", fontWeight: 800, mb: 0.5, letterSpacing: "-0.5px" }}>
+                {album.albumName}
+              </Typography>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1, color: "rgba(255,255,255,0.85)" }}>
+                <Typography variant="body2" sx={{ fontWeight: 600 }}>View Events</Typography>
+                <RightIcon size={16} />
+              </Box>
+            </Box>
+          </>
+        ) : (
+          <Box
+            sx={{
+              width: "100%",
+              height: "100%",
+              p: 3,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              textAlign: "center",
+              background: "linear-gradient(145deg, #f7fcf8 0%, #ffffff 50%, #edf7f0 100%)",
+            }}
+          >
+            <Box
+              sx={{
+                width: 64,
+                height: 64,
+                borderRadius: "20px",
+                bgcolor: alpha(COLORS.primary, 0.1),
+                border: `1.5px solid ${alpha(COLORS.primary, 0.25)}`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mb: 2,
+                transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+                transform: hovered ? "scale(1.1) rotate(2deg)" : "none",
+                boxShadow: hovered ? `0 10px 20px ${alpha(COLORS.primary, 0.2)}` : "none",
+              }}
+            >
+              <SectionIcon size={32} color={COLORS.primary} strokeWidth={2.2} />
+            </Box>
+            <Typography variant="h5" sx={{ color: "#0f172a", fontWeight: 800, mb: 1, letterSpacing: "-0.5px" }}>
+              {album.albumName}
+            </Typography>
+            <Box
+              sx={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 0.8,
+                color: COLORS.primary,
+                bgcolor: alpha(COLORS.primary, 0.08),
+                px: 2,
+                py: 0.6,
+                borderRadius: "50px",
+                border: `1px solid ${alpha(COLORS.primary, 0.22)}`,
+                mt: 1,
+              }}
+            >
+              <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                View Events
+              </Typography>
+              <RightIcon size={14} />
+            </Box>
           </Box>
-        </Box>
+        )}
       </Box>
     </GlassCard>
   );
@@ -504,7 +566,7 @@ export default function Gallery() {
             <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }} key={album.id || i}>
               <Fade in timeout={400 + i * 100}>
                 <Box>
-                  <AlbumCard album={album} onSelect={setSelectedAlbum} />
+                  <AlbumCard album={album} events={events} onSelect={setSelectedAlbum} />
                 </Box>
               </Fade>
             </Grid>
