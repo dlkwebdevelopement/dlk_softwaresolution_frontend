@@ -240,6 +240,7 @@ export default function InternshipPage() {
               maxWidth: "850px",
               mx: "auto",
               mb: 1.5,
+              color: "#ffffff",
             }}
           >
             Industry Internship Programs
