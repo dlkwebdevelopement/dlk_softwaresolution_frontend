@@ -43,8 +43,8 @@ const Product = () => {
       sx={{
         background: "linear-gradient(135deg, #022c22 0%, #064e3b 50%, #059669 100%)", // Rich dark green gradient
         color: "#fff",
-        py: { xs: 8, md: 14 },
-        px: { xs: 3, md: 8 },
+        py: { xs: 4, md: 6 },
+        px: { xs: 2.5, md: 6 },
         mt: 0,
         position: 'relative',
         overflow: 'hidden',
@@ -94,7 +94,7 @@ const Product = () => {
         sx={{
           display: "flex",
           flexDirection: { xs: "column", lg: "row" },
-          gap: { xs: 6, lg: 10 },
+          gap: { xs: 4, lg: 6 },
           maxWidth: "1280px",
           margin: "auto",
           alignItems: "center",
@@ -139,8 +139,8 @@ const Product = () => {
             sx={{
               fontSize: { xs: '28px', md: '38px', lg: '44px' },
               fontWeight: 600,
-              mb: 3,
-              lineHeight: 1.1,
+              mb: 2,
+              lineHeight: 1.15,
               fontFamily: '"Poppins", sans-serif',
               textShadow: '0 2px 10px rgba(0,0,0,0.1)'
             }}
@@ -153,7 +153,7 @@ const Product = () => {
               fontSize: '15px',
               color: 'rgba(255,255,255,0.9)',
               lineHeight: 1.6,
-              mb: 5,
+              mb: 3,
               maxWidth: "680px",
               fontWeight: 400,
             }}
@@ -167,7 +167,7 @@ const Product = () => {
             flexWrap: 'wrap',
             alignItems: "center",
             gap: { xs: 2, md: 4 },
-            mb: 5,
+            mb: 0,
             p: 2,
             bgcolor: 'rgba(255,255,255,0.05)',
             backdropFilter: 'blur(10px)',
@@ -224,7 +224,7 @@ const Product = () => {
             color: "#0f172a",
             borderRadius: "28px",
             overflow: "hidden",
-            p: { xs: 3, md: 5 },
+            p: { xs: 2.5, md: 3.5 },
             boxShadow: "0 30px 60px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,1)",
             animation: 'float 6s ease-in-out infinite, fadeInUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards',
             border: '1px solid rgba(255,255,255,0.8)',
@@ -236,12 +236,12 @@ const Product = () => {
           <Box
             sx={{
               width: "100%",
-              height: 260,
+              height: 220,
               position: "relative",
               overflow: "hidden",
-              borderRadius: "20px",
+              borderRadius: "18px",
               bgcolor: "#f1f5f9",
-              mb: 4,
+              mb: 2.5,
               border: '1px solid rgba(0,0,0,0.05)',
               boxShadow: 'inset 0 4px 10px rgba(0,0,0,0.05)',
             }}
