@@ -86,7 +86,6 @@ const AppRoute = () => {
             element={
               <>
                 <Navbar />
-                <Box sx={{ mt: 12 }}></Box>
                 <Product />
                 <OverviewSection />
                 <ServicesCards />

@@ -45,7 +45,7 @@ const Product = () => {
         color: "#fff",
         py: { xs: 8, md: 14 },
         px: { xs: 3, md: 8 },
-        mt: { xs: -2.4, md: -2 },
+        mt: 0,
         position: 'relative',
         overflow: 'hidden',
       }}
