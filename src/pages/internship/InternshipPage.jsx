@@ -302,15 +302,23 @@ export default function InternshipPage() {
             sx={{
               display: "flex",
               alignItems: "center",
-              gap: 0.8,
+              gap: 1,
               overflowX: "auto",
+              flex: 1,
+              minWidth: 0,
               maxWidth: { xs: "100%", md: "calc(100% - 300px)" },
-              pb: { xs: 0.8, md: 0.5 },
+              pb: { xs: 0.8, md: 0.6 },
               pt: 0.2,
-              "&::-webkit-scrollbar": { height: "5px" },
-              "&::-webkit-scrollbar-thumb": {
-                bgcolor: "rgba(61, 184, 67, 0.25)",
+              scrollBehavior: "smooth",
+              "&::-webkit-scrollbar": { height: "6px" },
+              "&::-webkit-scrollbar-track": {
+                bgcolor: "rgba(0,0,0,0.03)",
                 borderRadius: "4px",
+              },
+              "&::-webkit-scrollbar-thumb": {
+                bgcolor: "rgba(61, 184, 67, 0.35)",
+                borderRadius: "4px",
+                "&:hover": { bgcolor: "rgba(61, 184, 67, 0.6)" },
               },
             }}
           >
@@ -320,6 +328,7 @@ export default function InternshipPage() {
                 onClick={() => setActiveTab(tab)}
                 size="small"
                 sx={{
+                  flexShrink: 0,
                   borderRadius: "20px",
                   px: 2,
                   py: 0.6,
@@ -348,6 +357,7 @@ export default function InternshipPage() {
             size="small"
             sx={{
               width: { xs: "100%", md: "280px" },
+              flexShrink: 0,
               "& .MuiOutlinedInput-root": {
                 borderRadius: "20px",
                 bgcolor: "#f8fcf8",
