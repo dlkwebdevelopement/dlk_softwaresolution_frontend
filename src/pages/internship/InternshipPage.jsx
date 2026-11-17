@@ -35,16 +35,10 @@ import { GetRequest, PostRequest, getImgUrl } from "../../api/api";
 import {
   GET_ALL_INTERNSHIPS,
   POST_INTERNSHIP_SYLLABUS_REQUEST,
+  ADMIN_GET_CATEGORIES,
 } from "../../api/endpoints";
 
-const DOMAIN_TABS = [
-  "All",
-  "Web Development",
-  "AI & Machine Learning",
-  "Data Analytics",
-  "Cloud & DevOps",
-  "Cyber Security",
-];
+
 
 const YEAR_OPTIONS = [
   "1st Year",
@@ -65,6 +59,32 @@ export default function InternshipPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const [categories, setCategories] = useState([]);
+
+  const fetchCategories = async () => {
+    try {
+      const res = await GetRequest(`${ADMIN_GET_CATEGORIES}?scope=internship`);
+      if (Array.isArray(res)) {
+        setCategories(res);
+      }
+    } catch (err) {
+      console.error("Failed to load internship categories:", err);
+    }
+  };
+
+  const domainTabs = useMemo(() => {
+    const fromDb = categories
+      .map((c) => (c.categoryName || c.category)?.trim())
+      .filter((n) => n && n.toLowerCase() !== "int");
+
+    const fromInternships = internships
+      .map((i) => i.category?.trim())
+      .filter(Boolean);
+
+    const unique = Array.from(new Set([...fromDb, ...fromInternships]));
+    unique.sort((a, b) => a.localeCompare(b));
+    return ["All", ...unique];
+  }, [categories, internships]);
 
   // Modal State
   const [openModal, setOpenModal] = useState(false);
@@ -101,6 +121,7 @@ export default function InternshipPage() {
 
   useEffect(() => {
     fetchInternships();
+    fetchCategories();
   }, []);
 
   const handleOpenSyllabusModal = (course) => {
@@ -283,12 +304,17 @@ export default function InternshipPage() {
               alignItems: "center",
               gap: 0.8,
               overflowX: "auto",
-              width: { xs: "100%", md: "auto" },
-              pb: { xs: 0.5, md: 0 },
-              "&::-webkit-scrollbar": { display: "none" },
+              maxWidth: { xs: "100%", md: "calc(100% - 300px)" },
+              pb: { xs: 0.8, md: 0.5 },
+              pt: 0.2,
+              "&::-webkit-scrollbar": { height: "5px" },
+              "&::-webkit-scrollbar-thumb": {
+                bgcolor: "rgba(61, 184, 67, 0.25)",
+                borderRadius: "4px",
+              },
             }}
           >
-            {DOMAIN_TABS.map((tab) => (
+            {domainTabs.map((tab) => (
               <Button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
