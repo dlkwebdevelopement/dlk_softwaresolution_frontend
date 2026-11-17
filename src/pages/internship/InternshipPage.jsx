@@ -17,6 +17,7 @@ import {
   CircularProgress,
   alpha,
   InputAdornment,
+  Divider,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import SearchIcon from "@mui/icons-material/Search";
@@ -83,7 +84,7 @@ export default function InternshipPage() {
 
     const unique = Array.from(new Set([...fromDb, ...fromInternships]));
     unique.sort((a, b) => a.localeCompare(b));
-    return ["All", ...unique];
+    return unique.filter((t) => t.toLowerCase() !== "all");
   }, [categories, internships]);
 
   // Modal State
@@ -302,51 +303,111 @@ export default function InternshipPage() {
             sx={{
               display: "flex",
               alignItems: "center",
-              gap: 1,
-              overflowX: "auto",
+              gap: 1.2,
               flex: 1,
               minWidth: 0,
+              width: { xs: "100%", md: "auto" },
               maxWidth: { xs: "100%", md: "calc(100% - 300px)" },
-              pb: { xs: 0.8, md: 0.6 },
-              pt: 0.2,
-              scrollBehavior: "smooth",
-              "&::-webkit-scrollbar": { height: "6px" },
-              "&::-webkit-scrollbar-track": {
-                bgcolor: "rgba(0,0,0,0.03)",
-                borderRadius: "4px",
-              },
-              "&::-webkit-scrollbar-thumb": {
-                bgcolor: "rgba(61, 184, 67, 0.35)",
-                borderRadius: "4px",
-                "&:hover": { bgcolor: "rgba(61, 184, 67, 0.6)" },
-              },
             }}
           >
-            {domainTabs.map((tab) => (
-              <Button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                size="small"
-                sx={{
-                  flexShrink: 0,
-                  borderRadius: "20px",
-                  px: 2,
-                  py: 0.6,
-                  fontSize: "0.8rem",
-                  fontWeight: 600,
-                  whiteSpace: "nowrap",
-                  textTransform: "none",
-                  transition: "all 0.25s ease",
-                  bgcolor: activeTab === tab ? "#3DB843" : "rgba(61, 184, 67, 0.06)",
-                  color: activeTab === tab ? "#fff" : "#1a2b1b",
-                  "&:hover": {
-                    bgcolor: activeTab === tab ? "#2e9133" : "rgba(61, 184, 67, 0.12)",
-                  },
-                }}
-              >
-                {tab}
-              </Button>
-            ))}
+            {/* Static "All" button */}
+            <Button
+              onClick={() => setActiveTab("All")}
+              size="small"
+              sx={{
+                flexShrink: 0,
+                borderRadius: "20px",
+                px: 2.2,
+                py: 0.6,
+                fontSize: "0.8rem",
+                fontWeight: 600,
+                whiteSpace: "nowrap",
+                textTransform: "none",
+                transition: "all 0.25s ease",
+                bgcolor: activeTab === "All" ? "#3DB843" : "rgba(61, 184, 67, 0.06)",
+                color: activeTab === "All" ? "#fff" : "#1a2b1b",
+                boxShadow:
+                  activeTab === "All"
+                    ? "0 3px 10px rgba(61, 184, 67, 0.35)"
+                    : "none",
+                "&:hover": {
+                  bgcolor:
+                    activeTab === "All" ? "#2e9133" : "rgba(61, 184, 67, 0.12)",
+                },
+              }}
+            >
+              All
+            </Button>
+
+            {/* Subtle Divider */}
+            <Divider
+              orientation="vertical"
+              flexItem
+              sx={{
+                height: 22,
+                my: "auto",
+                borderColor: "rgba(61, 184, 67, 0.2)",
+              }}
+            />
+
+            {/* Scrollable Categories List */}
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                overflowX: "auto",
+                flex: 1,
+                minWidth: 0,
+                pb: { xs: 0.8, md: 0.6 },
+                pt: 0.2,
+                scrollBehavior: "smooth",
+                "&::-webkit-scrollbar": { height: "5px" },
+                "&::-webkit-scrollbar-track": {
+                  bgcolor: "rgba(0,0,0,0.03)",
+                  borderRadius: "4px",
+                },
+                "&::-webkit-scrollbar-thumb": {
+                  bgcolor: "rgba(61, 184, 67, 0.35)",
+                  borderRadius: "4px",
+                  "&:hover": { bgcolor: "rgba(61, 184, 67, 0.6)" },
+                },
+              }}
+            >
+              {domainTabs.map((tab) => (
+                <Button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  size="small"
+                  sx={{
+                    flexShrink: 0,
+                    borderRadius: "20px",
+                    px: 2,
+                    py: 0.6,
+                    fontSize: "0.8rem",
+                    fontWeight: 600,
+                    whiteSpace: "nowrap",
+                    textTransform: "none",
+                    transition: "all 0.25s ease",
+                    bgcolor:
+                      activeTab === tab ? "#3DB843" : "rgba(61, 184, 67, 0.06)",
+                    color: activeTab === tab ? "#fff" : "#1a2b1b",
+                    boxShadow:
+                      activeTab === tab
+                        ? "0 3px 10px rgba(61, 184, 67, 0.35)"
+                        : "none",
+                    "&:hover": {
+                      bgcolor:
+                        activeTab === tab
+                          ? "#2e9133"
+                          : "rgba(61, 184, 67, 0.12)",
+                    },
+                  }}
+                >
+                  {tab}
+                </Button>
+              ))}
+            </Box>
           </Box>
 
           {/* Search Box */}
