@@ -27,9 +27,6 @@ import { Link } from "react-router-dom";
 import { GetRequest } from "../../api/api";
 import { ADMIN_GET_CATEGORIES } from "../../api/endpoints";
 import { getImgUrl } from "../../api/api";
-import Navbar from "../../components/Navbar";
-import Footer from "../../components/Footer";
-import BottomInfo from "../../components/BottomInfo";
 
 const colors = {
   primary: "#3DB843",
@@ -87,12 +84,45 @@ const CategoryCourseList = () => {
         setLoading(true);
 
         const cats = await GetRequest(ADMIN_GET_CATEGORIES);
-        const currentCat = cats.find(c => c.id === id || c._id === id);
+        const currentCat = Array.isArray(cats)
+          ? cats.find((c) => c.id === id || c._id === id)
+          : null;
         setCategory(currentCat);
 
-        const res = await GetRequest(`/admin/course/category/${id}`);
-        setCourses(res?.data || []);
+        // If this category is an internship category, redirect directly to Internship Hub
+        if (currentCat?.scope === "internship") {
+          navigate(
+            `/internship?domain=${encodeURIComponent(currentCat.categoryName)}`,
+            { replace: true }
+          );
+          return;
+        }
 
+        const res = await GetRequest(`/admin/course/category/${id}`);
+        let fetchedCourses = res?.data || [];
+
+        // If no direct courses by category ID, check if internships exist for this category name
+        if (fetchedCourses.length === 0 && currentCat?.categoryName) {
+          const internRes = await GetRequest("/admin/internships");
+          const allInterns = internRes?.data || internRes || [];
+          const hasInterns =
+            Array.isArray(allInterns) &&
+            allInterns.some(
+              (i) =>
+                i.category &&
+                i.category.trim().toLowerCase() ===
+                  currentCat.categoryName.trim().toLowerCase()
+            );
+          if (hasInterns) {
+            navigate(
+              `/internship?domain=${encodeURIComponent(currentCat.categoryName)}`,
+              { replace: true }
+            );
+            return;
+          }
+        }
+
+        setCourses(fetchedCourses);
       } catch (err) {
         console.error("Failed to fetch category data", err);
       } finally {
@@ -101,7 +131,7 @@ const CategoryCourseList = () => {
     };
 
     fetchData();
-  }, [id]);
+  }, [id, navigate]);
 
   if (loading) {
     return (
@@ -109,7 +139,7 @@ const CategoryCourseList = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        minHeight: "100vh"
+        minHeight: "60vh"
       }}>
         <CircularProgress />
       </Box>
@@ -118,8 +148,6 @@ const CategoryCourseList = () => {
 
   return (
     <Box sx={{ bgcolor: colors.background }}>
-
-      <Navbar />
 
       {/* HEADER */}
       <HeaderSection>
@@ -168,9 +196,30 @@ const CategoryCourseList = () => {
       <Container maxWidth={false} sx={{ maxWidth: "1400px", py: 8 }}>
 
         {courses.length === 0 ? (
-
-          <Typography>No courses found</Typography>
-
+          <Box sx={{ textAlign: "center", py: 8 }}>
+            <Typography variant="h5" sx={{ fontWeight: 700, mb: 1, color: colors.textPrimary }}>
+              No courses found for this category
+            </Typography>
+            <Typography variant="body1" sx={{ color: colors.textSecondary, mb: 3 }}>
+              Explore our other industry-focused courses or browse all specialized internship tracks.
+            </Typography>
+            <Box sx={{ display: "flex", gap: 2, justifyContent: "center", flexWrap: "wrap" }}>
+              <Button
+                variant="contained"
+                onClick={() => navigate("/")}
+                sx={{ borderRadius: "30px", bgcolor: colors.primary, px: 3, textTransform: "none", fontWeight: 700 }}
+              >
+                Browse All Categories
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={() => navigate("/internship")}
+                sx={{ borderRadius: "30px", borderColor: colors.primary, color: colors.primary, px: 3, textTransform: "none", fontWeight: 700 }}
+              >
+                Explore Internship Hub
+              </Button>
+            </Box>
+          </Box>
         ) : (
 
           <Grid container spacing={3}>
@@ -332,10 +381,6 @@ const CategoryCourseList = () => {
         )}
 
       </Container>
-
-      <BottomInfo />
-      <Footer />
-
     </Box>
   );
 };

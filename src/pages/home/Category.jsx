@@ -183,15 +183,22 @@ const Category = () => {
                 <CategoryCard
                   key={`${cat._id}-${index}`}
                   $index={index}
+                  onClick={() => {
+                    if (cat.scope === "internship") {
+                      navigate(`/internship?domain=${encodeURIComponent(cat.categoryName)}`);
+                    } else {
+                      navigate(`/category/${cat._id}`);
+                    }
+                  }}
                   sx={{
                     width: 'calc(100vw / 6)',
                     maxWidth: '180px',
                     minWidth: '120px',
                     px: 1,
+                    cursor: 'pointer',
                   }}
                 >
                   <CategoryImage
-                    onClick={() => navigate(`/category/${cat._id}`)}
                     sx={{
                       width: { xs: "80px", sm: "110px", lg: "135px" },
                       height: { xs: "80px", sm: "110px", lg: "135px" },
@@ -221,7 +228,7 @@ const Category = () => {
                     sx={{
                       mt: "12px",
                       fontSize: { xs: "11px", sm: "13px", lg: "14px" },
-                      fontWeight: 500,
+                      fontWeight: 600,
                       color: "black",
                       lineHeight: 1.3,
                       textAlign: 'center',

@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   Box,
   Container,
@@ -56,6 +57,9 @@ const MODE_OPTIONS = [
 ];
 
 export default function InternshipPage() {
+  const [searchParams] = useSearchParams();
+  const domainParam = searchParams.get("domain") || searchParams.get("category");
+
   const [internships, setInternships] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("All");
@@ -124,6 +128,28 @@ export default function InternshipPage() {
     fetchInternships();
     fetchCategories();
   }, []);
+
+  useEffect(() => {
+    if (domainParam) {
+      if (domainTabs.length > 0) {
+        const matched = domainTabs.find(
+          (t) => t.toLowerCase() === domainParam.toLowerCase()
+        );
+        setActiveTab(matched || domainParam);
+      } else {
+        setActiveTab(domainParam);
+      }
+    }
+  }, [domainParam, domainTabs]);
+
+  useEffect(() => {
+    if (activeTab && activeTab !== "All") {
+      const el = document.getElementById(`tab-btn-${activeTab}`);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+      }
+    }
+  }, [activeTab]);
 
   const handleOpenSyllabusModal = (course) => {
     setSelectedCourse(course);
@@ -377,6 +403,7 @@ export default function InternshipPage() {
               {domainTabs.map((tab) => (
                 <Button
                   key={tab}
+                  id={`tab-btn-${tab}`}
                   onClick={() => setActiveTab(tab)}
                   size="small"
                   sx={{
