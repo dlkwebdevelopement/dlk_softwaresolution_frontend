@@ -714,17 +714,19 @@ export default function Gallery() {
           zIndex: 99999,
           overscrollBehavior: "contain",
           "& .MuiBackdrop-root": {
-            zIndex: 99998,
             backgroundColor: "rgba(0, 0, 0, 0.75)",
             backdropFilter: "blur(6px)",
           },
           "& .MuiDialog-container": {
-            zIndex: 99999,
+            position: "relative",
+            zIndex: 1,
             overscrollBehavior: "contain",
           },
         }}
         PaperProps={{
           sx: {
+            position: "relative",
+            zIndex: 2,
             borderRadius: isMobile ? 0 : 4,
             overflowY: isMobile ? "auto" : "hidden",
             overflowX: "hidden",
